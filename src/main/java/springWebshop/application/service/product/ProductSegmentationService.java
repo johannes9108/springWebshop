@@ -11,6 +11,8 @@ import springWebshop.application.model.dto.SegmentDTO;
 public interface ProductSegmentationService {
 	
 	List<SegmentDTO> getAllCategories();
+	List<SegmentDTO> getAllSubCategories();
+	List<SegmentDTO> getAllTypes();
 	List<SegmentDTO> getSubCategoriesByCategoryId(long categoryId);
 	List<SegmentDTO> getTypesBySubCategoryId(long subCategoryId);
 	

@@ -124,4 +124,16 @@ public class ProductSegmentationServiceMockImpl implements ProductSegmentationSe
 		return categoryStore;
 	}
 
+	@Override
+	public List<SegmentDTO> getAllSubCategories() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<SegmentDTO> getAllTypes() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

@@ -13,22 +13,33 @@ import springWebshop.application.model.domain.ProductType;
 import springWebshop.application.model.dto.SegmentDTO;
 
 @Service("ProductSegmentationServiceImpl")
-public class ProductSegmentationServiceImpl implements ProductSegmentationService {
+public class SegmentationServiceImpl implements ProductSegmentationService {
 	
 	@Autowired
-	SegmentationDTORepositoryImpl productCategoryDTORepository;
+	SegmentationDTORepositoryImpl segmentationDTORepository;
 
 	@Override
 	public List<SegmentDTO> getAllCategories() {
-		return productCategoryDTORepository.getAllCategoryDTO();
+		return segmentationDTORepository.getAllCategoryDTO();
 //		return productCategoryRepository.findAll().stream()
 //				.map(productCategory -> new SegmentDTO(productCategory.getId(), productCategory.getName()))
 //				.collect(Collectors.toList());
 	}
+	
+	@Override
+	public List<SegmentDTO> getAllSubCategories() {
+		return segmentationDTORepository.getAllSubCategoryDTO();
+	}
+
+	@Override
+	public List<SegmentDTO> getAllTypes() {
+		// TODO Auto-generated method stub
+		return segmentationDTORepository.getAllTypeDTO();
+	}
 
 	@Override
 	public List<SegmentDTO> getSubCategoriesByCategoryId(long categoryId) {
-		return productCategoryDTORepository.getAllSubCategoryDTO(categoryId);
+		return segmentationDTORepository.getAllSubCategoryDTO(categoryId);
 //		return productSubCategoryRepository.findAll().stream()
 //				.filter(subCategory -> subCategory.getProductCategory().getId() == categoryId)
 //				.map(productSubcategory -> new SegmentDTO(productSubcategory.getId(),
@@ -38,7 +49,7 @@ public class ProductSegmentationServiceImpl implements ProductSegmentationServic
 
 	@Override
 	public List<SegmentDTO> getTypesBySubCategoryId(long subCategoryId) {
-		return productCategoryDTORepository.getAllTypeDTO(subCategoryId);
+		return segmentationDTORepository.getAllTypeDTO(subCategoryId);
 //		return productTypeRepository.findAll().stream()
 //				.filter(type -> type.getProductSubCategory().getId() == subCategoryId)
 //				.map(productType -> new SegmentDTO(productType.getId(), productType.getName()))
@@ -94,5 +105,7 @@ public class ProductSegmentationServiceImpl implements ProductSegmentationServic
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
+	
 
 }

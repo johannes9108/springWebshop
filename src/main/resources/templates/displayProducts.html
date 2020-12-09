@@ -8,7 +8,7 @@
     <link rel="stylesheet" th:href="@{/css/base.css}">
 
     <script type="text/javascript" th:src="@{/js/categoriesScript.js}"></script>
-    <script src="http://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script th:src="@{/js/jquery-3.5.1.min.js}"></script>
 
     <script th:inline="javascript">
         function selectedCategory() {
@@ -57,7 +57,7 @@
     <!-- <p th:text="|CP:${currentPage},TP:${totalPages}|"></p>
     <button type="button" th:onclick="showAlert()">Show Alert</button> -->
 
-    <div th:replace="fragments/header.html :: header(title=Browsing...)"></div>
+    <div th:replace="fragments/header.html :: header(title=Browsing...,links=${linkMap})"></div>
 
     <main>
         <!-- <p th:text="${sessionModel.categoryModel}"></p> -->

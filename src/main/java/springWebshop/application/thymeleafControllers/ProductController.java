@@ -1,5 +1,6 @@
 package springWebshop.application.thymeleafControllers;
 
+import java.util.LinkedHashMap;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,16 @@ public class ProductController {
 	@Autowired
 	CustomerRepository customerRepository;
 
+	private LinkedHashMap<String, String> getLinks() {
+		LinkedHashMap<String, String> linkMap = new LinkedHashMap<>();
+		linkMap.put("Products","/webshop/products");
+		linkMap.put("Shopping Cart","/webshop/shoppingcart");
+		return linkMap;
+		
+	}
+	
+	
+	
 	@ModelAttribute("sessionModel")
 	private SessionModel getSessionModel() {
 		return new SessionModel(productService,productSegmentationService, customerRepository);
@@ -90,6 +101,7 @@ public class ProductController {
 			@PathVariable(name = "subcategory",required = false) Optional<String> subcategory,
 			@PathVariable(name = "type",required = false) Optional<String> type,
 			@RequestParam(required = false, name = "page",defaultValue = "1") Optional<Integer> pathPage, Model m) {
+		m.addAttribute("linkMap", getLinks());
 		System.out.println("GET");
 //		resetCategories(session.getCategoryModel());
 //		selectFilteredProducts(category,subcategory,type);
@@ -137,6 +149,7 @@ public class ProductController {
 			@RequestParam("id") Optional<Integer> productId,@ModelAttribute("sessionModel") SessionModel session,
 			@RequestParam(required = false, name = "page") Optional<Integer> pathPage, Model m) {
 //		System.out.println("POST from products");
+		m.addAttribute("linkMap", getLinks());
 		ProductSearchConfig config = new ProductSearchConfig();
 		handleFiltering(session.getCategoryModel(),config);
 		System.out.println("POST");
@@ -180,6 +193,7 @@ public class ProductController {
 	public String getProduct(Model m,@PathVariable("id") long productId,
 			@ModelAttribute("sessionModel") SessionModel session) {
 		System.out.println("GetProduct");
+		m.addAttribute("linkMap", getLinks());
 		ServiceResponse<Product> response = productService.getProductById(productId);
 		m.addAttribute("currentProduct", response.getResponseObjects().get(0));
 //		m.addAttribute("quantity", session.getCart().getProductMap())
@@ -193,6 +207,7 @@ public class ProductController {
 		System.out.println("POST");
 		m.addAttribute("currentProduct", product);
 		System.out.println(session.getCart());
+		m.addAttribute("linkMap", getLinks());
 		return "displayProduct";
 	}
 	@PostMapping(value = "/products/product/{id}",params = "cartAction=Remove")
@@ -202,6 +217,7 @@ public class ProductController {
 		System.out.println("POST");
 		m.addAttribute("currentProduct", product);
 		System.out.println(session.getCart());
+		m.addAttribute("linkMap", getLinks());
 		return "displayProduct";
 	}
 	
@@ -210,6 +226,7 @@ public class ProductController {
 	@GetMapping("shoppingcart")
 	public String getShoppingCart(@ModelAttribute SessionModel sesionModel, Model m) {
 		System.out.println(sesionModel);
+		m.addAttribute("linkMap", getLinks());
 		return "displayShoppingCart";
 	}
 	@PostMapping("shoppingcart")
@@ -225,7 +242,7 @@ public class ProductController {
 				sesionModel.getCart().removeItem((productId.get()));
 		}
 		
-		
+		m.addAttribute("linkMap", getLinks());
 		return "displayShoppingCart";
 	}
 	

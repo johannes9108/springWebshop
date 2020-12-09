@@ -12,7 +12,7 @@
 
 <body th:with="test=('/webshop/product'),abc=${currentProduct}">
     <!-- <p th:text="$"></p> -->
-    <div th:replace="fragments/header.html :: header(title=${abc.name})"></div>
+    <div th:replace="fragments/header.html :: header(title=${abc.name},links=${linkMap})"></div>
 
     <main th:object="${currentProduct}">
         <section class="itemFields">

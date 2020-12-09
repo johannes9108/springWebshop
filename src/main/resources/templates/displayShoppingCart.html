@@ -10,7 +10,7 @@
 </head>
 
 <body th:with="cart=${session.sessionModel.cart}">
-    <div th:replace="fragments/header.html :: header(title='Shopping Cart')"></div>
+    <div th:replace="fragments/header.html :: header(title='Shopping Cart',links=${linkMap})"></div>
 
     <main th:object="${cart}">
         <article class="wrapper">

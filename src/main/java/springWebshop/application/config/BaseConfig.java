@@ -312,7 +312,7 @@ public class BaseConfig {
 //        ProductType prodType = new ProductType("Gungstol", subCat2);
 
 
-        for (int i = 0; i < 40; i++) {
+        for (int i = 0; i < 100; i++) {
         	long rand = new Random().nextInt(noType)+1;
             Product product1 = new Product();
             product1.setName("Product " + (i+1));

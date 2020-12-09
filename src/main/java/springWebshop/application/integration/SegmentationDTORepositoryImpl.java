@@ -57,7 +57,6 @@ public class SegmentationDTORepositoryImpl implements SegmentationDTORepository{
 			query.where(builder.equal(category.get("id"),categoryId))
 			.multiselect(subCategory.get("id"),subCategory.get("name"));
 			TypedQuery<SegmentDTO> typedQuery = em.createQuery(query);
-			System.out.println("TQ SUB:" + typedQuery.getResultList());
 			return typedQuery.getResultList();
 					
 		}
@@ -79,10 +78,39 @@ public class SegmentationDTORepositoryImpl implements SegmentationDTORepository{
 			query
 			.multiselect(type.get("id"),type.get("name"));
 			TypedQuery<SegmentDTO> typedQuery = em.createQuery(query);
-			System.out.println("TQ Type:" + typedQuery.getResultList());
 			return typedQuery.getResultList();
 					
 					
+		}
+		catch(NoResultException e) {
+			System.out.println(e);
+			return new ArrayList<>();
+		}
+	}
+
+	public List<SegmentDTO> getAllSubCategoryDTO() {
+		try {
+			CriteriaBuilder builder = em.getCriteriaBuilder();
+			CriteriaQuery<SegmentDTO> query = builder.createQuery(SegmentDTO.class);
+			Root<ProductSubCategory> category = query.from(ProductSubCategory.class);
+			query.multiselect(category.get("id"),category.get("name"));
+			TypedQuery<SegmentDTO> typedQuery = em.createQuery(query);
+			return typedQuery.getResultList();
+		}
+		catch(NoResultException e) {
+			System.out.println(e);
+			return new ArrayList<>();
+		}
+	}
+
+	public List<SegmentDTO> getAllTypeDTO() {
+		try {
+			CriteriaBuilder builder = em.getCriteriaBuilder();
+			CriteriaQuery<SegmentDTO> query = builder.createQuery(SegmentDTO.class);
+			Root<ProductType> category = query.from(ProductType.class);
+			query.multiselect(category.get("id"),category.get("name"));
+			TypedQuery<SegmentDTO> typedQuery = em.createQuery(query);
+			return typedQuery.getResultList();
 		}
 		catch(NoResultException e) {
 			System.out.println(e);

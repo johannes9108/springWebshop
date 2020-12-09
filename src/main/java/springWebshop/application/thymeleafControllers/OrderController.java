@@ -1,5 +1,7 @@
 package springWebshop.application.thymeleafControllers;
 
+import java.util.LinkedHashMap;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,9 +23,19 @@ public class OrderController {
 
 	@Autowired
 	OrderService orderService;
+	
+	private LinkedHashMap<String, String> getLinks() {
+		LinkedHashMap<String, String> linkMap = new LinkedHashMap<>();
+		linkMap.put("Products","/webshop/products");
+		linkMap.put("Shopping Cart","/webshop/shoppingcart");
+		return linkMap;
+		
+	}
+	
 
 	@GetMapping("checkout")
 	public String getCheckout(@ModelAttribute SessionModel sessionModel, Model m) {
+		m.addAttribute("linkMap", getLinks());
 		if(sessionModel==null)
 			return "redirect:/webshop/products";
 
@@ -32,6 +44,7 @@ public class OrderController {
 	
 	@PostMapping("checkout")
 	public String postCheckout(@ModelAttribute SessionModel sessionModel, Model m) {
+		m.addAttribute("linkMap", getLinks());
 		//TODO Validation, navigation
 		
 		System.out.println(sessionModel.getCart().getTotalItems());
