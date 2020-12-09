@@ -42,7 +42,7 @@ public class Company{
 //	@ElementCollection(fetch = FetchType.EAGER)
 //	private List<Address> addresses = new ArrayList<>();
 	
-	@OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+	@OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE})
 	@JoinColumn(name = "companyId")
 	private List<Customer> customers = new ArrayList<>();
 

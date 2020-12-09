@@ -142,6 +142,11 @@ public class ProductController {
 //		m.addAttribute("quantity", session.getCart().getProductMap())
 		return "displayProduct";
 	}
+
+	@GetMapping("/currentuser")
+	public String getLoggeinUser() {
+		return "loggedInUser";
+	}
 	
 	@PostMapping(value = "/products/product/{id}")
 	public String postChangeSpecificItemQuantity(Product product, 

@@ -13,16 +13,16 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+//@AllArgsConstructor
 @Entity(name ="Admins")
 public class Admin extends Account {
 
-	@ElementCollection
-	private List<AdminRole> roles;
+//	@ElementCollection
+//	private List<ERole> roles;
 
 	@Override
 	public String toString() {
-		return "Admin [roles=" + roles + ", toString()=" + super.toString() + "]";
+		return "Admin [toString()=" + super.toString() + "]";
 	}
 	
 	
