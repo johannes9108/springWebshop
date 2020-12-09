@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html xmlns:th="http:://www.thymeleaf.org">
+<html lang="en"
+      xmlns:th="https://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<!--<html xmlns:th="https://www.thymeleaf.org">-->
 
 <head>
     <meta charset="ISO-8859-1">
@@ -110,6 +113,7 @@
 
 
             <div class="userDetails">
+<<<<<<< Upstream, based on ExpeditingFromUI
                 <div class="userDataRow">
                     <span>First Name</span>
                     <input type="text" th:field="*{firstName}" />
@@ -165,6 +169,14 @@
 
                 </div>
 
+=======
+                <span sec:authentication="principal.firstName"></span>
+                <span sec:authentication="principal.lastName"></span>
+                <span>Name</span>
+                <span>Name</span>
+                <span>Name</span>
+                <span>Name</span>
+>>>>>>> 9aa97f5 :fix: added current user first and last name to checkout view
             </div>
             <div class="actions">
                 <!-- <a th:href="@{/webshop/checkout(action=updateUserDetail)}">Update user details</a> -->
