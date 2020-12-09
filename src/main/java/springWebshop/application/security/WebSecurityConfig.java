@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import springWebshop.application.model.domain.user.ERole;
 
 @Configuration
 @EnableWebSecurity
@@ -21,6 +22,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/webshop/products/**",
                         "/login",
                         "/webshop/shoppingcart/**").permitAll()
+                .antMatchers("/webshop/admin/**").hasAuthority(ERole.ADMIN.name())
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
