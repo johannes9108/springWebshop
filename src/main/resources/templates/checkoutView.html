@@ -11,7 +11,7 @@
         .container {
             box-sizing: border-box;
             background-color: antiquewhite;
-            grid-template-columns: auto auto;
+            grid-template-columns: 50% 50%;
             grid-template-rows: 100%;
             overflow: auto;
         }
@@ -19,20 +19,44 @@
 
 
         .customerInfo {
+            box-sizing: border-box;
             display: grid;
-            grid-template-rows: 10fr 1fr;
+            grid-template-rows: 40% 50% 10%;
             background-color: aliceblue;
         }
 
 
         .userDetails {
 
+            box-sizing: border-box;
             padding: 2rem;
             flex: 2;
             display: grid;
             grid-template-columns: auto auto;
-            grid-auto-rows: 10vh;
+            grid-auto-rows: 5vh;
+            gap: 0.5rem;
             background-color: blanchedalmond;
+        }
+
+        .addressContainer {
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem;
+            overflow: auto;
+            /* background-color: red; */
+        }
+
+        .address {
+            margin-bottom: 2rem;
+            display: grid;
+            grid-auto-rows: 5vh;
+            gap: 0.5rem;
+        }
+
+        .userDataRow {
+            display: flex;
+            flex-direction: column;
         }
 
         .actions {
@@ -45,7 +69,7 @@
     </style>
 </head>
 
-<body th:with="cart=${session.sessionModel.cart}">
+<body th:with="cart=${session.sessionModel.cart},user=${session.sessionModel.user}">
     <div th:replace="fragments/header.html :: header(title='Checkout')"></div>
     <main class="container">
         <section class="wrapper" th:object="${cart}">
@@ -80,20 +104,71 @@
         </section>
 
 
-        <section class="customerInfo">
+        <form th:object="${sessionModel.user}" class="customerInfo" method="POST" th:action="@{/webshop/checkout}">
+
+
             <div class="userDetails">
-                <span>Name</span>
-                <span>Name</span>
-                <span>Name</span>
-                <span>Name</span>
-                <span>Name</span>
-                <span>Name</span>
+                <div class="userDataRow">
+                    <span>First Name</span>
+                    <input type="text" th:field="*{firstName}" />
+                </div>
+                <div class="userDataRow">
+                    <span>Last Name</span>
+                    <input type="text" th:field="*{lastName}" />
+
+                </div>
+                <div class="userDataRow">
+                    <span>Email</span>
+                    <input type="text" th:field="*{email}" />
+
+                </div>
+                <div class="userDataRow">
+                    <span>Phonenumber</span>
+                    <input type="number" th:field="*{phoneNumber}" />
+
+                </div>
+                <div class="userDataRow">
+                    <span>Mobile</span>
+                    <input type="text" th:field="*{mobileNumber}" />
+
+                </div>
+            </div>
+            <div class="addressContainer">
+                <div th:each="address,meta: *{addresses}" class="address" th:object="${address}">
+                    <div class="userDataRow">
+                        <address>Street</address>
+                        <input type="text" th:value="*{street}" placeholder="*{street}" />
+
+                    </div>
+                    <div class="userDataRow">
+                        <span>Zipcode</span>
+                        <input type="number" th:value="*{zipCode}" />
+
+                    </div>
+                    <div class="userDataRow">
+                        <address>City</address>
+                        <input type="text" th:value="*{city}" />
+
+                    </div>
+                    <div class="userDataRow">
+                        <address>Country</address>
+                        <input type="text " th:value="*{country}" />
+
+                    </div>
+                    <div class="userDataRow">
+                        <span>AddressType</span>
+                        <input type="text" th:value="*{addressType}" />
+
+                    </div>
+
+                </div>
+
             </div>
             <div class="actions">
-                <span>Update user details</span>
-                <span>Place Order</span>
+                <!-- <a th:href="@{/webshop/checkout(action=updateUserDetail)}">Update user details</a> -->
+                <input type="submit" value="Place order"></a>
             </div>
-        </section>
+        </form>
     </main>
     <footer>
         Footer Here

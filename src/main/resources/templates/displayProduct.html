@@ -4,117 +4,64 @@
 <head>
     <meta charset="ISO-8859-1">
     <title>Single Product</title>
+    <link rel="stylesheet" th:href="@{/css/base.css}">
     <style>
-        .container {
-            display: grid;
-            grid-template-rows: 5vh 80vh 10vh;
-            margin: auto;
-            width: 80vw;
-        }
 
-        header {
-            border-bottom: 1px solid darkcyan;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        footer {
-            border-top: 1px solid darkcyan;
-        }
-
-        main {
-            background-color: antiquewhite;
-            display: grid;
-            grid-template-rows: 10fr 1fr;
-        }
-
-        .itemFields {
-            background-color: aquamarine;
-        }
-
-        .actionButtons {
-            display: flex;
-            justify-content: space-around;
-            background-color: maroon;
-        }
-
-
-
-        input[type='submit'] {
-            border: none;
-
-        }
-
-
-
-        a:link,
-        a:visited {
-            color: black;
-            text-decoration: none;
-        }
-
-        a:hover {
-            color: royalblue;
-        }
     </style>
 </head>
 
 <body th:with="test=('/webshop/product'),abc=${currentProduct}">
     <!-- <p th:text="$"></p> -->
-    <article th:object="${currentProduct}" class="container">
-        <div th:replace="fragments/header.html :: header(title=${abc.name})"></div>
+    <div th:replace="fragments/header.html :: header(title=${abc.name})"></div>
 
-        <main>
-            <section class="itemFields">
-                <div class="itemField">
-                    <span>Price</span>
-                    <span th:text="*{basePrice}">Empty</span>
-                </div>
-                <div class="itemField">
-                    <span>Description</span>
-                    <textarea th:text="*{description}">Empty</textarea>
-                </div>
+    <main th:object="${currentProduct}">
+        <section class="itemFields">
+            <div class="itemField">
+                <span>Price</span>
+                <span th:text="*{basePrice}">Empty</span>
+            </div>
+            <div class="itemField">
+                <span>Description</span>
+                <textarea th:text="*{description}">Empty</textarea>
+            </div>
 
-            </section>
-
-
-            <section class="shoppingCartActions">
-
-                <div class="actionButtons">
-
-                    <form th:action="@{/webshop/products/product/__${currentProduct.id}__(cartAction=Add)}"
-                        method="POST">
-                        <input type="hidden" th:field="*{name}" />
-                        <input type="hidden" th:field="*{id}" />
-                        <input type="hidden" th:field="*{basePrice}" />
-                        <input type="hidden" th:field="*{description}" />
-                        <input type="hidden" th:field="*{fullImageUrl}" />
-                        <input type="hidden" th:field="*{thumbnailUrl}" />
-                        <input type="submit" value="Add to cart" />
-                    </form>
-                    <form th:action="@{/webshop/products/product/__*{id}__(cartAction=Remove)}" method="POST">
-                        <input type="hidden" th:field="*{name}" />
-                        <input type="hidden" th:field="*{id}" />
-                        <input type="hidden" th:field="*{basePrice}" />
-                        <input type="hidden" th:field="*{description}" />
-                        <input type="hidden" th:field="*{fullImageUrl}" />
-                        <input type="hidden" th:field="*{thumbnailUrl}" />
-                        <input type="submit" value="Delete from cart" />
-                    </form>
-                </div>
-            </section>
-        </main>
+        </section>
 
 
-        <!-- <p th:if="${test}" th:text="${test}">sadasd</p>
+        <section class="shoppingCartActions">
+
+            <div class="actionButtons">
+
+                <form th:action="@{/webshop/products/product/__${currentProduct.id}__(cartAction=Add)}" method="POST">
+                    <input type="hidden" th:field="*{name}" />
+                    <input type="hidden" th:field="*{id}" />
+                    <input type="hidden" th:field="*{basePrice}" />
+                    <input type="hidden" th:field="*{description}" />
+                    <input type="hidden" th:field="*{fullImageUrl}" />
+                    <input type="hidden" th:field="*{thumbnailUrl}" />
+                    <input type="submit" value="Add to cart" />
+                </form>
+                <form th:action="@{/webshop/products/product/__*{id}__(cartAction=Remove)}" method="POST">
+                    <input type="hidden" th:field="*{name}" />
+                    <input type="hidden" th:field="*{id}" />
+                    <input type="hidden" th:field="*{basePrice}" />
+                    <input type="hidden" th:field="*{description}" />
+                    <input type="hidden" th:field="*{fullImageUrl}" />
+                    <input type="hidden" th:field="*{thumbnailUrl}" />
+                    <input type="submit" value="Delete from cart" />
+                </form>
+            </div>
+        </section>
+    </main>
+
+
+    <!-- <p th:if="${test}" th:text="${test}">sadasd</p>
             <p th:unless="${test}">Empty</p> -->
-        <footer>
-            <a th:href="@{/webshop/products(page=${session.sessionModel.productPage})}">Back</a>
+    <footer>
+        <a th:href="@{/webshop/products(page=${session.sessionModel.productPage})}">Back</a>
 
 
-        </footer>
-    </article>
+    </footer>
 </body>
 
 </html>

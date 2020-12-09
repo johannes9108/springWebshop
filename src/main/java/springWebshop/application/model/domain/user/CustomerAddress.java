@@ -23,7 +23,6 @@ public class CustomerAddress implements Address, Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     long id;
     @ManyToOne
-    @NotNull
     private Customer customer;
     @NotBlank
     private String street;

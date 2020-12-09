@@ -92,6 +92,10 @@ public class ShoppingCartDTO {
         }
     }
 
+	public void dispose() {
+		productMap.clear();
+	}
+
 //    @Override
 //    public String toString() {
 ////		System.out.println(productMap);

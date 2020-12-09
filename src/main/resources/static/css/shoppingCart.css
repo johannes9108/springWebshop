@@ -1,7 +1,7 @@
 @charset "ISO-8859-1";
 .wrapper {
   display: grid;
-  grid-template-rows: 10fr 1fr;
+  grid-template-rows: 90% 10%;
   height: 100%;
   background-color: red;
 }
@@ -22,7 +22,8 @@
   background-color: azure;
   border-bottom: 1px solid black;
 }
-
+.itemInfo {
+}
 .itemEdit {
   display: flex;
 }

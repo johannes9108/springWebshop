@@ -14,12 +14,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import lombok.CustomLog;
+import springWebshop.application.integration.CustomerRepository;
 import springWebshop.application.model.domain.Product;
-import springWebshop.application.model.domain.ProductType;
 import springWebshop.application.model.dto.CategoryModelObject;
-import springWebshop.application.model.dto.ProductFormModel;
 import springWebshop.application.model.dto.SessionModel;
 import springWebshop.application.service.ServiceResponse;
 import springWebshop.application.service.product.ProductCategoryService;
@@ -48,10 +47,12 @@ public class ProductController {
 	@Autowired
 	ProductTypeService productTypeService;
 
+	@Autowired
+	CustomerRepository customerRepository;
 
 	@ModelAttribute("sessionModel")
 	private SessionModel getSessionModel() {
-		return new SessionModel(productService,productSegmentationService);
+		return new SessionModel(productService,productSegmentationService, customerRepository);
 	}
 
 	
@@ -228,13 +229,6 @@ public class ProductController {
 		return "displayShoppingCart";
 	}
 	
-	@GetMapping("checkout")
-	public String getCheckout(@ModelAttribute SessionModel sessionModel,Model m) {
-		
-		
-		
-		return "checkoutView";
-	}
 
 	
 

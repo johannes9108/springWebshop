@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Congratulations to your order!</title>
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <style>
+        main {
+            display: grid;
+            grid-template-columns: auto;
+            grid-template-rows: 10fr 1fr;
+        }
+
+        .actionLinks {
+            display: flex;
+            justify-content: space-around;
+        }
+    </style>
+</head>
+
+<body th:with="completedOrder=${completedOrder}">
+    <div th:replace="fragments/header.html :: header(title=Order)"></div>
+    <main>
+        <section class="orderInfo">
+            <p th:text="${completedOrder}"></p>
+        </section>
+        <section class="action">
+            <div class="actionLinks">
+                <a th:href="@{/webshop/products}">Back go Browsing</a>
+                <a th:href="@{/webshop/products}">Go to My Account</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+
+    </footer>
+</body>
+
+</html>

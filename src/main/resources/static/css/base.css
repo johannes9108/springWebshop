@@ -10,6 +10,7 @@ header {
   height: 11%;
 }
 main {
+  background-image: linear-gradient(white, beige);
   height: 80%;
 }
 footer {
@@ -35,8 +36,13 @@ header {
   justify-content: space-between;
 }
 footer {
+  display: flex;
   box-sizing: border-box;
-  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+}
+footer > a {
+  margin: 0 1rem;
 }
 
 .navigationLinks {
