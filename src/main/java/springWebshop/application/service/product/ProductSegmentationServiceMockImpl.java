@@ -14,6 +14,8 @@ import springWebshop.application.model.domain.segmentation.ProductCategory;
 import springWebshop.application.model.domain.segmentation.ProductSubCategory;
 import springWebshop.application.model.domain.segmentation.ProductType;
 import springWebshop.application.model.dto.SegmentDTO;
+import springWebshop.application.model.dto.SegmentationModelObject;
+import springWebshop.application.service.ServiceResponse;
 
 @Service("ProductSegmentationServiceMockImpl")
 public class ProductSegmentationServiceMockImpl implements SegmentationService {
@@ -69,31 +71,31 @@ public class ProductSegmentationServiceMockImpl implements SegmentationService {
 		
 	}
 
-	@Override
-	public List<SegmentDTO> getAllCategories() {
-		System.out.println("inne  i get all categories");
-		return categoryStore.stream()
-				.map(productCategory -> new SegmentDTO(productCategory.getId(), productCategory.getName()))
-				.collect(Collectors.toList());
-
-	}
-
-	@Override
-	public List<SegmentDTO> getSubCategoriesByCategoryId(long categoryId) {
-		return subStore.stream()
-				.filter(subCategory -> subCategory.getProductCategory().getId() == categoryId)
-				.map(productSubcategory -> new SegmentDTO(productSubcategory.getId(),
-						productSubcategory.getName()))
-				.collect(Collectors.toList());
-	}
-
-	@Override
-	public List<SegmentDTO> getTypesBySubCategoryId(long subCategoryId) {
-		return typeStore.stream()
-				.filter(type -> type.getProductSubCategory().getId() == subCategoryId)
-				.map(productType -> new SegmentDTO(productType.getId(), productType.getName()))
-				.collect(Collectors.toList());
-	}
+//	@Override
+//	public List<SegmentDTO> getAllCategories() {
+//		System.out.println("inne  i get all categories");
+//		return categoryStore.stream()
+//				.map(productCategory -> new SegmentDTO(productCategory.getId(), productCategory.getName()))
+//				.collect(Collectors.toList());
+//
+//	}
+//
+//	@Override
+//	public List<SegmentDTO> getSubCategoriesByCategoryId(long categoryId) {
+//		return subStore.stream()
+//				.filter(subCategory -> subCategory.getProductCategory().getId() == categoryId)
+//				.map(productSubcategory -> new SegmentDTO(productSubcategory.getId(),
+//						productSubcategory.getName()))
+//				.collect(Collectors.toList());
+//	}
+//
+//	@Override
+//	public List<SegmentDTO> getTypesBySubCategoryId(long subCategoryId) {
+//		return typeStore.stream()
+//				.filter(type -> type.getProductSubCategory().getId() == subCategoryId)
+//				.map(productType -> new SegmentDTO(productType.getId(), productType.getName()))
+//				.collect(Collectors.toList());
+//	}
 
 	@Override
 	public int getNoCategories() {
@@ -126,33 +128,58 @@ public class ProductSegmentationServiceMockImpl implements SegmentationService {
 	}
 
 	@Override
-	public List<SegmentDTO> getAllSubCategories() {
+	public ServiceResponse<SegmentDTO> getAllCategories() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<SegmentDTO> getAllTypes() {
+	public ServiceResponse<SegmentDTO> getAllSubCategories() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Optional<ProductCategory> getProductCategoryById(long id) {
+	public ServiceResponse<SegmentDTO> getAllTypes() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Optional<ProductSubCategory> getProductSubCategoryById(long id) {
+	public ServiceResponse<ProductCategory> getProductCategoryById(long id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Optional<ProductType> getProductTypeById(long id) {
+	public ServiceResponse<ProductSubCategory> getProductSubCategoryById(long id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public ServiceResponse<ProductType> getProductTypeById(long id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ServiceResponse<SegmentDTO> getSubCategoriesByCategoryId(long categoryId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ServiceResponse<SegmentDTO> getTypesBySubCategoryId(long subCategoryId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ServiceResponse<Object> handleFiltering(SegmentationModelObject categoryModel, ProductSearchConfig config) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 }

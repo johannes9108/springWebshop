@@ -13,7 +13,7 @@ import springWebshop.application.model.domain.segmentation.ProductCategory;
 
 @Getter
 @Setter
-public class CategoryModelObject {
+public class SegmentationModelObject {
 	
 	
 
@@ -33,7 +33,7 @@ public class CategoryModelObject {
 	private List<SegmentDTO> subCategories;
 	private List<SegmentDTO> types;
 	
-	public CategoryModelObject() {
+	public SegmentationModelObject() {
 		categories = new  ArrayList<>();
 		subCategories = new  ArrayList<>();
 		types = new  ArrayList<>();

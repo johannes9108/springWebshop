@@ -31,7 +31,7 @@ public class SessionModel {
 	private Customer user;
 	private ShoppingCartDTO cart;
 	private int productPage;
-	private CategoryModelObject categoryModel;
+	private SegmentationModelObject categoryModel;
 	
 	public SessionModel(ProductService productService, SegmentationService productSegmentationService, CustomerRepository custRepo) {
 		// Start session as guest
@@ -45,8 +45,8 @@ public class SessionModel {
 		user = new Customer("Johannes", "Hedman", "Password", "Email@email.com", "12341234", "123412123",addresses);
 		custRepo.save(user);
 		productPage = 1;
-		categoryModel = new CategoryModelObject();
-		categoryModel.setCategories(productSegmentationService.getAllCategories());
+		categoryModel = new SegmentationModelObject();
+		categoryModel.setCategories(productSegmentationService.getAllCategories().getResponseObjects());
 	}
 
 

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import lombok.CustomLog;
 import springWebshop.application.integration.account.CustomerRepository;
 import springWebshop.application.model.domain.Product;
-import springWebshop.application.model.dto.CategoryModelObject;
+import springWebshop.application.model.dto.SegmentationModelObject;
 import springWebshop.application.model.dto.SessionModel;
 import springWebshop.application.service.ServiceResponse;
 import springWebshop.application.service.product.ProductCategoryService;
@@ -42,7 +42,7 @@ public class ProductController {
 	ProductCategoryService productCategoryService;
 	
 	@Autowired
-	@Qualifier("ProductSegmentationServiceImpl")
+	@Qualifier("SegmentationServiceImpl")
 	SegmentationService productSegmentationService;
 
 	@Autowired
@@ -104,7 +104,7 @@ public class ProductController {
 //		selectFilteredProducts(category,subcategory,type);
 		int currentPage = pathPage.isPresent() ? pathPage.get() : session.getProductPage();
 		ProductSearchConfig config = new ProductSearchConfig();
-		handleFiltering(session.getCategoryModel(),config);
+		productSegmentationService.handleFiltering(session.getCategoryModel(),config);
 		
 		ServiceResponse<Product> response = productService.getProducts(config,currentPage > 0 ? currentPage - 1 : 0, 10);
 		System.out.println(response);
@@ -126,7 +126,7 @@ public class ProductController {
 
 
 
-	private void resetCategories(CategoryModelObject categoryModelObject) {
+	private void resetCategories(SegmentationModelObject categoryModelObject) {
 		categoryModelObject.setSelectedCat(0);
 		categoryModelObject.setSelectedSub(0);
 		categoryModelObject.setSelectedType(0);
@@ -148,7 +148,7 @@ public class ProductController {
 //		System.out.println("POST from products");
 		m.addAttribute("linkMap", getLinks());
 		ProductSearchConfig config = new ProductSearchConfig();
-		handleFiltering(session.getCategoryModel(),config);
+		productSegmentationService.handleFiltering(session.getCategoryModel(),config);
 		System.out.println("POST");
 
 		System.out.println("Reset:" + reset);
@@ -170,25 +170,6 @@ public class ProductController {
 		return "displayProducts";
 	}
 	
-	private void handleFiltering(CategoryModelObject categoryDTO, ProductSearchConfig config) {
-		if(categoryDTO.getSelectedCat()>0) {
-			categoryDTO.setSubCategories(productSegmentationService.getSubCategoriesByCategoryId(categoryDTO.getSelectedCat()));
-			if(categoryDTO.getSelectedSub()>0) {
-				categoryDTO.setTypes(productSegmentationService.getTypesBySubCategoryId(categoryDTO.getSelectedSub()));
-//				System.out.println(categoryDTO);
-			}
-			else {
-				categoryDTO.getTypes().clear();
-				categoryDTO.setSelectedType(0);
-			}
-		}
-		else {
-			resetCategories(categoryDTO);
-		}
-		config.setProductCategoryId(categoryDTO.getSelectedCat());
-		config.setProductSubCategoryId(categoryDTO.getSelectedSub());
-		config.setProductTypeId(categoryDTO.getSelectedType());
-	}
 
 	@GetMapping("/products/product/{id}")
 	public String getProduct(Model m,@PathVariable("id") long productId,

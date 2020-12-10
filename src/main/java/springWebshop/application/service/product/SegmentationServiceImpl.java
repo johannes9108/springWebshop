@@ -11,17 +11,21 @@ import springWebshop.application.integration.SegmentationDTORepositoryImpl;
 import springWebshop.application.integration.product.ProductCategoryRepository;
 import springWebshop.application.integration.product.ProductSubCategoryRepository;
 import springWebshop.application.integration.product.ProductTypeRepository;
+import springWebshop.application.model.domain.Product;
 import springWebshop.application.model.domain.segmentation.ProductCategory;
 import springWebshop.application.model.domain.segmentation.ProductSubCategory;
 import springWebshop.application.model.domain.segmentation.ProductType;
 import springWebshop.application.model.dto.SegmentDTO;
+import springWebshop.application.model.dto.SegmentationModelObject;
+import springWebshop.application.service.ServiceErrorMessages;
+import springWebshop.application.service.ServiceResponse;
 
-@Service("ProductSegmentationServiceImpl")
+@Service("SegmentationServiceImpl")
 public class SegmentationServiceImpl implements SegmentationService {
-	
+
 	@Autowired
 	SegmentationDTORepositoryImpl segmentationDTORepository;
-	
+
 	@Autowired
 	ProductCategoryRepository productCategoryRepository;
 	@Autowired
@@ -30,76 +34,129 @@ public class SegmentationServiceImpl implements SegmentationService {
 	ProductTypeRepository productTypeRepository;
 
 	@Override
-	public List<SegmentDTO> getAllCategories() {
-		return segmentationDTORepository.getAllCategoryDTO();
+	public ServiceResponse<SegmentDTO> getAllCategories() {
+
+		ServiceResponse<SegmentDTO> response = new ServiceResponse<>();
+		try {
+			List<SegmentDTO> listOfSegments = segmentationDTORepository.getAllCategoryDTO();
+			response.setResponseObjects(listOfSegments);
+		} catch (Exception e) {
+			response.addErrorMessage(ServiceErrorMessages.PRODUCT_CATEGORY.couldNotFind());
+		}
+		return response;
+
 //		return productCategoryRepository.findAll().stream()
 //				.map(productCategory -> new SegmentDTO(productCategory.getId(), productCategory.getName()))
 //				.collect(Collectors.toList());
 	}
-	
-	@Override
-	public List<SegmentDTO> getAllSubCategories() {
-		return segmentationDTORepository.getAllSubCategoryDTO();
-	}
 
 	@Override
-	public List<SegmentDTO> getAllTypes() {
-		// TODO Auto-generated method stub
-		return segmentationDTORepository.getAllTypeDTO();
-	}
-
-	@Override
-	public Optional<ProductCategory> getProductCategoryById(long id) {
-		return productCategoryRepository.findById(id);
-	}
-
-	@Override
-	public Optional<ProductSubCategory> getProductSubCategoryById(long id) {
-		return productSubCategoryRepository.findById(id);
-	}
-
-	@Override
-	public Optional<ProductType> getProductTypeById(long id) {
-		return productTypeRepository.findById(id);
-	}
-	
-	
-	
-	
-	@Override
-	public List<SegmentDTO> getSubCategoriesByCategoryId(long categoryId) {
+	public ServiceResponse<SegmentDTO> getAllSubCategories() {
 		
-		return categoryId>0?segmentationDTORepository.getAllSubCategoryDTO(categoryId):segmentationDTORepository.getAllSubCategoryDTO();
-//		return productSubCategoryRepository.findAll().stream()
-//				.filter(subCategory -> subCategory.getProductCategory().getId() == categoryId)
-//				.map(productSubcategory -> new SegmentDTO(productSubcategory.getId(),
-//						productSubcategory.getName()))
-//				.collect(Collectors.toList());
+		ServiceResponse<SegmentDTO> response = new ServiceResponse<>();
+		try {
+			List<SegmentDTO> listOfSegments = segmentationDTORepository.getAllSubCategoryDTO();
+			response.setResponseObjects(listOfSegments);
+		} catch (Exception e) {
+			response.addErrorMessage(ServiceErrorMessages.PRODUCT_CATEGORY.couldNotFind());
+		}
+		return response;
+		
+		
+		
 	}
 
 	@Override
-	public List<SegmentDTO> getTypesBySubCategoryId(long subCategoryId) {
-		return subCategoryId>0?segmentationDTORepository.getAllTypeDTO(subCategoryId):segmentationDTORepository.getAllTypeDTO();
-//		return productTypeRepository.findAll().stream()
-//				.filter(type -> type.getProductSubCategory().getId() == subCategoryId)
-//				.map(productType -> new SegmentDTO(productType.getId(), productType.getName()))
-//				.collect(Collectors.toList());
+	public ServiceResponse<SegmentDTO> getAllTypes() {
+		ServiceResponse<SegmentDTO> response = new ServiceResponse<>();
+		try {
+			List<SegmentDTO> listOfSegments = segmentationDTORepository.getAllTypeDTO();
+			response.setResponseObjects(listOfSegments);
+		} catch (Exception e) {
+			response.addErrorMessage(ServiceErrorMessages.PRODUCT_CATEGORY.couldNotFind());
+		}
+		return response;
 	}
 
-//	@Override
-//	public int getNoCategories() {
-//		return (int) productCategoryRepository.count();
-//	}
-//
-//	@Override
-//	public int getNoSubCategories() {
-//		return (int) productSubCategoryRepository.count();
-//	}
-//
-//	@Override
-//	public int getNoTypes() {
-//		return (int) productTypeRepository.count();
-//	}
+	@Override
+	public ServiceResponse<ProductCategory> getProductCategoryById(long id) {
+		ServiceResponse<ProductCategory> response = new ServiceResponse<>();
+		try {
+			Optional<ProductCategory> productCategory = productCategoryRepository.findById(id);
+			if(!productCategory.isPresent()) {
+				response.addErrorMessage(ServiceErrorMessages.PRODUCT_CATEGORY.couldNotFind(id));
+			}else {
+				response.addResponseObject(productCategory.get());
+			}
+		} catch (Exception e) {
+			response.addErrorMessage(ServiceErrorMessages.PRODUCT_CATEGORY.couldNotFind());
+		}
+		return response;
+	}
+
+	@Override
+	public ServiceResponse<ProductSubCategory> getProductSubCategoryById(long id) {
+		ServiceResponse<ProductSubCategory> response = new ServiceResponse<>();
+		try {
+			Optional<ProductSubCategory> productSubCategory = productSubCategoryRepository.findById(id);
+			if(!productSubCategory.isPresent()) {
+				response.addErrorMessage(ServiceErrorMessages.PRODUCT_SUBCATEGORY.couldNotFind(id));
+			}else {
+				response.addResponseObject(productSubCategory.get());
+			}
+		} catch (Exception e) {
+			response.addErrorMessage(ServiceErrorMessages.PRODUCT_SUBCATEGORY.couldNotFind());
+		}
+		return response;
+	}
+
+	@Override
+	public ServiceResponse<ProductType> getProductTypeById(long id) {
+		
+		
+		
+		ServiceResponse<ProductType> response = new ServiceResponse<>();
+		try {
+			Optional<ProductType> productType = productTypeRepository.findById(id);
+			if(!productType.isPresent()) {
+				response.addErrorMessage(ServiceErrorMessages.PRODUCT_TYPE.couldNotFind(id));
+			}else {
+				response.addResponseObject(productType.get());
+			}
+		} catch (Exception e) {
+			response.addErrorMessage(ServiceErrorMessages.PRODUCT_TYPE.couldNotFind());
+		}
+		return response;
+	}
+
+	@Override
+	public ServiceResponse<SegmentDTO> getSubCategoriesByCategoryId(long categoryId) {
+
+		
+		ServiceResponse<SegmentDTO> response = new ServiceResponse<>();
+		try {
+			List<SegmentDTO> listOfSegments = categoryId > 0 ? segmentationDTORepository.getAllSubCategoryDTO(categoryId)
+					: segmentationDTORepository.getAllSubCategoryDTO();
+			response.setResponseObjects(listOfSegments);
+		} catch (Exception e) {
+			response.addErrorMessage(ServiceErrorMessages.PRODUCT_CATEGORY.couldNotFind());
+		}
+		return response;
+	}
+
+	@Override
+	public ServiceResponse<SegmentDTO> getTypesBySubCategoryId(long subCategoryId) {
+		
+		ServiceResponse<SegmentDTO> response = new ServiceResponse<>();
+		try {
+			List<SegmentDTO> listOfSegments = subCategoryId > 0 ? segmentationDTORepository.getAllTypeDTO(subCategoryId)
+					: segmentationDTORepository.getAllTypeDTO();
+			response.setResponseObjects(listOfSegments);
+		} catch (Exception e) {
+			response.addErrorMessage(ServiceErrorMessages.PRODUCT_CATEGORY.couldNotFind());
+		}
+		return response;
+	}
 
 	@Override
 	public ArrayList<ProductType> getTypeStore() {
@@ -136,8 +193,41 @@ public class SegmentationServiceImpl implements SegmentationService {
 		return 0;
 	}
 
+	@Override
+	public ServiceResponse<Object> handleFiltering(SegmentationModelObject categoryDTO, ProductSearchConfig config) {
+		ServiceResponse<SegmentDTO> listOfSegmentDTOs = new ServiceResponse<>();
+		if (categoryDTO.getSelectedCat() > 0) {
+			listOfSegmentDTOs = getSubCategoriesByCategoryId(categoryDTO.getSelectedCat());
+			if (listOfSegmentDTOs.isSucessful()) {
+				categoryDTO.setSubCategories(listOfSegmentDTOs.getResponseObjects());
+			}
+			if (categoryDTO.getSelectedSub() > 0) {
+				listOfSegmentDTOs = getTypesBySubCategoryId(categoryDTO.getSelectedSub());
+				if (listOfSegmentDTOs.isSucessful()) {
+					categoryDTO.setTypes(listOfSegmentDTOs.getResponseObjects());
+				}
+				System.out.println(categoryDTO);
+			} else {
+				categoryDTO.getTypes().clear();
+				categoryDTO.setSelectedType(0);
+			}
+		} else {
+			resetCategories(categoryDTO);
+		}
+		config.setProductCategoryId(categoryDTO.getSelectedCat());
+		config.setProductSubCategoryId(categoryDTO.getSelectedSub());
+		config.setProductTypeId(categoryDTO.getSelectedType());
+		
+		return new ServiceResponse<>();
+	}
 	
 
-	
+	private void resetCategories(SegmentationModelObject categoryModelObject) {
+		categoryModelObject.setSelectedCat(0);
+		categoryModelObject.setSelectedSub(0);
+		categoryModelObject.setSelectedType(0);
+		categoryModelObject.getSubCategories().clear();
+		categoryModelObject.getTypes().clear();
+	}
 
 }

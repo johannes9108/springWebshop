@@ -18,9 +18,10 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import springWebshop.application.integration.account.CustomerRepository;
 import springWebshop.application.model.domain.Product;
-import springWebshop.application.model.dto.CategoryModelObject;
+import springWebshop.application.model.dto.SegmentationModelObject;
 import springWebshop.application.model.dto.SessionModel;
 import springWebshop.application.service.ServiceResponse;
+import springWebshop.application.service.admin.AdminService;
 import springWebshop.application.service.product.ProductSearchConfig;
 import springWebshop.application.service.product.SegmentationService;
 import springWebshop.application.service.product.ProductService;
@@ -31,8 +32,11 @@ import springWebshop.application.service.product.ProductService;
 public class AdminController {
 
 	@Autowired
-	@Qualifier("ProductSegmentationServiceImpl")
-	SegmentationService productSegmentationService;
+	@Qualifier("SegmentationServiceImpl")
+	SegmentationService segmentationService;
+	
+	@Autowired
+	AdminService adminService;
 
 	@Autowired
 	@Qualifier("ProductServiceImpl")
@@ -43,7 +47,7 @@ public class AdminController {
 
 	@ModelAttribute("sessionModel")
 	private SessionModel getSessionModel() {
-		return new SessionModel(productService, productSegmentationService, customerRepository);
+		return new SessionModel(productService, segmentationService, customerRepository);
 	}
 
 	private LinkedHashMap<String, String> getLinks() {
@@ -55,32 +59,7 @@ public class AdminController {
 
 	}
 
-	private void handleFiltering(CategoryModelObject categoryDTO, ProductSearchConfig config) {
-		if (categoryDTO.getSelectedCat() > 0) {
-			categoryDTO.setSubCategories(
-					productSegmentationService.getSubCategoriesByCategoryId(categoryDTO.getSelectedCat()));
-			if (categoryDTO.getSelectedSub() > 0) {
-				categoryDTO.setTypes(productSegmentationService.getTypesBySubCategoryId(categoryDTO.getSelectedSub()));
-				System.out.println(categoryDTO);
-			} else {
-				categoryDTO.getTypes().clear();
-				categoryDTO.setSelectedType(0);
-			}
-		} else {
-			resetCategories(categoryDTO);
-		}
-		config.setProductCategoryId(categoryDTO.getSelectedCat());
-		config.setProductSubCategoryId(categoryDTO.getSelectedSub());
-		config.setProductTypeId(categoryDTO.getSelectedType());
-	}
-
-	private void resetCategories(CategoryModelObject categoryModelObject) {
-		categoryModelObject.setSelectedCat(0);
-		categoryModelObject.setSelectedSub(0);
-		categoryModelObject.setSelectedType(0);
-		categoryModelObject.getSubCategories().clear();
-		categoryModelObject.getTypes().clear();
-	}
+	
 
 	@GetMapping("")
 	public String forwardToProducts() {
@@ -90,14 +69,14 @@ public class AdminController {
 	@GetMapping(path = { "/products" })
 	public String getAllProducts(@ModelAttribute("sessionModel") SessionModel session, BindingResult result,
 			@RequestParam(required = false, name = "page", defaultValue = "1") Optional<Integer> pathPage, Model m) {
-
+		
 		int currentPage = pathPage.isPresent() ? pathPage.get() : session.getProductPage();
 		ProductSearchConfig config = new ProductSearchConfig();
-		handleFiltering(session.getCategoryModel(), config);
+		segmentationService.handleFiltering(session.getCategoryModel(), config);
 
 		ServiceResponse<Product> response = productService.getProducts(config, currentPage > 0 ? currentPage - 1 : 0,
 				20);
-
+		
 		m.addAttribute("allProducts", response.getResponseObjects());
 		m.addAttribute("totalPages", response.getTotalPages());
 		session.setProductPage(currentPage);
@@ -113,28 +92,14 @@ public class AdminController {
 		m.addAttribute("linkMap", getLinks());
 		ServiceResponse<Product> response = productService.getProductById(productId);
 		Product currentProduct = response.getResponseObjects().get(0);
-		session.setCategoryModel(fullSegmentation(currentProduct));
+		ServiceResponse<SegmentationModelObject> adminResponse = adminService.fullSegmentation(currentProduct);
+		session.setCategoryModel(adminResponse.getResponseObjects().get(0));
 		m.addAttribute("sessionModel", session);
 //		handleFiltering(session.getCategoryModel(),config);
 
 		m.addAttribute("currentProduct", response.getResponseObjects().get(0));
 
 		return "adminViews/editProduct";
-	}
-
-	private CategoryModelObject fullSegmentation(Product currentProduct) {
-
-		CategoryModelObject fullSegmentation = new CategoryModelObject();
-		fullSegmentation.setCategories(productSegmentationService.getAllCategories());
-		fullSegmentation.setSubCategories(productSegmentationService.getAllSubCategories());
-		fullSegmentation.setTypes(productSegmentationService.getAllTypes());
-
-		fullSegmentation
-				.setSelectedCat(currentProduct.getProductType().getProductSubCategory().getProductCategory().getId());
-		fullSegmentation.setSelectedSub(currentProduct.getProductType().getProductSubCategory().getId());
-		fullSegmentation.setSelectedType(currentProduct.getProductType().getId());
-
-		return fullSegmentation;
 	}
 
 	@PostMapping(path = { "/products/product/{id}" })
@@ -148,10 +113,7 @@ public class AdminController {
 		{
 			// Handle by a service
 			if(action.get().compareToIgnoreCase("updateProduct")==0) {
-				Product p = productService.getProductById(productId).getResponseObjects().get(0);
-				p = product;
-				p.setProductType(productSegmentationService.getProductTypeById(session.getCategoryModel().getSelectedType()).get());
-				productService.update(p);
+				adminService.updateProduct(product, productId);
 			}
 			else if(action.get().compareToIgnoreCase("deleteProduct")==0){
 				System.out.println("make delete");
@@ -166,44 +128,19 @@ public class AdminController {
 		System.out.println("Cat:" + session.getCategoryModel());
 		System.out.println("POST Admin Single product");
 		m.addAttribute("linkMap", getLinks());
+		
 		ServiceResponse<Product> response = productService.getProductById(productId);
 		Product currentProduct = response.getResponseObjects().get(0);
 		m.addAttribute("currentProduct", response.getResponseObjects().get(0));
-		m.addAttribute("fullSegmentation", fullSegmentation(currentProduct));
+
+		
+		ServiceResponse<SegmentationModelObject> adminResponse = adminService.fullSegmentation(currentProduct);
+		m.addAttribute("fullSegmentation", adminResponse.getResponseObjects().get(0));
+		
+		
 		return "adminViews/editProduct";
 	}
 
-	private void updateSegmentationOfProduct(String action, CategoryModelObject categoryModelObject, long id) {
-		ServiceResponse<Product> response = productService.getProductById(id);
-		if (response.isSucessful()) {
-			Product product = response.getResponseObjects().get(0);
-			switch (action) {
-			case "type":
-				// TODO NOT WORKING WHEN SELECTING 0/ALL
-				// TODO EXTRACT ALL THIS LOGIC TO SERVICE CLASSES AS WELL IN THE PRODUCT
-				// CONTROLLER
-				long newType = categoryModelObject.getSelectedType();
-
-				product.updateProductType(productSegmentationService.getProductTypeById(newType == 0 ? 1 : newType).get());
-				productService.update(product);
-
-				break;
-			case "sub":
-				long newSub = categoryModelObject.getSelectedType();
-
-				product.updateProductSub(productSegmentationService.getProductSubCategoryById(newSub == 0 ? 1 : newSub).get());
-				productService.update(product);
-				break;
-			case "cat":
-
-				break;
-			default:
-				break;
-			}
-
-		}
-
-	}
 
 	@GetMapping(path = { "orders" })
 	public String getAllOrders(Model m) {
