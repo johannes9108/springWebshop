@@ -77,7 +77,9 @@
         $(document).ready(function () {
             let categoriesObject = /*[[${sessionModel.categoryModel}]]*/;
             let session = /*[[${session}]]*/;
-            console.log(session);
+            let segmentation = /*[[${sessionModel.categoryModel}]]*/;
+
+            console.log(segmentation);
 
 
             // if (categoriesObject.selectedCat > 0) {
@@ -86,21 +88,60 @@
             // if (categoriesObject.selectedSub > 0) {
             //     $('#type').attr("disabled", false);
             // }
+            $('#cat option[value=' + segmentation.selectedCat + ']').attr('selected', true);
+            $('#cat').attr('disabled', true);
+
+            $('#sub option[value=' + segmentation.selectedSub + ']').attr('selected', true);
+            $('#sub').attr('disabled', true);
+
+            $('#type option[value=' + segmentation.selectedType + ']').attr('selected', true);
+
             $('#cat').on('change', function () {
                 let selectedVal = this.value;
                 console.log(selectedVal)
-                // document.forms['filter'].submit();
+
+
+                $('<input />').attr('type', 'hidden')
+                    .attr('name', "'action'")
+                    .attr('value', 'cat').appendTo(document.forms['filter']);
+
+                document.forms['filter'].submit();
             });
             $('#sub').on('change', function () {
                 let selectedVal = this.value;
                 console.log(selectedVal)
-                // document.forms['filter'].submit();
+                let isDisable = (selectedVal == 0) ? false : true;
+                $('#cat').attr('disabled', isDisable);
+
+
+                $('<input />').attr('type', 'hidden')
+                    .attr('name', "action")
+                    .attr('value', 'sub').appendTo(document.forms['filter']);
+
+                document.forms['filter'].submit();
             });
             $('#type').on('change', function () {
                 let selectedVal = this.value;
                 console.log(selectedVal)
-                // document.forms['filter'].submit();
+                let isDisable = (selectedVal == 0) ? false : true;
+                $('#sub').attr('disabled', isDisable);
+                $('<input />').attr('type', 'hidden')
+                    .attr('name', "action")
+                    .attr('value', 'type').appendTo(document.forms['filter']);
+                document.forms['filter'].submit();
             });
+
+            $('#updateProduct').on('click', function () {
+                $('<input />').attr('type', 'hidden')
+                    .attr('name', "action")
+                    .attr('value', 'updateProduct').appendTo(document.forms['filter']);
+            });
+            $('#deleteProduct').on('click', function () {
+                $('<input />').attr('type', 'hidden')
+                    .attr('name', "action")
+                    .attr('value', 'deleteProduct').appendTo(document.forms['filter']);
+            });
+
 
         });
 
@@ -113,7 +154,7 @@
     <div th:replace="fragments/header.html :: header(title=${abc.name},links=${linkMap})"></div>
 
     <main>
-        <form method="POST" th:action="@{/webshop/admin/products/product/__${currentProduct.id}__}">
+        <form name="filter" method="POST" th:action="@{/webshop/admin/products/product/__${currentProduct.id}__}">
             <section class="itemFields">
                 <div class="itemField">
                     <span>Id</span>
@@ -129,7 +170,7 @@
                 </div>
                 <div class="itemField">
                     <span>Description</span>
-                    <textarea th:text="${currentProduct.description}">Empty</textarea>
+                    <textarea th:field="${currentProduct.description}">Empty</textarea>
                 </div>
                 <div class="itemField">
                     <span>Vat Percentage</span>
@@ -145,14 +186,15 @@
                 </div>
 
             </section>
-            <section class="segmentation" th:object="${session.sessionModel.categoryModel}">
+            <section class="segmentation" th:object="${sessionModel.categoryModel}">
                 <div class="segmentationContainer">
-                    <p th:text="*{categories}"></p>
+                    <!-- <p th:text="*{categories}"></p>
                     <p th:text="*{subCategories}"></p>
-                    <p th:text="*{types}"></p>
+                    <p th:text="*{types}"></p> -->
+                    <!-- <p th:text="*{selectedCat}"></p> -->
                     <div class="segmentationRow">
                         <span>Category</span>
-                        <select id="cat">
+                        <select id="cat" th:field="*{selectedCat}">
                             <option value="0">All</option>
                             <option th:each="category : *{categories}" th:text="${category.name}"
                                 th:value="${category.id}">
@@ -161,7 +203,7 @@
                     </div>
                     <div class="segmentationRow">
                         <span>SubCategory</span>
-                        <select id="sub">
+                        <select id="sub" th:field="*{selectedSub}">
                             <option value="0">All</option>
                             <option th:each="subCategory : *{subCategories}" th:text="${subCategory.name}"
                                 th:value="${subCategory.id}">
@@ -170,7 +212,7 @@
                     </div>
                     <div class="segmentationRow">
                         <span>Type</span>
-                        <select id="type">
+                        <select id="type" th:field="*{selectedType}">
 
                             <option value="0">All</option>
                             <option th:each="type : *{types}" th:text="${type.name}" th:value="${type.id}"></option>
@@ -192,8 +234,8 @@
             </section>
             <section class="actions">
 
-                <input type="submit" value="Update Product">
-                <input type="submit" value="Delete Product">
+                <input id="updateProduct" type="submit" value="Update Product">
+                <input id="deleteProduct" type="submit" value="Delete Product">
 
             </section>
 

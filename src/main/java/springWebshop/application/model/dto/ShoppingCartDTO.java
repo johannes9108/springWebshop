@@ -6,8 +6,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import lombok.Getter;
-import springWebshop.application.model.domain.Currency;
 import springWebshop.application.model.domain.Product;
+import springWebshop.application.model.domain.order.Currency;
 import springWebshop.application.service.ServiceResponse;
 import springWebshop.application.service.product.ProductService;
 

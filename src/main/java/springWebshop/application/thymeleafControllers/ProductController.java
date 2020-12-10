@@ -17,14 +17,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import lombok.CustomLog;
-import springWebshop.application.integration.CustomerRepository;
+import springWebshop.application.integration.account.CustomerRepository;
 import springWebshop.application.model.domain.Product;
 import springWebshop.application.model.dto.CategoryModelObject;
 import springWebshop.application.model.dto.SessionModel;
 import springWebshop.application.service.ServiceResponse;
 import springWebshop.application.service.product.ProductCategoryService;
 import springWebshop.application.service.product.ProductSearchConfig;
-import springWebshop.application.service.product.ProductSegmentationService;
+import springWebshop.application.service.product.SegmentationService;
 import springWebshop.application.service.product.ProductService;
 import springWebshop.application.service.product.ProductTypeService;
 
@@ -43,7 +43,7 @@ public class ProductController {
 	
 	@Autowired
 	@Qualifier("ProductSegmentationServiceImpl")
-	ProductSegmentationService productSegmentationService;
+	SegmentationService productSegmentationService;
 
 	@Autowired
 	ProductTypeService productTypeService;
@@ -95,17 +95,13 @@ public class ProductController {
 //		return "createNewProduct";
 //	}
 
-	@GetMapping(path = { "products","products/{category}","products/{category}/{subcategory}","products/{category}/{subcategory}/{type}" })
+	@GetMapping(path = { "products" })
 	public String getAllProducts(@ModelAttribute("sessionModel") SessionModel session, BindingResult result,
-			@PathVariable(name = "category",required = false) Optional<String> category,
-			@PathVariable(name = "subcategory",required = false) Optional<String> subcategory,
-			@PathVariable(name = "type",required = false) Optional<String> type,
 			@RequestParam(required = false, name = "page",defaultValue = "1") Optional<Integer> pathPage, Model m) {
 		m.addAttribute("linkMap", getLinks());
 		System.out.println("GET");
 //		resetCategories(session.getCategoryModel());
 //		selectFilteredProducts(category,subcategory,type);
-		System.out.println("PP:"+pathPage);
 		int currentPage = pathPage.isPresent() ? pathPage.get() : session.getProductPage();
 		ProductSearchConfig config = new ProductSearchConfig();
 		handleFiltering(session.getCategoryModel(),config);
@@ -146,6 +142,7 @@ public class ProductController {
 
 	@PostMapping(path = { "products" })
 	public String postAddItemToCart(
+			@RequestParam(required = false, name ="reset") boolean reset,
 			@RequestParam("id") Optional<Integer> productId,@ModelAttribute("sessionModel") SessionModel session,
 			@RequestParam(required = false, name = "page") Optional<Integer> pathPage, Model m) {
 //		System.out.println("POST from products");
@@ -154,13 +151,17 @@ public class ProductController {
 		handleFiltering(session.getCategoryModel(),config);
 		System.out.println("POST");
 
-		
+		System.out.println("Reset:" + reset);
 		
 		if(productId.isPresent())
 			session.getCart().addItem(productId.get());
-		int currentPage = pathPage.isPresent() ? pathPage.get() : session.getProductPage();
+		int currentPage = 0;
+		if(!reset) {
+		  currentPage = pathPage.isPresent() ? pathPage.get() : session.getProductPage();
+		}
 		ServiceResponse<Product> response = productService.getProducts(config,currentPage > 0 ? currentPage - 1 : 0, 10);
-		m.addAttribute("currentPage", response.getCurrentPage()-1);
+		System.out.println(response);
+		session.setProductPage(currentPage);
 		m.addAttribute("allProducts", response.getResponseObjects());
 		// Doesnt return Error Message? Empty list
 		

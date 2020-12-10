@@ -2,21 +2,32 @@ package springWebshop.application.service.product;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import springWebshop.application.integration.SegmentationDTORepositoryImpl;
-import springWebshop.application.model.domain.ProductCategory;
-import springWebshop.application.model.domain.ProductSubCategory;
-import springWebshop.application.model.domain.ProductType;
+import springWebshop.application.integration.product.ProductCategoryRepository;
+import springWebshop.application.integration.product.ProductSubCategoryRepository;
+import springWebshop.application.integration.product.ProductTypeRepository;
+import springWebshop.application.model.domain.segmentation.ProductCategory;
+import springWebshop.application.model.domain.segmentation.ProductSubCategory;
+import springWebshop.application.model.domain.segmentation.ProductType;
 import springWebshop.application.model.dto.SegmentDTO;
 
 @Service("ProductSegmentationServiceImpl")
-public class SegmentationServiceImpl implements ProductSegmentationService {
+public class SegmentationServiceImpl implements SegmentationService {
 	
 	@Autowired
 	SegmentationDTORepositoryImpl segmentationDTORepository;
+	
+	@Autowired
+	ProductCategoryRepository productCategoryRepository;
+	@Autowired
+	ProductSubCategoryRepository productSubCategoryRepository;
+	@Autowired
+	ProductTypeRepository productTypeRepository;
 
 	@Override
 	public List<SegmentDTO> getAllCategories() {
@@ -38,8 +49,27 @@ public class SegmentationServiceImpl implements ProductSegmentationService {
 	}
 
 	@Override
+	public Optional<ProductCategory> getProductCategoryById(long id) {
+		return productCategoryRepository.findById(id);
+	}
+
+	@Override
+	public Optional<ProductSubCategory> getProductSubCategoryById(long id) {
+		return productSubCategoryRepository.findById(id);
+	}
+
+	@Override
+	public Optional<ProductType> getProductTypeById(long id) {
+		return productTypeRepository.findById(id);
+	}
+	
+	
+	
+	
+	@Override
 	public List<SegmentDTO> getSubCategoriesByCategoryId(long categoryId) {
-		return segmentationDTORepository.getAllSubCategoryDTO(categoryId);
+		
+		return categoryId>0?segmentationDTORepository.getAllSubCategoryDTO(categoryId):segmentationDTORepository.getAllSubCategoryDTO();
 //		return productSubCategoryRepository.findAll().stream()
 //				.filter(subCategory -> subCategory.getProductCategory().getId() == categoryId)
 //				.map(productSubcategory -> new SegmentDTO(productSubcategory.getId(),
@@ -49,7 +79,7 @@ public class SegmentationServiceImpl implements ProductSegmentationService {
 
 	@Override
 	public List<SegmentDTO> getTypesBySubCategoryId(long subCategoryId) {
-		return segmentationDTORepository.getAllTypeDTO(subCategoryId);
+		return subCategoryId>0?segmentationDTORepository.getAllTypeDTO(subCategoryId):segmentationDTORepository.getAllTypeDTO();
 //		return productTypeRepository.findAll().stream()
 //				.filter(type -> type.getProductSubCategory().getId() == subCategoryId)
 //				.map(productType -> new SegmentDTO(productType.getId(), productType.getName()))
@@ -105,6 +135,8 @@ public class SegmentationServiceImpl implements ProductSegmentationService {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
+	
 
 	
 

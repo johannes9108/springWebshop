@@ -2,6 +2,7 @@ package springWebshop.application.service.product;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -9,13 +10,13 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.stereotype.Service;
 
-import springWebshop.application.model.domain.ProductCategory;
-import springWebshop.application.model.domain.ProductSubCategory;
-import springWebshop.application.model.domain.ProductType;
+import springWebshop.application.model.domain.segmentation.ProductCategory;
+import springWebshop.application.model.domain.segmentation.ProductSubCategory;
+import springWebshop.application.model.domain.segmentation.ProductType;
 import springWebshop.application.model.dto.SegmentDTO;
 
 @Service("ProductSegmentationServiceMockImpl")
-public class ProductSegmentationServiceMockImpl implements ProductSegmentationService {
+public class ProductSegmentationServiceMockImpl implements SegmentationService {
 
 	private ArrayList<ProductType> typeStore;
 	private ArrayList<ProductSubCategory> subStore;
@@ -132,6 +133,24 @@ public class ProductSegmentationServiceMockImpl implements ProductSegmentationSe
 
 	@Override
 	public List<SegmentDTO> getAllTypes() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Optional<ProductCategory> getProductCategoryById(long id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Optional<ProductSubCategory> getProductSubCategoryById(long id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Optional<ProductType> getProductTypeById(long id) {
 		// TODO Auto-generated method stub
 		return null;
 	}

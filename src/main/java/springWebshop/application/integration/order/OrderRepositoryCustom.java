@@ -1,7 +1,8 @@
-package springWebshop.application.integration;
+package springWebshop.application.integration.order;
 
 import org.springframework.data.domain.Page;
-import springWebshop.application.model.domain.Order;
+
+import springWebshop.application.model.domain.order.Order;
 import springWebshop.application.service.order.OrderSearchConfig;
 
 public interface OrderRepositoryCustom {

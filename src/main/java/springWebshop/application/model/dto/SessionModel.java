@@ -7,12 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import lombok.Getter;
 import lombok.Setter;
-import springWebshop.application.integration.CustomerAddressRespoitory;
-import springWebshop.application.integration.CustomerRepository;
+import springWebshop.application.integration.account.CustomerAddressRespoitory;
+import springWebshop.application.integration.account.CustomerRepository;
 import springWebshop.application.model.domain.user.Account;
 import springWebshop.application.model.domain.user.Customer;
 import springWebshop.application.model.domain.user.CustomerAddress;
-import springWebshop.application.service.product.ProductSegmentationService;
+import springWebshop.application.service.product.SegmentationService;
 import springWebshop.application.service.product.ProductService;
 
 @Getter
@@ -33,7 +33,7 @@ public class SessionModel {
 	private int productPage;
 	private CategoryModelObject categoryModel;
 	
-	public SessionModel(ProductService productService, ProductSegmentationService productSegmentationService, CustomerRepository custRepo) {
+	public SessionModel(ProductService productService, SegmentationService productSegmentationService, CustomerRepository custRepo) {
 		// Start session as guest
 		cart = new ShoppingCartDTO(productService);
 		List<CustomerAddress> addresses = new ArrayList<>();

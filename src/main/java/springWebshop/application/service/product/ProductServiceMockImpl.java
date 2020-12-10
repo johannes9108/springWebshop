@@ -13,9 +13,9 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import springWebshop.application.model.domain.Product;
-import springWebshop.application.model.domain.ProductCategory;
-import springWebshop.application.model.domain.ProductSubCategory;
-import springWebshop.application.model.domain.ProductType;
+import springWebshop.application.model.domain.segmentation.ProductCategory;
+import springWebshop.application.model.domain.segmentation.ProductSubCategory;
+import springWebshop.application.model.domain.segmentation.ProductType;
 import springWebshop.application.service.ServiceResponse;
 
 @Service("productServiceMockImpl")
@@ -26,7 +26,7 @@ public class ProductServiceMockImpl implements ProductService {
 
 	@Autowired
 	@Qualifier("ProductSegmentationServiceMockImpl")
-	ProductSegmentationService productSegmentationService;
+	SegmentationService productSegmentationService;
 	private ArrayList<ProductType> typeStore;
 	private ArrayList<ProductCategory> subStore;
 	private ArrayList<ProductSubCategory> categoryStore;

@@ -1,4 +1,4 @@
-package springWebshop.application.model.domain;
+package springWebshop.application.model.domain.order;
 
 public interface Address {
 

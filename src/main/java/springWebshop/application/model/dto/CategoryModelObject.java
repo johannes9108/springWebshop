@@ -9,7 +9,7 @@ import java.util.Set;
 
 import lombok.Getter;
 import lombok.Setter;
-import springWebshop.application.model.domain.ProductCategory;
+import springWebshop.application.model.domain.segmentation.ProductCategory;
 
 @Getter
 @Setter

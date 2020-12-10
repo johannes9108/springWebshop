@@ -1,4 +1,4 @@
-package springWebshop.application.model.domain;
+package springWebshop.application.model.domain.segmentation;
 
 import java.util.HashSet;
 import java.util.Objects;

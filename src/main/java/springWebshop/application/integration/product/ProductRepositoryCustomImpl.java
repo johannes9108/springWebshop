@@ -1,4 +1,4 @@
-package springWebshop.application.integration;
+package springWebshop.application.integration.product;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,20 +35,20 @@ public class ProductRepositoryCustomImpl extends AbstractCustomRepository<Produc
 				predicates.add(criteriaBuilder.equal(
 						product.get("productType").get("id"),
 						config.getProductTypeId()));
-				System.out.println("Filter by Type");
+//				System.out.println("Filter by Type");
 			}
 			else if (config.getProductSubCategoryId() > 0) {
 				predicates.add(criteriaBuilder.equal(
 						product.get("productType").get("productSubCategory").get("id"),
 						config.getProductSubCategoryId()));
 				
-				System.out.println("Filter by SubCategory");
+//				System.out.println("Filter by SubCategory");
 			}
 			else if (config.getProductCategoryId() > 0) {
 				predicates.add(criteriaBuilder.equal(
 						product.get("productType").get("productSubCategory").get("productCategory").get("id"),
 						config.getProductCategoryId()));
-				System.out.println("Filter by Category");
+//				System.out.println("Filter by Category");
 				
 			}
 			if(config.getSearchString()!=null && config.getSearchString().length()>0) {
@@ -57,11 +57,7 @@ public class ProductRepositoryCustomImpl extends AbstractCustomRepository<Produc
 			}
 			criteriaQuery.select(product).distinct(true).where(predicates.toArray(new Predicate[0]));
 			TypedQuery<Product> typedQuery = em.createQuery(criteriaQuery);
-			Page<Product> tmp = getPaginatedResult(page, size, predicates, typedQuery);
-			System.out.println("ReturningPage:");
-			tmp.getContent().forEach(System.out::println);
-			
-			return tmp;
+			return getPaginatedResult(page, size, predicates, typedQuery);
 		} catch (NoResultException e) {
 			System.out.println("Exception:" + e);
 			return null;

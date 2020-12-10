@@ -1,4 +1,4 @@
-package springWebshop.application.integration;
+package springWebshop.application.integration.product;
 
 import java.util.List;
 
@@ -13,13 +13,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
-import springWebshop.application.model.domain.Order;
+
 import springWebshop.application.model.domain.Product;
+import springWebshop.application.model.domain.order.Order;
 
 @Repository
 public abstract class AbstractCustomRepository<T> {
 	
 	@PersistenceContext
+	protected
 	EntityManager em;
 //
 //	final Class<T> typeParameterClass;
@@ -44,7 +46,7 @@ public abstract class AbstractCustomRepository<T> {
 		List<T> productList = typedQuery.getResultList();
 		
 		Page<T> newPage = new PageImpl<>(productList, PageRequest.of(page, size), totalItems);
-		System.out.println(newPage);
+//		System.out.println(newPage);
 
 		return newPage;
 	}

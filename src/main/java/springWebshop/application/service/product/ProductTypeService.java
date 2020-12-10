@@ -3,7 +3,7 @@ package springWebshop.application.service.product;
 import java.util.List;
 import java.util.Optional;
 
-import springWebshop.application.model.domain.ProductType;
+import springWebshop.application.model.domain.segmentation.ProductType;
 
 public interface ProductTypeService {
 	

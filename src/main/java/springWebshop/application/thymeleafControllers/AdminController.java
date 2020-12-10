@@ -16,66 +16,63 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import springWebshop.application.integration.CustomerRepository;
+import springWebshop.application.integration.account.CustomerRepository;
 import springWebshop.application.model.domain.Product;
 import springWebshop.application.model.dto.CategoryModelObject;
 import springWebshop.application.model.dto.SessionModel;
 import springWebshop.application.service.ServiceResponse;
 import springWebshop.application.service.product.ProductSearchConfig;
-import springWebshop.application.service.product.ProductSegmentationService;
+import springWebshop.application.service.product.SegmentationService;
 import springWebshop.application.service.product.ProductService;
 
 @Controller
 @RequestMapping("webshop/admin")
-@SessionAttributes({"sessionModel"})
+@SessionAttributes({ "sessionModel" })
 public class AdminController {
-	
+
 	@Autowired
 	@Qualifier("ProductSegmentationServiceImpl")
-	ProductSegmentationService productSegmentationService;
-	
+	SegmentationService productSegmentationService;
+
 	@Autowired
 	@Qualifier("ProductServiceImpl")
 	ProductService productService;
-	
+
 	@Autowired
 	CustomerRepository customerRepository;
-	
+
 	@ModelAttribute("sessionModel")
 	private SessionModel getSessionModel() {
-		return new SessionModel(productService,productSegmentationService, customerRepository);
+		return new SessionModel(productService, productSegmentationService, customerRepository);
 	}
-	
+
 	private LinkedHashMap<String, String> getLinks() {
 		LinkedHashMap<String, String> linkMap = new LinkedHashMap<>();
-		linkMap.put("Products","/webshop/admin/products");
-		linkMap.put("Orders","/webshop/admin/orders");
-		linkMap.put("Users","/webshop/admin/users");
-		System.out.println("GETLINKS");
+		linkMap.put("Products", "/webshop/admin/products");
+		linkMap.put("Orders", "/webshop/admin/orders");
+		linkMap.put("Users", "/webshop/admin/users");
 		return linkMap;
-		
+
 	}
-	
+
 	private void handleFiltering(CategoryModelObject categoryDTO, ProductSearchConfig config) {
-		if(categoryDTO.getSelectedCat()>0) {
-			categoryDTO.setSubCategories(productSegmentationService.getSubCategoriesByCategoryId(categoryDTO.getSelectedCat()));
-			if(categoryDTO.getSelectedSub()>0) {
+		if (categoryDTO.getSelectedCat() > 0) {
+			categoryDTO.setSubCategories(
+					productSegmentationService.getSubCategoriesByCategoryId(categoryDTO.getSelectedCat()));
+			if (categoryDTO.getSelectedSub() > 0) {
 				categoryDTO.setTypes(productSegmentationService.getTypesBySubCategoryId(categoryDTO.getSelectedSub()));
 				System.out.println(categoryDTO);
-			}
-			else {
+			} else {
 				categoryDTO.getTypes().clear();
 				categoryDTO.setSelectedType(0);
 			}
-		}
-		else {
+		} else {
 			resetCategories(categoryDTO);
 		}
 		config.setProductCategoryId(categoryDTO.getSelectedCat());
 		config.setProductSubCategoryId(categoryDTO.getSelectedSub());
 		config.setProductTypeId(categoryDTO.getSelectedType());
 	}
-	
 
 	private void resetCategories(CategoryModelObject categoryModelObject) {
 		categoryModelObject.setSelectedCat(0);
@@ -84,83 +81,140 @@ public class AdminController {
 		categoryModelObject.getSubCategories().clear();
 		categoryModelObject.getTypes().clear();
 	}
-	
-	@GetMapping(path = {"","/products"})
+
+	@GetMapping("")
+	public String forwardToProducts() {
+		return "redirect:/webshop/admin/products";
+	}
+
+	@GetMapping(path = { "/products" })
 	public String getAllProducts(@ModelAttribute("sessionModel") SessionModel session, BindingResult result,
-			@RequestParam(required = false, name = "page",defaultValue = "1") Optional<Integer> pathPage, Model m) {
-		
+			@RequestParam(required = false, name = "page", defaultValue = "1") Optional<Integer> pathPage, Model m) {
+
 		int currentPage = pathPage.isPresent() ? pathPage.get() : session.getProductPage();
 		ProductSearchConfig config = new ProductSearchConfig();
-		handleFiltering(session.getCategoryModel(),config);
-		
-		ServiceResponse<Product> response = productService.getProducts(config,currentPage > 0 ? currentPage - 1 : 0, 20);
-		
+		handleFiltering(session.getCategoryModel(), config);
+
+		ServiceResponse<Product> response = productService.getProducts(config, currentPage > 0 ? currentPage - 1 : 0,
+				20);
+
 		m.addAttribute("allProducts", response.getResponseObjects());
 		m.addAttribute("totalPages", response.getTotalPages());
 		session.setProductPage(currentPage);
 		m.addAttribute("linkMap", getLinks());
-		return "adminHome";
+		return "adminViews/adminHome";
 	}
-	@GetMapping(path = {"/products/product/{id}"})
+
+	@GetMapping(path = { "/products/product/{id}" })
 	public String getSingleProductEdit(@ModelAttribute("sessionModel") SessionModel session, BindingResult result,
 			@PathVariable("id") long productId,
-			@RequestParam(required = false, name = "page",defaultValue = "1") Optional<Integer> pathPage, Model m) {
-		System.out.println("GetProduct");		
+			@RequestParam(required = false, name = "page", defaultValue = "1") Optional<Integer> pathPage, Model m) {
+		System.out.println("GetProduct");
 		m.addAttribute("linkMap", getLinks());
 		ServiceResponse<Product> response = productService.getProductById(productId);
 		Product currentProduct = response.getResponseObjects().get(0);
-		ProductSearchConfig config = createConfigFromProduct(currentProduct);
-		handleFiltering(session.getCategoryModel(),config);
-		
-		m.addAttribute("fullSegmentation", fullSegmentation());
-		m.addAttribute("currentProduct", response.getResponseObjects().get(0));		
+		session.setCategoryModel(fullSegmentation(currentProduct));
+		m.addAttribute("sessionModel", session);
+//		handleFiltering(session.getCategoryModel(),config);
 
-		return "editProduct";
-	}
-	private CategoryModelObject fullSegmentation() {
-		
-			CategoryModelObject fullSegmentation = new CategoryModelObject();
-			fullSegmentation.setCategories(productSegmentationService.getAllCategories());
-			fullSegmentation.setSubCategories(productSegmentationService.getAllSubCategories());
-			fullSegmentation.setTypes(productSegmentationService.getAllTypes());
-		
-		return null;
+		m.addAttribute("currentProduct", response.getResponseObjects().get(0));
+
+		return "adminViews/editProduct";
 	}
 
-	private ProductSearchConfig createConfigFromProduct(Product currentProduct) {
-		ProductSearchConfig conf = new ProductSearchConfig();
-		conf.setProductCategoryId(currentProduct.getProductType().getProductSubCategory().getProductCategory().getId());
-		conf.setProductCategoryId(currentProduct.getProductType().getProductSubCategory().getId());
-		conf.setProductCategoryId(currentProduct.getProductType().getId());
-		return conf;
+	private CategoryModelObject fullSegmentation(Product currentProduct) {
+
+		CategoryModelObject fullSegmentation = new CategoryModelObject();
+		fullSegmentation.setCategories(productSegmentationService.getAllCategories());
+		fullSegmentation.setSubCategories(productSegmentationService.getAllSubCategories());
+		fullSegmentation.setTypes(productSegmentationService.getAllTypes());
+
+		fullSegmentation
+				.setSelectedCat(currentProduct.getProductType().getProductSubCategory().getProductCategory().getId());
+		fullSegmentation.setSelectedSub(currentProduct.getProductType().getProductSubCategory().getId());
+		fullSegmentation.setSelectedType(currentProduct.getProductType().getId());
+
+		return fullSegmentation;
 	}
 
-	@PostMapping(path = {"/products/product/{id}"})
+	@PostMapping(path = { "/products/product/{id}" })
 	public String postSingleProductEdit(@ModelAttribute("sessionModel") SessionModel session, BindingResult result,
-			@PathVariable("id") long productId,
-			@RequestParam(required = false, name = "page",defaultValue = "1") Optional<Integer> pathPage, Model m,
-			Product product,CategoryModelObject cateTest
-			) {
+			@PathVariable("id") long productId, @RequestParam(required = false, name = "action") Optional<String> action,
+			@RequestParam(required = false, name = "page", defaultValue = "1") Optional<Integer> pathPage, Model m,
+			Product product) {
 		System.out.println(product);
-		System.out.println("POST Admin Single product");		
+		System.out.println(action);
+		if (action.isPresent())
+		{
+			// Handle by a service
+			if(action.get().compareToIgnoreCase("updateProduct")==0) {
+				Product p = productService.getProductById(productId).getResponseObjects().get(0);
+				p = product;
+				p.setProductType(productSegmentationService.getProductTypeById(session.getCategoryModel().getSelectedType()).get());
+				productService.update(p);
+			}
+			else if(action.get().compareToIgnoreCase("deleteProduct")==0){
+				System.out.println("make delete");
+				Product p = productService.getProductById(productId).getResponseObjects().get(0);
+				//TODO Create Delete in service
+				
+				
+			}
+		}
+			//			updateSegmentationOfProduct(action.get(), session.getCategoryModel(), product.getId());
+
+		System.out.println("Cat:" + session.getCategoryModel());
+		System.out.println("POST Admin Single product");
 		m.addAttribute("linkMap", getLinks());
 		ServiceResponse<Product> response = productService.getProductById(productId);
-		m.addAttribute("currentProduct", response.getResponseObjects().get(0));		
-		
-		return "editProduct";
+		Product currentProduct = response.getResponseObjects().get(0);
+		m.addAttribute("currentProduct", response.getResponseObjects().get(0));
+		m.addAttribute("fullSegmentation", fullSegmentation(currentProduct));
+		return "adminViews/editProduct";
 	}
-	
+
+	private void updateSegmentationOfProduct(String action, CategoryModelObject categoryModelObject, long id) {
+		ServiceResponse<Product> response = productService.getProductById(id);
+		if (response.isSucessful()) {
+			Product product = response.getResponseObjects().get(0);
+			switch (action) {
+			case "type":
+				// TODO NOT WORKING WHEN SELECTING 0/ALL
+				// TODO EXTRACT ALL THIS LOGIC TO SERVICE CLASSES AS WELL IN THE PRODUCT
+				// CONTROLLER
+				long newType = categoryModelObject.getSelectedType();
+
+				product.updateProductType(productSegmentationService.getProductTypeById(newType == 0 ? 1 : newType).get());
+				productService.update(product);
+
+				break;
+			case "sub":
+				long newSub = categoryModelObject.getSelectedType();
+
+				product.updateProductSub(productSegmentationService.getProductSubCategoryById(newSub == 0 ? 1 : newSub).get());
+				productService.update(product);
+				break;
+			case "cat":
+
+				break;
+			default:
+				break;
+			}
+
+		}
+
+	}
+
 	@GetMapping(path = { "orders" })
 	public String getAllOrders(Model m) {
 
-		return "adminOrdersView";
+		return "adminViews/adminOrdersView";
 	}
-	
-	@GetMapping(path = { "users" })
-	public String getAllUsers( Model m) {
 
-		return "adminUsersView";
+	@GetMapping(path = { "users" })
+	public String getAllUsers(Model m) {
+
+		return "adminViews/adminUsersView";
 	}
-	
-	
+
 }

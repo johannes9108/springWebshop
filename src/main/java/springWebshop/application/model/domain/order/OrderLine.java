@@ -1,4 +1,4 @@
-package springWebshop.application.model.domain;
+package springWebshop.application.model.domain.order;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

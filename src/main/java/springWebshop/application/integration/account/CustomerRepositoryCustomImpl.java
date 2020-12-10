@@ -1,4 +1,4 @@
-package springWebshop.application.integration;
+package springWebshop.application.integration.account;
 
 import org.springframework.stereotype.Repository;
 import springWebshop.application.model.domain.user.Customer;

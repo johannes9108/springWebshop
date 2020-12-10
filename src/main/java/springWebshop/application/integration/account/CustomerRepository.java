@@ -1,11 +1,12 @@
-package springWebshop.application.integration;
+package springWebshop.application.integration.account;
 
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import springWebshop.application.model.domain.Address;
+
+import springWebshop.application.model.domain.order.Address;
 import springWebshop.application.model.domain.user.Customer;
 import springWebshop.application.model.domain.user.CustomerAddress;
 

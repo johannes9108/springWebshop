@@ -1,4 +1,4 @@
-package springWebshop.application.integration;
+package springWebshop.application.integration.account;
 
 import java.util.List;
 

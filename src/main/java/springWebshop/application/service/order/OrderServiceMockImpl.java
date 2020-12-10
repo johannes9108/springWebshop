@@ -7,10 +7,10 @@ import java.util.Random;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
-import springWebshop.application.model.domain.Address;
-import springWebshop.application.model.domain.Order;
-import springWebshop.application.model.domain.Order.OrderStatus;
-import springWebshop.application.model.domain.OrderLine;
+import springWebshop.application.model.domain.order.Address;
+import springWebshop.application.model.domain.order.Order;
+import springWebshop.application.model.domain.order.OrderLine;
+import springWebshop.application.model.domain.order.Order.OrderStatus;
 import springWebshop.application.model.domain.user.CustomerAddress;
 import springWebshop.application.model.dto.ShoppingCartDTO;
 import springWebshop.application.service.ServiceResponse;

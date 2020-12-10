@@ -1,4 +1,4 @@
-package springWebshop.application.model.domain;
+package springWebshop.application.model.domain.segmentation;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

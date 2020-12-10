@@ -1,4 +1,4 @@
-package springWebshop.application.model.domain;
+package springWebshop.application.model.domain.order;
 
 import java.util.ArrayList;
 import java.util.Date;

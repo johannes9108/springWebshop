@@ -35,16 +35,25 @@
             $('#cat').on('change', function () {
                 let selectedVal = this.value;
                 console.log(selectedVal)
+                $('<input />').attr('type', 'hidden')
+                    .attr('name', "reset")
+                    .attr('value', 'true').appendTo(document.forms['filter']);
                 document.forms['filter'].submit();
             });
             $('#sub').on('change', function () {
                 let selectedVal = this.value;
                 console.log(selectedVal)
+                $('<input />').attr('type', 'hidden')
+                    .attr('name', "reset")
+                    .attr('value', 'true').appendTo(document.forms['filter']);
                 document.forms['filter'].submit();
             });
             $('#type').on('change', function () {
                 let selectedVal = this.value;
                 console.log(selectedVal)
+                $('<input />').attr('type', 'hidden')
+                    .attr('name', "reset")
+                    .attr('value', 'true').appendTo(document.forms['filter']);
                 document.forms['filter'].submit();
             });
 

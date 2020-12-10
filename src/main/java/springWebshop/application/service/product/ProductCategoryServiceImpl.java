@@ -6,8 +6,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import springWebshop.application.integration.ProductCategoryRepository;
-import springWebshop.application.model.domain.ProductCategory;
+import springWebshop.application.integration.product.ProductCategoryRepository;
+import springWebshop.application.model.domain.segmentation.ProductCategory;
 
 @Service
 public class ProductCategoryServiceImpl implements ProductCategoryService {

@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import springWebshop.application.model.domain.Address;
+import springWebshop.application.model.domain.order.Address;
 
 import java.io.Serializable;
 import java.util.Objects;

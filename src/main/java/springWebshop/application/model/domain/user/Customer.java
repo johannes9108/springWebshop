@@ -13,7 +13,7 @@ import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import springWebshop.application.model.domain.Order;
+import springWebshop.application.model.domain.order.Order;
 
 @Getter
 @Setter

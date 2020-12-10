@@ -16,7 +16,7 @@ public class SegmentDTO {
 	private String name;
 	@Override
 	public String toString() {
-		return "ProductCategoryDTO [id=" + id + ", name=" + name + "]";
+		return "SegmentDTO [id=" + id + ", name=" + name + "]";
 	}
 
 	

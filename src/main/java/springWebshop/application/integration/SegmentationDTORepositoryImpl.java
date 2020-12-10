@@ -15,9 +15,9 @@ import javax.persistence.criteria.Root;
 
 import org.springframework.stereotype.Repository;
 
-import springWebshop.application.model.domain.ProductCategory;
-import springWebshop.application.model.domain.ProductSubCategory;
-import springWebshop.application.model.domain.ProductType;
+import springWebshop.application.model.domain.segmentation.ProductCategory;
+import springWebshop.application.model.domain.segmentation.ProductSubCategory;
+import springWebshop.application.model.domain.segmentation.ProductType;
 import springWebshop.application.model.dto.SegmentDTO;
 
 @Repository
@@ -34,8 +34,7 @@ public class SegmentationDTORepositoryImpl implements SegmentationDTORepository{
 			Root<ProductCategory> category = query.from(ProductCategory.class);
 			query.multiselect(category.get("id"),category.get("name"));
 			TypedQuery<SegmentDTO> typedQuery = em.createQuery(query);
-			System.out.println("TQ CAT:" + typedQuery.getResultList());
-
+			typedQuery.setFirstResult(1);
 			return typedQuery.getResultList();
 		}
 		catch(NoResultException e) {
@@ -95,6 +94,7 @@ public class SegmentationDTORepositoryImpl implements SegmentationDTORepository{
 			Root<ProductSubCategory> category = query.from(ProductSubCategory.class);
 			query.multiselect(category.get("id"),category.get("name"));
 			TypedQuery<SegmentDTO> typedQuery = em.createQuery(query);
+			typedQuery.setFirstResult(1);
 			return typedQuery.getResultList();
 		}
 		catch(NoResultException e) {
@@ -110,6 +110,7 @@ public class SegmentationDTORepositoryImpl implements SegmentationDTORepository{
 			Root<ProductType> category = query.from(ProductType.class);
 			query.multiselect(category.get("id"),category.get("name"));
 			TypedQuery<SegmentDTO> typedQuery = em.createQuery(query);
+			typedQuery.setFirstResult(1);
 			return typedQuery.getResultList();
 		}
 		catch(NoResultException e) {

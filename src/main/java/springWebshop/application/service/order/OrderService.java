@@ -1,8 +1,8 @@
 package springWebshop.application.service.order;
 
-import springWebshop.application.model.domain.Address;
-import springWebshop.application.model.domain.Order;
 import springWebshop.application.model.domain.Product;
+import springWebshop.application.model.domain.order.Address;
+import springWebshop.application.model.domain.order.Order;
 import springWebshop.application.model.domain.user.CustomerAddress;
 import springWebshop.application.model.dto.ShoppingCartDTO;
 import springWebshop.application.service.ServiceResponse;

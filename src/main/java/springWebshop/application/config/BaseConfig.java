@@ -14,22 +14,22 @@ import org.springframework.context.annotation.Configuration;
 import org.thymeleaf.templateresolver.FileTemplateResolver;
 import org.thymeleaf.templateresolver.ITemplateResolver;
 
-import springWebshop.application.integration.AccountRepository;
-import springWebshop.application.integration.CompanyRepository;
-import springWebshop.application.integration.CustomerAddressRespoitory;
-import springWebshop.application.integration.CustomerRepository;
-import springWebshop.application.integration.OrderRepository;
-import springWebshop.application.integration.ProductCategoryRepository;
-import springWebshop.application.integration.ProductRepository;
-import springWebshop.application.integration.ProductSubCategoryRepository;
-import springWebshop.application.integration.ProductTypeRepository;
-import springWebshop.application.model.domain.Address;
-import springWebshop.application.model.domain.Order;
-import springWebshop.application.model.domain.OrderLine;
+import springWebshop.application.integration.account.AccountRepository;
+import springWebshop.application.integration.account.CompanyRepository;
+import springWebshop.application.integration.account.CustomerAddressRespoitory;
+import springWebshop.application.integration.account.CustomerRepository;
+import springWebshop.application.integration.order.OrderRepository;
+import springWebshop.application.integration.product.ProductCategoryRepository;
+import springWebshop.application.integration.product.ProductRepository;
+import springWebshop.application.integration.product.ProductSubCategoryRepository;
+import springWebshop.application.integration.product.ProductTypeRepository;
 import springWebshop.application.model.domain.Product;
-import springWebshop.application.model.domain.ProductCategory;
-import springWebshop.application.model.domain.ProductSubCategory;
-import springWebshop.application.model.domain.ProductType;
+import springWebshop.application.model.domain.order.Address;
+import springWebshop.application.model.domain.order.Order;
+import springWebshop.application.model.domain.order.OrderLine;
+import springWebshop.application.model.domain.segmentation.ProductCategory;
+import springWebshop.application.model.domain.segmentation.ProductSubCategory;
+import springWebshop.application.model.domain.segmentation.ProductType;
 import springWebshop.application.model.domain.user.Customer;
 import springWebshop.application.model.domain.user.CustomerAddress;
 import springWebshop.application.model.dto.ShoppingCartDTO;
@@ -278,24 +278,32 @@ public class BaseConfig {
     private void testingRedesignedProductRepoAndService(ProductRepository productRepository,
                                                         ProductTypeRepository typeRepo, ProductCategoryRepository catRepo, ProductSubCategoryRepository subCatRepo) {
         int noCat = 3, noSub = 4,noType = 5;
+        ProductCategory category = new ProductCategory("All");
+        catRepo.save(category);
+        ProductSubCategory subCategory = new ProductSubCategory("All",
+        		catRepo.findById(1L).get());
+        subCatRepo.save(subCategory);
+        ProductType prodType = new ProductType("All",
+        		subCatRepo.findById(1L).get());
+        typeRepo.save(prodType);
 
 		
-		for (int i = 0; i < noCat; i++) {
-			ProductCategory category = new ProductCategory("Category " + (i + 1));
+		for (int i = 2; i <= noCat+1; i++) {
+			 category = new ProductCategory("Category " + (i));
 			catRepo.save(category);
 
 		}
-		for (int i = 0; i < noSub; i++) {
-			long rand = new Random().nextInt(noCat)+1;
+		for (int i = 2; i <= noSub+1; i++) {
+			long rand = new Random().nextInt(noCat)+2;
 //			System.out.println("Cat Rand:"+rand);
-			ProductSubCategory subCategory = new ProductSubCategory("SubCategory " + (i + 1),
+			subCategory = new ProductSubCategory("SubCategory " + (i),
 					catRepo.findById(rand).get());
 			subCatRepo.save(subCategory);
 		}
-		for (int i = 0; i < noType; i++) {
-			long rand = new Random().nextInt(noSub)+1;
+		for (int i = 2; i <= noType+1; i++) {
+			long rand = new Random().nextInt(noSub)+2;
 //			System.out.println("Sub Rand:"+rand);
-			ProductType prodType = new ProductType("ProductType " + (i + 1),
+			prodType = new ProductType("ProductType " + (i),
 					subCatRepo.findById(rand).get());
 			typeRepo.save(prodType);
 
@@ -313,7 +321,7 @@ public class BaseConfig {
 
 
         for (int i = 0; i < 100; i++) {
-        	long rand = new Random().nextInt(noType)+1;
+        	long rand = new Random(System.currentTimeMillis()).nextInt(noType)+2;
             Product product1 = new Product();
             product1.setName("Product " + (i+1));
             product1.setDescription("Testing this big product " + (i+1));

@@ -1,6 +1,9 @@
 package springWebshop.application.model.domain;
 
 import lombok.*;
+import springWebshop.application.model.domain.segmentation.ProductCategory;
+import springWebshop.application.model.domain.segmentation.ProductSubCategory;
+import springWebshop.application.model.domain.segmentation.ProductType;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -38,4 +41,20 @@ public class Product {
 	public int hashCode() {
 		return Objects.hash(id);
 	}
+
+	public boolean updateProductCat(ProductCategory newCat) {
+		
+	return true;
+	}
+	public boolean updateProductSub(ProductSubCategory newSub) {
+		
+		return true;
+	}
+	public boolean updateProductType(ProductType newType) {
+		productType.getProductSubCategory().addProductType(newType);
+		productType.getProductSubCategory().removeProductType(productType);
+		productType = newType;
+		return true;
+	}
+	
 }
