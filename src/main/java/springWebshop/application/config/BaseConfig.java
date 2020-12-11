@@ -130,11 +130,10 @@ public class BaseConfig {
             Account account = accountRepository.findByEmail("admin1@gmail.com").get();
             System.out.println(account);
 
-
             createOrderTest(orderService);
             OrderSearchConfig orderConf = OrderSearchConfig.builder()
-//                    .minTotalSum(10.00)
-//                    .maxTotalSum(90.00)
+                    .minTotalSum(10.00)
+                    .maxTotalSum(90.00)
                     .status(Order.OrderStatus.NOT_HANDLED)
                     .sortBy(OrderSearchConfig.SortBy.totalSum)
                     .build();
