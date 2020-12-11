@@ -52,7 +52,7 @@ public class OrderRepositoryCustomImpl extends AbstractCustomRepository<Order> i
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(orderRoot.get("totalSum"), config.getMaxTotalSum()));
             }
 
-            criteriaQuery.select(orderRoot).where(predicates.toArray(new Predicate[0])).distinct(true);
+            criteriaQuery.select(orderRoot).distinct(true).where(predicates.toArray(new Predicate[0]));
             if (config.getSortBy() != null) {
                 criteriaQuery.orderBy(criteriaBuilder.desc(orderRoot.get(config.getSortBy().name())));
             }
