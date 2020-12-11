@@ -5,7 +5,6 @@ import java.util.*;
 
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import springWebshop.application.integration.account.CustomerRepository;
@@ -20,7 +19,6 @@ import springWebshop.application.model.domain.user.Customer;
 import springWebshop.application.model.dto.ShoppingCartDTO;
 import springWebshop.application.service.ServiceErrorMessages;
 import springWebshop.application.service.ServiceResponse;
-import springWebshop.application.service.product.ProductSearchConfig;
 
 @Service("PROD")
 @Primary
@@ -73,16 +71,6 @@ public class OrderSerivceImpl implements OrderService {
         return getAllOrdersPageAndSize(config, 0, defaultPageSize);
     }
 
-//    @Override
-//    public ServiceResponse<Order> getAllOrders() {
-//        return getAllOrderPageAndSize(0, defaultPageSize);
-//    }
-//
-//    @Override
-//    public ServiceResponse<Order> getAllOrders(int page, int size) {
-//        return getAllOrderPageAndSize(page, size);
-//    }
-
     @Override
     public ServiceResponse<Order> getOrders(OrderSearchConfig orderSearchConfig) {
         return getAllOrdersPageAndSize(orderSearchConfig, 0, defaultPageSize);
@@ -114,28 +102,6 @@ public class OrderSerivceImpl implements OrderService {
                     "You have requested " + size + "orders. Max allowed page size is " + maxPageSize);
         return serviceResponse;
     }
-
-
-//    @Override
-//    public ServiceResponse<Order> getAllOrders(int page) {
-//        return getAllOrderPageAndSize(page, defaultPageSize);
-//    }
-
-//    private ServiceResponse<Order> getAllOrderPageAndSize(int page, int size) {
-//        ServiceResponse<Order> serviceResponse = new ServiceResponse<>();
-//        if (size <= maxPageSize)
-//            try {
-//                Page<Order> response = orderRepository.findAll(PageRequest.of(page, size));
-//                setPageMetaData(response, serviceResponse);
-//                serviceResponse.setResponseObjects(response.getContent());
-//            } catch (Exception e) {
-//                serviceResponse.addErrorMessage(ServiceErrorMessages.ORDER.couldNotFind() + "s page " + page + ".");
-//            }
-//        else
-//            serviceResponse.addErrorMessage(
-//                    "You have requested " + size + "orders. Max allowed page size is " + maxPageSize);
-//        return serviceResponse;
-//    }
 
     private void setPageMetaData(Page page, ServiceResponse serviceResponse) {
         serviceResponse.setTotalPages(page.getTotalPages());

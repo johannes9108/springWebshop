@@ -11,6 +11,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class OrderRepositoryCustomImpl extends AbstractCustomRepository<Order> implements OrderRepositoryCustom {
@@ -50,6 +51,34 @@ public class OrderRepositoryCustomImpl extends AbstractCustomRepository<Order> i
             }
             if (config.getMaxTotalSum() != null) {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(orderRoot.get("totalSum"), config.getMaxTotalSum()));
+                predicates.add(criteriaBuilder.isNotNull(orderRoot.get("totalSum")));
+            }
+
+            if (config.getStatus() != null) {
+                if (config.getStatus() == Order.OrderStatus.CANCELED) {
+                    predicates.add(criteriaBuilder.isNotNull(orderRoot.get("canceled")));
+                } else {
+                    predicates.add(criteriaBuilder.isNull(orderRoot.get("canceled")));
+                    switch (config.getStatus()) {
+                        case NOT_HANDLED:
+                            predicates.add(criteriaBuilder.isNull(orderRoot.get("dispatched")));
+                            predicates.add(criteriaBuilder.isNull(orderRoot.get("inDelivery")));
+                            predicates.add(criteriaBuilder.isNull(orderRoot.get("deliveryComplete")));
+                            break;
+                        case DISPATCHED:
+                            predicates.add(criteriaBuilder.isNotNull(orderRoot.get("dispatched")));
+                            predicates.add(criteriaBuilder.isNull(orderRoot.get("inDelivery")));
+                            predicates.add(criteriaBuilder.isNull(orderRoot.get("deliveryComplete")));
+                            break;
+                        case DELIVERY:
+                            predicates.add(criteriaBuilder.isNotNull(orderRoot.get("inDelivery")));
+                            predicates.add(criteriaBuilder.isNull(orderRoot.get("deliveryComplete")));
+                            break;
+                        case DELIVERY_COMPLETED:
+                            predicates.add(criteriaBuilder.isNotNull(orderRoot.get("deliveryComplete")));
+                            break;
+                    }
+                }
             }
 
             criteriaQuery.select(orderRoot).distinct(true).where(predicates.toArray(new Predicate[0]));

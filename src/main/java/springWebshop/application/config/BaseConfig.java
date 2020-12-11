@@ -141,6 +141,32 @@ public class BaseConfig {
             Account account = accountRepository.findByEmail("admin1@gmail.com").get();
             System.out.println(account);
 
+            prepareRoles(roleRepository);
+            createCustomers(customerRepository, companyRepository, roleRepository, 50);
+            Customer persistedCustomer = customerRepository.findById(1L).get();
+            System.out.println(persistedCustomer);
+            persistedCustomer.getAddresses().forEach(System.out::println);
+            createAdmins(adminRepository, roleRepository, 10);
+            Account account = accountRepository.findByEmail("admin1@gmail.com").get();
+            System.out.println(account);
+
+
+            createOrderTest(orderService);
+            OrderSearchConfig orderConf = OrderSearchConfig.builder()
+//                    .minTotalSum(10.00)
+//                    .maxTotalSum(90.00)
+                    .status(Order.OrderStatus.NOT_HANDLED)
+                    .sortBy(OrderSearchConfig.SortBy.totalSum)
+                    .build();
+            System.out.println(orderConf);
+            ServiceResponse<Order> searchOrderResult = orderService.getOrders(orderConf);
+            List<Order> orderList = searchOrderResult.getResponseObjects();
+            System.out.println("Start order search result print");
+            if (searchOrderResult.isSucessful()){
+                orderList.forEach(order -> System.out.println(order.getHeaderString()));
+            } else searchOrderResult.getErrorMessages().forEach(System.out::println);
+
+            System.out.println("End order search result print");
 
             createOrderTest(orderService);
             OrderSearchConfig orderConf = OrderSearchConfig.builder()
@@ -165,6 +191,8 @@ public class BaseConfig {
 //            });
 >>>>>>> 5e74aa2 :bug: Fixing a bug in AbstractCustomRepository by adding expected Class as param, example: getPaginatedResult(..., Order.class)
 
+//           
+
 
         };
 
@@ -186,7 +214,11 @@ public class BaseConfig {
             statusList.add(Order.OrderStatus.DELIVERY);
             statusList.add(Order.OrderStatus.DELIVERY_COMPLETED);
 
-<<<<<<< Upstream, based on ExpeditingFromUI
+            if(randomBetween(0,4) != 0){
+                ServiceResponse<Order> setStatusResponse = orderService.setStatus(i, statusList.get(randomBetween(0, 3)));
+                System.out.println("Changed status successfully: " + setStatusResponse.isSucessful() + setStatusResponse.getErrorMessages());
+            }
+
 		    ServiceResponse response = orderService.setStatus(i, statusList.get(randomBetween(0,3)));
 		    System.out.println("Changed status successfully: " + response.isSucessful() + response.getErrorMessages());
 		}
@@ -199,6 +231,16 @@ public class BaseConfig {
 //		    System.out.println(order);
 //		});
 	}
+        }
+//        OrderSearchConfig orderSearchConfig = new OrderSearchConfig();
+//        orderSearchConfig.setMaxTotalSum(350.00);
+//        orderSearchConfig.setSortBy(OrderSearchConfig.SortBy.totalSum);
+//        ServiceResponse<Order> searchOrderResponse = orderService.getOrders(orderSearchConfig, 0, 30);
+//        System.out.println(searchOrderResponse);
+//        searchOrderResponse.getResponseObjects().forEach(order -> {
+//            System.out.println(order);
+//        });
+    }
 =======
             ServiceResponse<Order> setStatusResponse = orderService.setStatus(i, statusList.get(randomBetween(0, 3)));
             System.out.println("Changed status successfully: " + setStatusResponse.isSucessful() + setStatusResponse.getErrorMessages());
