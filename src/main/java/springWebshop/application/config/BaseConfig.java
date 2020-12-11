@@ -40,26 +40,12 @@ import springWebshop.application.service.order.OrderSearchConfig;
 import springWebshop.application.service.order.OrderService;
 import springWebshop.application.service.product.ProductSearchConfig;
 import springWebshop.application.service.product.ProductService;
+import springWebshop.application.service.user.AccountService;
 
 @Configuration
 public class BaseConfig {
     final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-//    final
-//    ProductRepository productRepository;
-//    final
-//    ProductTypeRepository typeRepo;
-//    final
-//    ProductCategoryRepository catRepo;
-//    final
-//    ProductSubCategoryRepository subCatRepo;
-//
-//    final
-//    AccountRepository accountRepository;
-//    final
-//    CompanyRepository companyRepository;
-
-    //    final
-//    ProductSerivce productService;
+    final PasswordEncoder passwordEncoder;
     private final ThymeleafProperties properties;
     @Autowired
     @Qualifier("ProductServiceImpl")
@@ -67,14 +53,8 @@ public class BaseConfig {
     @Value("${spring.thymeleaf.templates_root:}")
     private String templatesRoot;
 
-    public BaseConfig(ThymeleafProperties properties) {
-//        this.productRepository = productRepository;
-//        this.typeRepo = typeRepo;
-//        this.catRepo = catRepo;
-//        this.subCatRepo = subCatRepo;
-//        this.accountRepository = accountRepository;
-//        this.companyRepository = companyRepository;
-//        this.productService = productService;
+    public BaseConfig(ThymeleafProperties properties, PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
         this.properties = properties;
     }
 
@@ -333,7 +313,31 @@ public class BaseConfig {
                 CustomerAddress address = new CustomerAddress("Storgatan " + (i + 1), randomBetween(11401, 94789), "City X", "Sweden");
                 customer.addAddress(address);
             }
-            customerRepository.save(customer);
+            ServiceResponse<Customer> resp = accountService.createCustomer(customer);
+            if (resp.isSucessful()) {
+                System.out.println("JAAAAAAAAA!!-->: " + resp);
+            } else System.out.println("NEEEEEEEEEEEEEEEEEEEJ!!-->: " + resp);;
+        }
+        List<Customer> customerList = new ArrayList<>();
+        customerList.add(accountService.getCustomerById(10L).getResponseObjects().get(0));
+        customerList.add(accountService.getCustomerById(20L).getResponseObjects().get(0));
+
+        Company company = new Company();
+        company.setVAT("SE556587983701");
+        company.setCustomers(customerList);
+        companyRepository.save(company);
+    }
+
+
+    private void createAdmins(AccountService accountService, int quantity) {
+        for (int i = 0; i < quantity; i++) {
+            Admin admin = new Admin();
+            admin.setFirstName("Admin");
+            admin.setLastName("Number" + (i + 1));
+            admin.setEmail("admin" + (i + 1) + "@gmail.com");
+            admin.setPhoneNumber("46709408925");
+            admin.setPassword("password");
+            accountService.createAdmin(admin);
         }
         List<Customer> customerList = new ArrayList<>();
         customerList.add(customerRepository.findById(10L).get());

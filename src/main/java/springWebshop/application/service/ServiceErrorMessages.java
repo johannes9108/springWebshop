@@ -2,6 +2,7 @@ package springWebshop.application.service;
 
 public enum ServiceErrorMessages {
         CUSTOMER("customer"),
+        ADMIN("admin"),
         ORDER("order"),
         PRODUCT("product"),
         PRODUCT_TYPE("product type"),
