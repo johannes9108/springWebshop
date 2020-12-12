@@ -176,11 +176,6 @@ public class ProductSegmentationServiceMockImpl implements SegmentationService {
 		return null;
 	}
 
-	@Override
-	public ServiceResponse<Object> handleFiltering(SegmentationModelObject categoryModel, ProductSearchConfig config) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public ServiceResponse<SegmentationModelObject> fullSegmentation(Product currentProduct) {
@@ -190,6 +185,19 @@ public class ProductSegmentationServiceMockImpl implements SegmentationService {
 
 	@Override
 	public ServiceResponse<Integer> create(String string, SegmentationModelObject segmentationModel) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ServiceResponse<Object> prepareSegmentationModel(SegmentationModelObject categoryModel) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ServiceResponse<Object> prepareProductConfig(SegmentationModelObject categoryModel,
+			ProductSearchConfig config) {
 		// TODO Auto-generated method stub
 		return null;
 	}

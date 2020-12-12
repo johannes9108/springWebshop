@@ -85,7 +85,9 @@ public class AdminController {
 			newSMO.setCategories(listOfCategories.getResponseObjects());
 			session.setCategoryModel(newSMO);
 		}
-		segmentationService.handleFiltering(session.getCategoryModel(), config);
+		segmentationService.prepareSegmentationModel(session.getCategoryModel());
+		segmentationService.prepareProductConfig(session.getCategoryModel(), config);
+		
 		ServiceResponse<Product> response = productService.getProducts(config, currentPage > 0 ? currentPage - 1 : 0,
 				20);
 
@@ -131,7 +133,8 @@ public class AdminController {
 		if (resetFlag)
 			session.setCategoryModel(new SegmentationModelObject());
 
-		segmentationService.handleFiltering(session.getCategoryModel(), config);
+		segmentationService.prepareSegmentationModel(session.getCategoryModel());
+		segmentationService.prepareProductConfig(session.getCategoryModel(), config);
 		ServiceResponse<Product> response = productService.getProducts(config, currentPage > 0 ? currentPage - 1 : 0,
 				20);
 		if (response.isSucessful()) {
@@ -179,7 +182,8 @@ public class AdminController {
 		if (newSegmentation.isPresent()) {
 			System.out.println("New Segment:" + newSegmentation);
 			adminService.createNewSegmentation(newSegmentation.get(), session.getCategoryModel());
-			segmentationService.handleFiltering(session.getCategoryModel(), config);
+			segmentationService.prepareSegmentationModel(session.getCategoryModel());
+			segmentationService.prepareProductConfig(session.getCategoryModel(), config);
 		}
 
 		else if (action.isPresent()) {
@@ -208,13 +212,15 @@ public class AdminController {
 //				session.getCategoryModel().getTypes().clear();
 				session.getCategoryModel().setSelectedSub(0);
 				session.getCategoryModel().setSelectedType(0);
-				segmentationService.handleFiltering(session.getCategoryModel(), config);
+				segmentationService.prepareSegmentationModel(session.getCategoryModel());
+				segmentationService.prepareProductConfig(session.getCategoryModel(), config);
 
 			} else if (ac.compareToIgnoreCase("sub") == 0) {
 //				session.getCategoryModel().setTypes(segmentationService.getTypesBySubCategoryId(actionValue.get()).getResponseObjects());
 				session.getCategoryModel().setSelectedType(0);
 //				session.getCategoryModel().getTypes().clear();
-				segmentationService.handleFiltering(session.getCategoryModel(), config);
+				segmentationService.prepareSegmentationModel(session.getCategoryModel());
+				segmentationService.prepareProductConfig(session.getCategoryModel(), config);
 
 			} else if (ac.compareToIgnoreCase("type") == 0) {
 				adminService.updateSegmentationOfProduct("type", session.getCategoryModel(), productId);
@@ -257,7 +263,8 @@ public class AdminController {
 		if (newSegmentation.isPresent()) {
 			System.out.println("New Segment:" + newSegmentation);
 			adminService.createNewSegmentation(newSegmentation.get(), session.getCategoryModel());
-			segmentationService.handleFiltering(session.getCategoryModel(), config);
+			segmentationService.prepareSegmentationModel(session.getCategoryModel());
+			segmentationService.prepareProductConfig(session.getCategoryModel(), config);
 		} else if (action.isPresent()) {
 			String ac = action.get();
 			if (ac.compareToIgnoreCase("cat") == 0) {
@@ -265,13 +272,15 @@ public class AdminController {
 //				session.getCategoryModel().getTypes().clear();
 				session.getCategoryModel().setSelectedSub(0);
 				session.getCategoryModel().setSelectedType(0);
-				segmentationService.handleFiltering(session.getCategoryModel(), config);
+				segmentationService.prepareSegmentationModel(session.getCategoryModel());
+				segmentationService.prepareProductConfig(session.getCategoryModel(), config);
 
 			} else if (ac.compareToIgnoreCase("sub") == 0) {
 //				session.getCategoryModel().setTypes(segmentationService.getTypesBySubCategoryId(actionValue.get()).getResponseObjects());
 				session.getCategoryModel().setSelectedType(0);
 //				session.getCategoryModel().getTypes().clear();
-				segmentationService.handleFiltering(session.getCategoryModel(), config);
+				segmentationService.prepareSegmentationModel(session.getCategoryModel());
+				segmentationService.prepareProductConfig(session.getCategoryModel(), config);
 
 			}
 		} else {

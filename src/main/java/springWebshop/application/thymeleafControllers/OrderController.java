@@ -44,8 +44,8 @@ public class OrderController {
 	
 	@PostMapping("checkout")
 	public String postCheckout(@ModelAttribute SessionModel sessionModel, Model m) {
-		m.addAttribute("linkMap", getLinks());
 		//TODO Validation, navigation
+		m.addAttribute("linkMap", getLinks());
 		
 		System.out.println(sessionModel.getCart().getTotalItems());
 		System.out.println(sessionModel.getUser().getId());

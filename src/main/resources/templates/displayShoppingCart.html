@@ -50,7 +50,7 @@
 
 
     <footer>
-        <a href="/webshop/products">Back to Shopping</a>
+        <a th:href="@{/webshop/products(page=${session.sessionModel.productPage})}">Back to Shopping</a>
 
     </footer>
 

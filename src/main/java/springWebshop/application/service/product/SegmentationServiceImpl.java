@@ -225,8 +225,23 @@ public class SegmentationServiceImpl implements SegmentationService {
 	}
 
 	@Override
-	public ServiceResponse<Object> handleFiltering(SegmentationModelObject categoryDTO, ProductSearchConfig config) {
+	public ServiceResponse<Object> prepareSegmentationModel(SegmentationModelObject categoryDTO) {
 		ServiceResponse<SegmentDTO> listOfSegmentDTOs = new ServiceResponse<>();
+		prepareCategoryModel(categoryDTO);
+		
+		return new ServiceResponse<>();
+	}
+	@Override
+	public ServiceResponse<Object> prepareProductConfig(SegmentationModelObject categoryDTO, ProductSearchConfig config) {
+		config.setProductCategoryId(categoryDTO.getSelectedCat());
+		config.setProductSubCategoryId(categoryDTO.getSelectedSub());
+		config.setProductTypeId(categoryDTO.getSelectedType());
+		
+		return new ServiceResponse<>();
+	}
+
+	private void prepareCategoryModel(SegmentationModelObject categoryDTO) {
+		ServiceResponse<SegmentDTO> listOfSegmentDTOs;
 		categoryDTO.setCategories(getAllCategories().getResponseObjects());
 		if (categoryDTO.getSelectedCat() > 0) {
 			listOfSegmentDTOs = getSubCategoriesByCategoryId(categoryDTO.getSelectedCat());
@@ -246,11 +261,6 @@ public class SegmentationServiceImpl implements SegmentationService {
 		} else {
 			resetCategories(categoryDTO);
 		}
-		config.setProductCategoryId(categoryDTO.getSelectedCat());
-		config.setProductSubCategoryId(categoryDTO.getSelectedSub());
-		config.setProductTypeId(categoryDTO.getSelectedType());
-		
-		return new ServiceResponse<>();
 	}
 	
 

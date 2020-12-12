@@ -20,7 +20,8 @@ public interface SegmentationService{
 	ServiceResponse<ProductType> getProductTypeById(long id);
 	ServiceResponse<SegmentDTO> getSubCategoriesByCategoryId(long categoryId);
 	ServiceResponse<SegmentDTO> getTypesBySubCategoryId(long subCategoryId);
-	ServiceResponse<Object> handleFiltering(SegmentationModelObject categoryModel, ProductSearchConfig config);
+	ServiceResponse<Object> prepareSegmentationModel(SegmentationModelObject categoryModel);
+	ServiceResponse<Object> prepareProductConfig(SegmentationModelObject categoryModel,ProductSearchConfig config);
 	ServiceResponse<SegmentationModelObject> fullSegmentation(Product currentProduct);
 	
 	int getNoCategories();

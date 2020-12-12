@@ -66,61 +66,36 @@ public class ProductController {
 		return new SessionModel(productService,productSegmentationService, customerRepository);
 	}
 
-	
-	
-//
-//	@PostConstruct
-//	void init() {
-//		productCategoryService.save(new ProductCategory("Tools"));
-//		productCategoryService.save(new ProductCategory("Furniture"));
-//		productCategoryService.save(new ProductCategory("Grocery"));
-//
-//		productTypeService.save(new ProductSubCategory("Hammers"));
-//		productTypeService.save(new ProductSubCategory("Couches"));
-//		productTypeService.save(new ProductSubCategory("Ice Cream"));*//*
-//	}
-//
-//	@GetMapping()
-//	public String home(Model model) {
-//		model.addAttribute("newProduct", new ProductFormModel());
-//		return "createNewProduct";
-//	}
-//
-//	@PostMapping()
-//	public String postHome(ProductFormModel postData, Model model) {
-//		System.out.println(postData);
-//		model.addAttribute("newProduct", new ProductFormModel());
-//		postData.getDomainProduct().setProductType(new ProductType());
-//		productService.create(postData.getDomainProduct());
-//		return "createNewProduct";
-//	}
-
 	@GetMapping(path = { "products" })
-	public String getAllProducts(@ModelAttribute("sessionModel") SessionModel session, BindingResult result,
-			@RequestParam(required = false, name = "page",defaultValue = "1") Optional<Integer> pathPage, Model m) {
-		m.addAttribute("linkMap", getLinks());
+	public String getAllProducts(@ModelAttribute("sessionModel") SessionModel session,
+			BindingResult result,
+			@RequestParam(required = false, name = "page",defaultValue = "1") Optional<Integer> pathPage,
+			Model m) {
 		System.out.println("GET");
-//		resetCategories(session.getCategoryModel());
-//		selectFilteredProducts(category,subcategory,type);
 		int currentPage = pathPage.isPresent() ? pathPage.get() : session.getProductPage();
+		
+		
+		productSegmentationService.prepareSegmentationModel(session.getCategoryModel());
 		ProductSearchConfig config = new ProductSearchConfig();
-		productSegmentationService.handleFiltering(session.getCategoryModel(),config);
+		productSegmentationService.prepareProductConfig(session.getCategoryModel(), config);
+		
 		
 		ServiceResponse<Product> response = productService.getProducts(config,currentPage > 0 ? currentPage - 1 : 0, 10);
-		System.out.println(response);
-//		ServiceResponse<Product> response = productService.getProducts(currentPage > 0 ? currentPage - 1 : 0, 10);
-		m.addAttribute("allProducts", response.getResponseObjects());
-		session.setProductPage(currentPage);
-		// Doesnt return Error Message? Empty list
-		m.addAttribute("totalPages", response.getTotalPages());
+		
+		if(response.isSucessful()) {
+				session.setProductPage(currentPage);
+				m.addAttribute("totalPages", response.getTotalPages());
+		}
+		else {
+			m.addAttribute("errorMessages", response.getErrorMessages());
+			m.addAttribute("totalPages", 1);
+			session.setProductPage(1);
+		}
+				
+		
+		m.addAttribute("allProducts", response.getResponseObjects());			
+		m.addAttribute("linkMap", getLinks());
 		m.addAttribute("sessionModel", session);
-
-		
-		
-		
-		
-		
-		
 		return "displayProducts";
 	}
 
@@ -143,12 +118,15 @@ public class ProductController {
 	@PostMapping(path = { "products" })
 	public String postAddItemToCart(
 			@RequestParam(required = false, name ="reset") boolean reset,
-			@RequestParam("id") Optional<Integer> productId,@ModelAttribute("sessionModel") SessionModel session,
-			@RequestParam(required = false, name = "page") Optional<Integer> pathPage, Model m) {
-//		System.out.println("POST from products");
-		m.addAttribute("linkMap", getLinks());
+			@RequestParam("id") Optional<Integer> productId,
+			@ModelAttribute("sessionModel") SessionModel session,
+			@RequestParam(required = false, name = "page") Optional<Integer> pathPage,
+			Model m) {
+		
+		productSegmentationService.prepareSegmentationModel(session.getCategoryModel());
 		ProductSearchConfig config = new ProductSearchConfig();
-		productSegmentationService.handleFiltering(session.getCategoryModel(),config);
+		productSegmentationService.prepareProductConfig(session.getCategoryModel(), config);
+		
 		System.out.println("POST");
 
 		System.out.println("Reset:" + reset);
@@ -165,8 +143,8 @@ public class ProductController {
 		m.addAttribute("allProducts", response.getResponseObjects());
 		// Doesnt return Error Message? Empty list
 		
+		m.addAttribute("linkMap", getLinks());
 		m.addAttribute("totalPages", response.getTotalPages());
-
 		return "displayProducts";
 	}
 	

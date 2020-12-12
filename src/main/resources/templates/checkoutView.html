@@ -70,7 +70,7 @@
 </head>
 
 <body th:with="cart=${session.sessionModel.cart},user=${session.sessionModel.user}">
-    <div th:replace="fragments/header.html :: header(title='Checkout')"></div>
+    <div th:replace="fragments/header.html :: header(title='Checkout',links=${linkMap})"></div>
     <main class="container">
         <section class="wrapper" th:object="${cart}">
 
