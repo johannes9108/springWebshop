@@ -39,14 +39,14 @@ public class ProductRepositoryCustomImpl extends AbstractCustomRepository<Produc
 			}
 			else if (config.getProductSubCategoryId() > 0) {
 				predicates.add(criteriaBuilder.equal(
-						product.get("productType").get("productSubCategory").get("id"),
+						product.get("productType").get("subCategoryId"),
 						config.getProductSubCategoryId()));
 				
 //				System.out.println("Filter by SubCategory");
 			}
 			else if (config.getProductCategoryId() > 0) {
 				predicates.add(criteriaBuilder.equal(
-						product.get("productType").get("productSubCategory").get("productCategory").get("id"),
+						product.get("productType").get("categoryId"),
 						config.getProductCategoryId()));
 //				System.out.println("Filter by Category");
 				

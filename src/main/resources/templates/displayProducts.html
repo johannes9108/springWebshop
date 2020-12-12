@@ -20,6 +20,12 @@
 
 
         }
+        function reset(element) {
+            console.log("Resetting:" + element)
+            element.val('0');
+
+            console.log(element)
+        }
         $(document).ready(function () {
             let categoriesObject = /*[[${sessionModel.categoryModel}]]*/;
             let session = /*[[${session}]]*/;
@@ -33,6 +39,8 @@
                 $('#type').attr("disabled", false);
             }
             $('#cat').on('change', function () {
+                reset($('#sub'));
+                reset($('#type'));
                 let selectedVal = this.value;
                 console.log(selectedVal)
                 $('<input />').attr('type', 'hidden')
@@ -41,6 +49,7 @@
                 document.forms['filter'].submit();
             });
             $('#sub').on('change', function () {
+                reset($('#type'));
                 let selectedVal = this.value;
                 console.log(selectedVal)
                 $('<input />').attr('type', 'hidden')
@@ -98,7 +107,7 @@
             <div th:each="product : ${allProducts}" class="productItem">
                 <a th:href="@{__${#request.getRequestURL()}__/product/__${product.id}__}">
                         <span th:text="${product.name}">test</span></a>
-                        <!-- <span th:text="${product.productType}"></span> -->
+                        <span th:text="${product.productType}"></span>
                         <!-- <span th:text="${product.productType.toString()}"></span> -->
                         <form method="POST" th:action="@{/webshop/products(id=__${product.id}__)}">
                             <input  type="submit" value="Add to cart"/>

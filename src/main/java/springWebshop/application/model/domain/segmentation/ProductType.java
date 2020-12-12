@@ -19,13 +19,19 @@ public class ProductType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-
+    
+    
+    private long categoryId;
+    private long subCategoryId;
+    
     private String name;
 
     @ManyToOne
     private ProductSubCategory productSubCategory;
 
     public ProductType(String name, ProductSubCategory productSubCategory) {
+    	this.subCategoryId = productSubCategory.getId();
+    	this.categoryId = productSubCategory.getProductCategory().getId();
         this.name = name;
         this.productSubCategory = productSubCategory;
     }
