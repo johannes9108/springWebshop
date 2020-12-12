@@ -15,42 +15,52 @@
 
 
 
-        .categories {
-            background-color: greenyellow;
+        .segmentation {
+            /* background-color: greenyellow; */
             display: grid;
             grid-template-rows: 4fr 1fr;
         }
 
-        .categoriesContainer {
-            display: grid;
+        .segmentationContainer>* {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             box-sizing: border-box;
-            background-color: seagreen;
+            /* background-color: seagreen; */
+        }
+
+        .segmentationRow {
+            display: flex;
+            flex-direction: column;
+            width: 50%;
+        }
+
+        .segmentationInput {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
         }
 
         .category {
             margin: 1rem;
-            background-color: skyblue;
+            /* background-color: skyblue; */
         }
 
         .subCategory {
             margin: 1rem;
 
-            background-color: rebeccapurple;
+            /* background-color: rebeccapurple; */
         }
 
         .type {
             margin: 1rem;
-            background-color: black;
-        }
-
-        .categoriesMeta {
-            margin: 1rem;
-            background-color: khaki;
+            /* background-color: black; */
         }
 
 
         .product {
-            background-color: red;
+            /* background-color: red; */
             display: grid;
             height: 100%;
             grid-template-rows: 4fr 1fr;
@@ -59,15 +69,17 @@
         }
 
         .productTable {
-            background-color: blue;
             display: flex;
             flex-direction: column;
-            padding: 1rem;
             overflow: auto;
         }
 
         .productMeta {
-            background-color: yellow;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* justify-content: space-around; */
         }
 
         .dataRow {
@@ -86,12 +98,51 @@
         }
 
         .pages {
+            align-self: center;
             margin: auto 0 0 0;
 
         }
     </style>
     <script type="text/javascript" th:src="@{/js/jquery-3.5.1.min.js}"></script>
+    <script th:inline="javascript">
+        $(document).ready(function () {
+            let categoriesObject = /*[[${sessionModel.categoryModel}]]*/;
+            let session = /*[[${session}]]*/;
+            let segmentation = /*[[${sessionModel.categoryModel}]]*/;
 
+            console.log(segmentation);
+
+
+            if (categoriesObject.selectedCat > 0) {
+                $('#sub').attr("disabled", false);
+            }
+            if (categoriesObject.selectedSub > 0) {
+                $('#type').attr("disabled", false);
+            }
+
+
+
+
+            $('#cat').on('change', function () {
+                let selectedVal = this.value;
+                console.log(selectedVal)
+
+                document.forms['filter'].submit();
+            });
+            $('#sub').on('change', function () {
+                let selectedVal = this.value;
+                console.log(selectedVal)
+
+                document.forms['filter'].submit();
+            });
+            $('#type').on('change', function () {
+                let selectedVal = this.value;
+                console.log(selectedVal)
+
+                document.forms['filter'].submit();
+            });
+        });
+    </script>
 </head>
 
 <body th:with="currentPage=(${sessionModel.productPage})">
@@ -105,7 +156,7 @@
                     <span>Name</span>
                     <span>Price</span>
                 </div>
-                <a th:each="product : ${allProducts}" th:href="@{__${#request.getRequestURL()}__/product/__${product.id}__}">
+                <a th:each="product : ${allProducts}" th:href="@{/webshop/admin/products/product/__${product.id}__}">
                     <div class="dataRow">
                         <span th:text="${product.id}">ID</span>
                         <span th:text="${product.name}">Name</span>
@@ -122,32 +173,67 @@
 
 
             </div>
-            <div class="productMeta">
-                <button>Add New Product</button>
-                <button>Delete Selected Product</button>
-                <input type="text" placeholder="Search for name">
-            </div>
+
         </section>
-        <section class="categories">
-            <div class="categoriesContainer">
-                <div class="category">
-
+        <section class="segmentation" th:object="${sessionModel.categoryModel}">
+            <div class="segmentationContainer" th:object="${sessionModel.categoryModel}">
+                <!-- <p th:text="*{categories}"></p>
+                            <p th:text="*{subCategories}"></p>
+                            <p th:text="*{types}"></p> -->
+                <!-- <p th:text="*{selectedCat}"></p> -->
+                <form name="filter" th:action="@{/webshop/admin/products}" method="POST">
+                    <div class="segmentationRow">
+                        <span>Category</span>
+                        <select id="cat" th:field="*{selectedCat}">
+                            <option value="0">All</option>
+                            <option th:each="category : *{categories}" th:text="${category.name}"
+                                th:value="${category.id}">
+                            </option>
+                        </select>
+                    </div>
+                    <div class="segmentationRow">
+                        <span>SubCategory</span>
+                        <select id="sub" th:field="*{selectedSub}" disabled>
+                            <option value="0">All</option>
+                            <option th:each="subCategory : *{subCategories}" th:text="${subCategory.name}"
+                                th:value="${subCategory.id}">
+                                Subcategories</option>
+                        </select>
+                    </div>
+                    <div class="segmentationRow">
+                        <span>Type</span>
+                        <select id="type" th:field="*{selectedType}" disabled>
+                            <option value="0">All</option>
+                            <option th:each="type : *{types}" th:text="${type.name}" th:value="${type.id}"></option>
+                            Types</option>
+                        </select>
+                    </div>
+                </form>
+                <form method="POST" th:action="@{/webshop/admin/products}">
+                    <div class="segmentationInput">
+                        <span th:if="*{selectedCat==0}">Custom Category</span>
+                        <span th:if="*{selectedSub==0 && selectedCat!=0}">Custom Subcategory</span>
+                        <span th:if="*{selectedType==0 && selectedCat!=0 && selectedSub!=0}">Custom Type</span>
+                        <input th:unless="*{selectedType!=0 && selectedCat!=0 && selectedSub!=0}" type="text"
+                            name="newSegmentation" th:value="${newSegmentation}" />
+                        <input th:if="*{selectedCat==0}" type="submit" value="Add New Category" />
+                        <input th:if="*{selectedSub==0 && selectedCat!=0}" type="submit" value="Add New Sub Category" />
+                        <input th:if="*{selectedType==0 && selectedCat!=0 && selectedSub!=0}" type="submit"
+                            value="Add New Type" />
+                        <!-- <input type="submit" value="Delete Selected Category"> -->
+                    </div>
+                </form>
+                <div class="productMeta">
+                    <form method="POST" th:action="@{/webshop/admin/products}">
+                        <input type="text" name="searchInput" th:value="${searchInput}" placeholder="Search for name">
+                        <input type="submit" id="search" value="Search">
+                    </form>
                 </div>
-                <div class="subCategory">
+                <a th:href="@{/webshop/admin/products/new}">Add New Product</a>
 
-                </div>
-                <div class="type">
-
-                </div>
-
-                <div>
-                    <input type="text">
-                </div>
             </div>
-            <div class="categoriesMeta">
-                <input type="submit" value="Add New Category">
-                <input type="submit" value="Delete Selected Category">
-            </div>
+
+
         </section>
 
 

@@ -34,7 +34,6 @@ public class SegmentationDTORepositoryImpl implements SegmentationDTORepository{
 			Root<ProductCategory> category = query.from(ProductCategory.class);
 			query.multiselect(category.get("id"),category.get("name"));
 			TypedQuery<SegmentDTO> typedQuery = em.createQuery(query);
-			typedQuery.setFirstResult(1);
 			return typedQuery.getResultList();
 		}
 		catch(NoResultException e) {
@@ -94,7 +93,6 @@ public class SegmentationDTORepositoryImpl implements SegmentationDTORepository{
 			Root<ProductSubCategory> category = query.from(ProductSubCategory.class);
 			query.multiselect(category.get("id"),category.get("name"));
 			TypedQuery<SegmentDTO> typedQuery = em.createQuery(query);
-			typedQuery.setFirstResult(1);
 			return typedQuery.getResultList();
 		}
 		catch(NoResultException e) {
@@ -110,7 +108,6 @@ public class SegmentationDTORepositoryImpl implements SegmentationDTORepository{
 			Root<ProductType> category = query.from(ProductType.class);
 			query.multiselect(category.get("id"),category.get("name"));
 			TypedQuery<SegmentDTO> typedQuery = em.createQuery(query);
-			typedQuery.setFirstResult(1);
 			return typedQuery.getResultList();
 		}
 		catch(NoResultException e) {

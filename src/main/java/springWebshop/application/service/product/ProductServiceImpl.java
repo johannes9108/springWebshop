@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import springWebshop.application.integration.product.ProductRepository;
 import springWebshop.application.integration.product.ProductTypeRepository;
 import springWebshop.application.model.domain.Product;
+import springWebshop.application.model.domain.segmentation.ProductType;
 import springWebshop.application.service.ServiceErrorMessages;
 import springWebshop.application.service.ServiceResponse;
 
@@ -116,6 +117,8 @@ public class ProductServiceImpl implements ProductService {
 	public ServiceResponse<Product> create(Product newProduct) {
 		ServiceResponse<Product> response = new ServiceResponse<>();
 		List<String> errors = new ArrayList<>();
+		newProduct.setProductType(productTypeRepository.findById(1L).get());
+		System.out.println("In Create:" + newProduct);
 
 		if (isValidNewProduct(newProduct, errors))
 			try {

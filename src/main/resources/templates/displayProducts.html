@@ -98,7 +98,7 @@
             <div th:each="product : ${allProducts}" class="productItem">
                 <a th:href="@{__${#request.getRequestURL()}__/product/__${product.id}__}">
                         <span th:text="${product.name}">test</span></a>
-                        <span th:text="${product.productType}"></span>
+                        <!-- <span th:text="${product.productType}"></span> -->
                         <!-- <span th:text="${product.productType.toString()}"></span> -->
                         <form method="POST" th:action="@{/webshop/products(id=__${product.id}__)}">
                             <input  type="submit" value="Add to cart"/>

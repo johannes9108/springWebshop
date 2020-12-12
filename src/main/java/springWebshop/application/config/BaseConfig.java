@@ -99,40 +99,40 @@ public class BaseConfig {
 //        	productService.getProductById(1L).getResponseObjects().forEach(t->System.out.println(t.getId() + ":" + t.getName()));
 //        	productService.getProductByName("Johannes").getResponseObjects().forEach(t->System.out.println(t.getId() + ":" + t.getName()));
 //
-//            createCustomers(customerRepository, 50);
-//            Customer persistedCustomer = customerRepository.findById(1L).get();
-//            System.out.println(persistedCustomer);
-//            persistedCustomer.getAddresses().forEach(System.out::println);
-//
-//
-//
-//            ShoppingCartDTO randomShoppingCartDTO = getRandomShoppingCartDTO(productService, 1, 100);
-//            Address deliveryAddress = persistedCustomer.getAddresses()
-//                    .stream()
-//                    .filter(address -> address.isDefaultAddress())
-//                    .findFirst().get();
-//
-//            System.out.println("Input shoppingCart: \n" + randomShoppingCartDTO
-//                    + "\nInput deliveryAddress: \n" + deliveryAddress);
-//
-//            ServiceResponse<Order> createOrderResponse = orderService.createOrderFromShoppingCart(randomShoppingCartDTO, 1L, deliveryAddress);
-//            System.out.println("Created order - response: " + createOrderResponse);
-//
-//
-//
-//            if (createOrderResponse.isSucessful()) {
-//                System.out.println(createOrderResponse.getResponseObjects());
-//            }
-//
-//            productSearchTest(productService);
-//
-//
-//
-//
-//
-//            testSetOrderStatus(orderService, 1L);
-//
-//            orderSearchTest(orderService, productService, deliveryAddress, createOrderResponse);
+            createCustomers(customerRepository, 50);
+            Customer persistedCustomer = customerRepository.findById(1L).get();
+            System.out.println(persistedCustomer);
+            persistedCustomer.getAddresses().forEach(System.out::println);
+
+
+
+            ShoppingCartDTO randomShoppingCartDTO = getRandomShoppingCartDTO(productService, 1, 100);
+            Address deliveryAddress = persistedCustomer.getAddresses()
+                    .stream()
+                    .filter(address -> address.isDefaultAddress())
+                    .findFirst().get();
+
+            System.out.println("Input shoppingCart: \n" + randomShoppingCartDTO
+                    + "\nInput deliveryAddress: \n" + deliveryAddress);
+
+            ServiceResponse<Order> createOrderResponse = orderService.createOrderFromShoppingCart(randomShoppingCartDTO, 1L, deliveryAddress);
+            System.out.println("Created order - response: " + createOrderResponse);
+
+
+
+            if (createOrderResponse.isSucessful()) {
+                System.out.println(createOrderResponse.getResponseObjects());
+            }
+
+            productSearchTest(productService);
+
+
+
+
+
+            testSetOrderStatus(orderService, 1L);
+
+            orderSearchTest(orderService, productService, deliveryAddress, createOrderResponse);
 
 
 
@@ -161,14 +161,14 @@ public class BaseConfig {
 		    ServiceResponse response = orderService.setStatus(i, statusList.get(randomBetween(0,3)));
 		    System.out.println("Changed status successfully: " + response.isSucessful() + response.getErrorMessages());
 		}
-		OrderSearchConfig orderSearchConfig = new OrderSearchConfig();
-		orderSearchConfig.setMaxTotalSum(350.00);
-		orderSearchConfig.setSortBy(OrderSearchConfig.SortBy.totalSum);
-		ServiceResponse<Order> searchOrderResponse = orderService.getOrders(orderSearchConfig, 0,30);
-		System.out.println(searchOrderResponse);
-		searchOrderResponse.getResponseObjects().forEach(order -> {
-		    System.out.println(order);
-		});
+//		OrderSearchConfig orderSearchConfig = new OrderSearchConfig();
+//		orderSearchConfig.setMaxTotalSum(350.00);
+//		orderSearchConfig.setSortBy(OrderSearchConfig.SortBy.totalSum);
+//		ServiceResponse<Order> searchOrderResponse = orderService.getOrders(orderSearchConfig, 0,30);
+//		System.out.println(searchOrderResponse);
+//		searchOrderResponse.getResponseObjects().forEach(order -> {
+//		    System.out.println(order);
+//		});
 	}
 
 	private void productSearchTest(ProductService productService) {
@@ -278,32 +278,24 @@ public class BaseConfig {
     private void testingRedesignedProductRepoAndService(ProductRepository productRepository,
                                                         ProductTypeRepository typeRepo, ProductCategoryRepository catRepo, ProductSubCategoryRepository subCatRepo) {
         int noCat = 3, noSub = 4,noType = 5;
-        ProductCategory category = new ProductCategory("All");
-        catRepo.save(category);
-        ProductSubCategory subCategory = new ProductSubCategory("All",
-        		catRepo.findById(1L).get());
-        subCatRepo.save(subCategory);
-        ProductType prodType = new ProductType("All",
-        		subCatRepo.findById(1L).get());
-        typeRepo.save(prodType);
+       
 
-		
-		for (int i = 2; i <= noCat+1; i++) {
-			 category = new ProductCategory("Category " + (i));
+		for (int i = 1; i <= noCat; i++) {
+			ProductCategory category = new ProductCategory("Category " + (i));
 			catRepo.save(category);
 
 		}
-		for (int i = 2; i <= noSub+1; i++) {
-			long rand = new Random().nextInt(noCat)+2;
+		for (int i = 1; i <= noSub; i++) {
+			long rand = new Random().nextInt(noCat)+1;
 //			System.out.println("Cat Rand:"+rand);
-			subCategory = new ProductSubCategory("SubCategory " + (i),
+			ProductSubCategory subCategory = new ProductSubCategory("SubCategory " + (i),
 					catRepo.findById(rand).get());
 			subCatRepo.save(subCategory);
 		}
-		for (int i = 2; i <= noType+1; i++) {
-			long rand = new Random().nextInt(noSub)+2;
+		for (int i = 1; i <= noType; i++) {
+			long rand = new Random().nextInt(noSub)+1;
 //			System.out.println("Sub Rand:"+rand);
-			prodType = new ProductType("ProductType " + (i),
+			ProductType prodType = new ProductType("ProductType " + (i),
 					subCatRepo.findById(rand).get());
 			typeRepo.save(prodType);
 
@@ -320,11 +312,11 @@ public class BaseConfig {
 //        ProductType prodType = new ProductType("Gungstol", subCat2);
 
 
-        for (int i = 0; i < 100; i++) {
-        	long rand = new Random(System.currentTimeMillis()).nextInt(noType)+2;
+        for (int i = 1; i <= 100; i++) {
+        	long rand = new Random().nextInt(noType)+1;
             Product product1 = new Product();
-            product1.setName("Product " + (i+1));
-            product1.setDescription("Testing this big product " + (i+1));
+            product1.setName("Product " + (i));
+            product1.setDescription("Testing this big product " + (i));
             product1.setBasePrice(new Random().nextInt(50));
             product1.setProductType(typeRepo.findById(rand).get());
             product1.setVatPercentage(i % 2 == 0 ? 0.25 : 0.12);

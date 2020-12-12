@@ -9,6 +9,7 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.GeneratorType;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -23,10 +24,9 @@ import java.util.Set;
 public class ProductSubCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    long id;
+    private long id;
 
-    @NotBlank
-    String name;
+    private String name;
 
     @ManyToOne
     @NotNull
@@ -38,6 +38,7 @@ public class ProductSubCategory {
 
 
     public ProductSubCategory(String name, ProductCategory productCategory) {
+    	this.productTypes = new HashSet<ProductType>();
         this.name = name;
         this.productCategory = productCategory;
     }
@@ -64,7 +65,7 @@ public class ProductSubCategory {
         return Objects.hash(id);
     }
 
-	public @NotBlank String getFullyQualifiedName() {
+	public String getFullyQualifiedName() {
 		return productCategory.getFullyQualifiedName() + "/" + name ;
 	}
 

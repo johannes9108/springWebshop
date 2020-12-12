@@ -9,8 +9,22 @@ body {
 header {
   height: 11%;
 }
+.navigationLinks {
+  width: 20vw;
+  display: flex;
+  justify-content: space-around;
+}
+.navigationLinks > a {
+  border-bottom: 1px darkcyan solid;
+  border-top: 1px darkcyan solid;
+  padding: 0.5rem 1rem;
+}
+.navigationLinks > a:hover {
+  background-color: rgb(219, 226, 243);
+}
 main {
-  background-image: linear-gradient(white, beige);
+  padding: 1rem 0;
+  background-image: linear-gradient(white, rgb(239, 255, 250));
   height: 80%;
 }
 footer {

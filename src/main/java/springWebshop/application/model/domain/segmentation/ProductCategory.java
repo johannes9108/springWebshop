@@ -60,7 +60,7 @@ public class ProductCategory {
         return "Category:"+name;
         
     }
-	public @NotBlank String getFullyQualifiedName() {
+	public String getFullyQualifiedName() {
 		return name;
 	}
 }

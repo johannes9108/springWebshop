@@ -2,6 +2,7 @@ package springWebshop.application.service.product;
 
 import java.util.ArrayList;
 
+import springWebshop.application.model.domain.Product;
 import springWebshop.application.model.domain.segmentation.ProductCategory;
 import springWebshop.application.model.domain.segmentation.ProductSubCategory;
 import springWebshop.application.model.domain.segmentation.ProductType;
@@ -20,6 +21,7 @@ public interface SegmentationService{
 	ServiceResponse<SegmentDTO> getSubCategoriesByCategoryId(long categoryId);
 	ServiceResponse<SegmentDTO> getTypesBySubCategoryId(long subCategoryId);
 	ServiceResponse<Object> handleFiltering(SegmentationModelObject categoryModel, ProductSearchConfig config);
+	ServiceResponse<SegmentationModelObject> fullSegmentation(Product currentProduct);
 	
 	int getNoCategories();
 	int getNoSubCategories();
@@ -28,6 +30,7 @@ public interface SegmentationService{
 	ArrayList<ProductType> getTypeStore();
 	ArrayList<ProductSubCategory> getSubCategoryStore();
 	ArrayList<ProductCategory> getCategoryStore();
+	ServiceResponse<Integer> create(String string, SegmentationModelObject segmentationModel);
 	
 	
 

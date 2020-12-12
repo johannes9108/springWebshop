@@ -18,13 +18,11 @@ import java.util.Objects;
 public class ProductType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    long id;
+    private long id;
 
-    @NotBlank
-    String name;
+    private String name;
 
     @ManyToOne
-    @NotNull
     private ProductSubCategory productSubCategory;
 
     public ProductType(String name, ProductSubCategory productSubCategory) {

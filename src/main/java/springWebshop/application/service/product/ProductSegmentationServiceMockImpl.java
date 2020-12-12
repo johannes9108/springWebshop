@@ -10,6 +10,7 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.stereotype.Service;
 
+import springWebshop.application.model.domain.Product;
 import springWebshop.application.model.domain.segmentation.ProductCategory;
 import springWebshop.application.model.domain.segmentation.ProductSubCategory;
 import springWebshop.application.model.domain.segmentation.ProductType;
@@ -177,6 +178,18 @@ public class ProductSegmentationServiceMockImpl implements SegmentationService {
 
 	@Override
 	public ServiceResponse<Object> handleFiltering(SegmentationModelObject categoryModel, ProductSearchConfig config) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ServiceResponse<SegmentationModelObject> fullSegmentation(Product currentProduct) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ServiceResponse<Integer> create(String string, SegmentationModelObject segmentationModel) {
 		// TODO Auto-generated method stub
 		return null;
 	}

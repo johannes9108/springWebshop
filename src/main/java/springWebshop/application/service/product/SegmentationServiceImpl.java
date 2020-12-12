@@ -157,6 +157,37 @@ public class SegmentationServiceImpl implements SegmentationService {
 		}
 		return response;
 	}
+	
+	@Override
+
+	public ServiceResponse<SegmentationModelObject> fullSegmentation(Product currentProduct) {
+		ServiceResponse<SegmentDTO> response = new ServiceResponse<>();
+		SegmentationModelObject fullSegmentation = new SegmentationModelObject();
+		
+		long catId = currentProduct.getProductType().getProductSubCategory().getProductCategory().getId();
+		long subId = currentProduct.getProductType().getProductSubCategory().getId();
+		long typeId = currentProduct.getProductType().getId();
+		ProductCategory cat = productCategoryRepository.findById(catId).get();
+		ProductSubCategory sub = productSubCategoryRepository.findById(subId).get();
+		ProductType type = productTypeRepository.findById(typeId).get();
+		SegmentDTO catDTO = new SegmentDTO(cat.getId(), cat.getName());
+		SegmentDTO subDTO = new SegmentDTO(sub.getId(), sub.getName());
+		SegmentDTO typeDTO = new SegmentDTO(type.getId(), type.getName());
+		
+		fullSegmentation.setCategories(segmentationDTORepository.getAllCategoryDTO());
+		fullSegmentation.setSubCategories(segmentationDTORepository.getAllSubCategoryDTO(catId));
+		fullSegmentation.setTypes(segmentationDTORepository.getAllTypeDTO(subId));
+
+		fullSegmentation
+				.setSelectedCat(catId);
+		
+		
+		fullSegmentation.setSelectedSub(subId);
+		fullSegmentation.setSelectedType(typeId);
+		ServiceResponse<SegmentationModelObject> returningResponse = new ServiceResponse<>();
+		returningResponse.addResponseObject(fullSegmentation);
+		return returningResponse;
+	}
 
 	@Override
 	public ArrayList<ProductType> getTypeStore() {
@@ -196,6 +227,7 @@ public class SegmentationServiceImpl implements SegmentationService {
 	@Override
 	public ServiceResponse<Object> handleFiltering(SegmentationModelObject categoryDTO, ProductSearchConfig config) {
 		ServiceResponse<SegmentDTO> listOfSegmentDTOs = new ServiceResponse<>();
+		categoryDTO.setCategories(getAllCategories().getResponseObjects());
 		if (categoryDTO.getSelectedCat() > 0) {
 			listOfSegmentDTOs = getSubCategoriesByCategoryId(categoryDTO.getSelectedCat());
 			if (listOfSegmentDTOs.isSucessful()) {
@@ -226,8 +258,59 @@ public class SegmentationServiceImpl implements SegmentationService {
 		categoryModelObject.setSelectedCat(0);
 		categoryModelObject.setSelectedSub(0);
 		categoryModelObject.setSelectedType(0);
+		ServiceResponse<SegmentDTO> response = getAllCategories();
+		if(response.isSucessful())
+		categoryModelObject.setCategories(response.getResponseObjects());
 		categoryModelObject.getSubCategories().clear();
 		categoryModelObject.getTypes().clear();
+	}
+
+	@Override
+	public ServiceResponse<Integer> create(String name, SegmentationModelObject segmentationModel) {
+		ServiceResponse<Integer> response = new ServiceResponse<>();
+		try {
+			switch(whichNewSegment(segmentationModel)) {
+			case 1:
+				ProductCategory catResult = productCategoryRepository.save(new ProductCategory(name));
+				response.addResponseObject(1);
+				break;
+			case 2:
+				Optional<ProductCategory> persistedProductCategory = productCategoryRepository.findById(segmentationModel.getSelectedCat());
+				if(persistedProductCategory.isPresent()) {
+					ProductSubCategory subResult = productSubCategoryRepository.save(new ProductSubCategory(name, persistedProductCategory.get()));					
+					response.addResponseObject(2);
+				}
+				break;
+				
+			case 3:
+				Optional<ProductSubCategory> persistedProductSubCategory = productSubCategoryRepository.findById(segmentationModel.getSelectedSub());
+				if(persistedProductSubCategory.isPresent()) {
+					ProductType typeResult = productTypeRepository.save(new ProductType(name, persistedProductSubCategory.get()));
+					response.addResponseObject(3);
+				}
+				break;
+			}
+			
+			return response;
+		}
+		catch(Exception e) {
+			System.err.println(e);
+			return response;
+		}
+	}
+
+	private int whichNewSegment(SegmentationModelObject segmentationModel) {
+		if(segmentationModel.getSelectedCat() == 0) {
+			return 1;
+		}
+		else {
+			if(segmentationModel.getSelectedSub()==0) {
+				return 2;
+			}
+			else {
+				return 3;
+			}
+		}
 	}
 
 }
