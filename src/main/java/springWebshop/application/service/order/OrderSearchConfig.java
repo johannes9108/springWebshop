@@ -1,15 +1,17 @@
 package springWebshop.application.service.order;
 
-import java.time.LocalDate;
-
 import lombok.Getter;
 import lombok.Setter;
 import springWebshop.application.model.domain.order.Order.OrderStatus;
 
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class OrderSearchConfig {
 
+    Order.OrderStatus status;
     LocalDate createdEarliest;
     LocalDate createdLatest;
     LocalDate dispatchedEarliest;

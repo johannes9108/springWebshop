@@ -273,7 +273,7 @@ public class OrderSerivceImpl implements OrderService {
         OrderStatus currentStatus = order.getOrderStatus();
         System.out.println("ORDER:"+order);
 
-        if (statusHierarchy.get(currentStatus) <= statusHierarchy.get(requestedOrderStatus)) {
+        if (isValidNewStatus(currentStatus, requestedOrderStatus)) {
             switch (requestedOrderStatus) {
                 case CANCELED:
                     order.setCanceled(now);
@@ -283,9 +283,12 @@ public class OrderSerivceImpl implements OrderService {
                     break;
                 case DELIVERY:
                     order.setInDelivery(now);
+                    if (order.getDispatched() == null) order.setDispatched(now);
                     break;
                 case DELIVERY_COMPLETED:
                     order.setDeliveryComplete(now);
+                    if (order.getDispatched() == null) order.setDispatched(now);
+                    if (order.getInDelivery() == null) order.setInDelivery(now);
                     break;
                 default:
                     errors.add(requestedOrderStatus + "is not a valid status.");
@@ -297,6 +300,10 @@ public class OrderSerivceImpl implements OrderService {
             errors.add("Cannot set status to " + requestedOrderStatus + " since current status is already set to " + currentStatus);
             return false;
         }
+    }
+
+    private boolean isValidNewStatus(OrderStatus currentStatus, OrderStatus newStatus){
+        return statusHierarchy.get(currentStatus) <= statusHierarchy.get(newStatus);
     }
 
     private boolean orderExist(long orderId, List<String> errors) {

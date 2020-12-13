@@ -105,6 +105,7 @@ public class BaseConfig {
             Customer persistedCustomer = customerRepository.findById(1L).get();
             System.out.println(persistedCustomer);
             persistedCustomer.getAddresses().forEach(System.out::println);
+<<<<<<< Upstream, based on ExpeditingFromUI
 
 
 
@@ -135,6 +136,34 @@ public class BaseConfig {
             testSetOrderStatus(orderService, 1L);
 
             orderSearchTest(orderService, productService, deliveryAddress, createOrderResponse);
+=======
+            createAdmins(adminRepository, roleRepository, 10);
+            Account account = accountRepository.findByEmail("admin1@gmail.com").get();
+            System.out.println(account);
+
+
+            createOrderTest(orderService);
+            OrderSearchConfig orderConf = OrderSearchConfig.builder()
+                    .minTotalSum(10.00)
+                    .maxTotalSum(90.00)
+                    .sortBy(OrderSearchConfig.SortBy.totalSum)
+                    .build();
+            System.out.println(orderConf);
+            ServiceResponse<Order> searchOrderResult = orderService.getOrders(orderConf);
+            List<Order> orderList = searchOrderResult.getResponseObjects();
+            System.out.println("Start order search result print");
+            System.out.println(searchOrderResult.isSucessful() ? orderList : searchOrderResult.getErrorMessages());
+            System.out.println("End order search result print");
+
+//            OrderSearchConfig orderSearchConfig = new OrderSearchConfig();
+//            orderSearchConfig.setMaxTotalSum(350.00);
+//            orderSearchConfig.setSortBy(OrderSearchConfig.SortBy.totalSum);
+//            ServiceResponse<Order> searchOrderResponse = orderService.getOrders(orderSearchConfig, 0, 30);
+//            System.out.println(searchOrderResponse);
+//            searchOrderResponse.getResponseObjects().forEach(order -> {
+//                System.out.println(order);
+//            });
+>>>>>>> 5e74aa2 :bug: Fixing a bug in AbstractCustomRepository by adding expected Class as param, example: getPaginatedResult(..., Order.class)
 
 
         };
@@ -142,22 +171,22 @@ public class BaseConfig {
 
     }
 
-    private void orderSearchTest(OrderService orderService, ProductService productService, Address deliveryAddress,
-                                 ServiceResponse<Order> createOrderResponse) {
+    private void createOrderTest(OrderService orderService) {
         for (int i = 0; i < 100; i++) {
-            ShoppingCartDTO cart = getRandomShoppingCartDTO(productService, 1, 100);
-
-            orderService.createOrderFromShoppingCart(cart, randomBetween(1, 50), deliveryAddress);
-            System.out.println("Created order sucessfully: " + createOrderResponse.isSucessful());
+            Address deliveryAddress2 = new CustomerAddress("Storgatan " + (i + 1), randomBetween(11120, 98799), "Stockholm", "Sweden");
+            ShoppingCartDTO randomShoppingCartDTO = getRandomShoppingCartDTO(productService, 1, 100);
+            ServiceResponse<Order> createOrderResponse = orderService.createOrderFromShoppingCart(randomShoppingCartDTO, randomBetween(1, 50), deliveryAddress2);
+            System.out.println("Created order - sucessfully: " + createOrderResponse.isSucessful());
         }
 
-        for (int i = 2; i < 100; i++) {
+        for (int i = 1; i < 100; i++) {
             ArrayList<Order.OrderStatus> statusList = new ArrayList<>();
             statusList.add(Order.OrderStatus.CANCELED);
             statusList.add(Order.OrderStatus.DISPATCHED);
             statusList.add(Order.OrderStatus.DELIVERY);
             statusList.add(Order.OrderStatus.DELIVERY_COMPLETED);
 
+<<<<<<< Upstream, based on ExpeditingFromUI
 		    ServiceResponse response = orderService.setStatus(i, statusList.get(randomBetween(0,3)));
 		    System.out.println("Changed status successfully: " + response.isSucessful() + response.getErrorMessages());
 		}
@@ -170,6 +199,20 @@ public class BaseConfig {
 //		    System.out.println(order);
 //		});
 	}
+=======
+            ServiceResponse<Order> setStatusResponse = orderService.setStatus(i, statusList.get(randomBetween(0, 3)));
+            System.out.println("Changed status successfully: " + setStatusResponse.isSucessful() + setStatusResponse.getErrorMessages());
+        }
+//        OrderSearchConfig orderSearchConfig = new OrderSearchConfig();
+//        orderSearchConfig.setMaxTotalSum(350.00);
+//        orderSearchConfig.setSortBy(OrderSearchConfig.SortBy.totalSum);
+//        ServiceResponse<Order> searchOrderResponse = orderService.getOrders(orderSearchConfig, 0, 30);
+//        System.out.println(searchOrderResponse);
+//        searchOrderResponse.getResponseObjects().forEach(order -> {
+//            System.out.println(order);
+//        });
+    }
+>>>>>>> 5e74aa2 :bug: Fixing a bug in AbstractCustomRepository by adding expected Class as param, example: getPaginatedResult(..., Order.class)
 
     private void productSearchTest(ProductService productService) {
         ProductSearchConfig prodConf = new ProductSearchConfig();
