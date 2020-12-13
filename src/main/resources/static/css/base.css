@@ -6,9 +6,7 @@ body {
   width: 80vw;
   margin: auto;
 }
-header {
-  height: 11%;
-}
+
 .navigationLinks {
   width: 20vw;
   display: flex;
@@ -26,9 +24,9 @@ main {
   padding: 1rem 0;
   background-image: linear-gradient(white, rgb(239, 255, 250));
   height: 80%;
-}
-footer {
-  height: 9%;
+  border-bottom: 1px solid darkcyan;
+  border-top: 1px solid darkcyan;
+  box-sizing: border-box;
 }
 .container {
   display: grid;
@@ -37,19 +35,15 @@ footer {
   width: 80vw;
 }
 
-main {
-  border-bottom: 1px solid darkcyan;
-  border-top: 1px solid darkcyan;
-  box-sizing: border-box;
-}
-
 header {
+  height: 11%;
   display: flex;
   box-sizing: border-box;
   align-items: center;
   justify-content: space-between;
 }
 footer {
+  height: 9%;
   display: flex;
   box-sizing: border-box;
   align-items: center;
@@ -89,4 +83,7 @@ a:visited {
 
 a:hover {
   color: royalblue;
+}
+textarea {
+  resize: none;
 }

@@ -64,5 +64,12 @@ public class OrderController {
 		
 		//Redirect to OrderCompleted or myaccount
 	}
+	@GetMapping("testOrderView")
+	public String getOrderCompleteView(Model m) {
+		
+
+		m.addAttribute("completedOrder",orderService.getOrderById(1L).getResponseObjects().get(0));
+		return "orderCompletedView";
+	}
 
 }

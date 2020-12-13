@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 import springWebshop.application.integration.account.CustomerAddressRespoitory;
 import springWebshop.application.integration.account.CustomerRepository;
+import springWebshop.application.model.domain.order.Order.OrderStatus;
 import springWebshop.application.model.domain.user.Account;
 import springWebshop.application.model.domain.user.Customer;
 import springWebshop.application.model.domain.user.CustomerAddress;
@@ -31,7 +32,10 @@ public class SessionModel {
 	private Customer user;
 	private ShoppingCartDTO cart;
 	private int productPage;
+	private int orderPage;
+	private int accountPage;
 	private SegmentationModelObject categoryModel;
+	private OrderStatus orderStatus;
 	
 	public SessionModel(ProductService productService, SegmentationService productSegmentationService, CustomerRepository custRepo) {
 		// Start session as guest
@@ -41,10 +45,12 @@ public class SessionModel {
 			CustomerAddress address = new CustomerAddress("Storgatan " + j, (j*33), "City X", "Sweden");
 			addresses.add(address);
 		}
-		
+		orderStatus = OrderStatus.NOT_HANDLED;
 		user = new Customer("Johannes", "Hedman", "Password", "Email@email.com", "12341234", "123412123",addresses);
 		custRepo.save(user);
 		productPage = 1;
+		orderPage = 1;
+		accountPage = 1;
 		categoryModel = new SegmentationModelObject();
 		categoryModel.setCategories(productSegmentationService.getAllCategories().getResponseObjects());
 	}

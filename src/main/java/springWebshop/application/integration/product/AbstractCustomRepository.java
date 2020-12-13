@@ -35,7 +35,7 @@ public abstract class AbstractCustomRepository<T> {
 		int firstResult = page * size;
 		CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
 		CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
-		countQuery.select(criteriaBuilder.count(countQuery.from(Product.class)))
+		countQuery.select(criteriaBuilder.count(countQuery.from(Order.class)))
 				.where(predicates.toArray(new Predicate[0]));
 		
 		Long totalItems = em.createQuery(countQuery).getSingleResult();

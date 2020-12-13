@@ -8,22 +8,30 @@
 .cartContainer {
   padding: 2rem;
   background-color: beige;
-  display: grid;
-  grid-auto-rows: 50px;
+  display: flex;
+  flex-direction: column;
   gap: 1rem;
   overflow: auto;
 }
 
 .cartItem {
-  padding: 2rem;
+  padding: 0.5rem;
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: center;
   background-color: azure;
   border-bottom: 1px solid black;
 }
+
 .itemInfo {
+  display: flex;
+  flex-flow: wrap;
+  /* justify-content: space-around; */
 }
+.itemInfo > span {
+  margin: 0.5rem;
+}
+
 .itemEdit {
   display: flex;
 }

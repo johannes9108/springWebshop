@@ -1,5 +1,6 @@
 <header th:fragment="header(title,links)">
     <h1 th:text="${title}"></h1>
+    <p th:if="${errorMessage}" th:text="${errorMessage}"></p>
     <nav class="navigationLinks">
         <a th:each="link,meta : ${links}" th:text="${link.key}" th:href="@{${link.value}}"></a>
     </nav>

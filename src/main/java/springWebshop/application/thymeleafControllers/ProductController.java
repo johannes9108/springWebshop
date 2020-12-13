@@ -58,9 +58,6 @@ public class ProductController {
 		return linkMap;
 		
 	}
-	
-	
-	
 	@ModelAttribute("sessionModel")
 	private SessionModel getSessionModel() {
 		return new SessionModel(productService,productSegmentationService, customerRepository);
@@ -99,52 +96,33 @@ public class ProductController {
 		return "displayProducts";
 	}
 
-
-
-	private void resetCategories(SegmentationModelObject categoryModelObject) {
-		categoryModelObject.setSelectedCat(0);
-		categoryModelObject.setSelectedSub(0);
-		categoryModelObject.setSelectedType(0);
-		categoryModelObject.getSubCategories().clear();
-		categoryModelObject.getTypes().clear();
-	}
-	
-	private void selectFilteredProducts(Optional<String> category, Optional<String> subcategory, Optional<String> type) {
-		System.out.println(category);
-		System.out.println(subcategory);
-		System.out.println(type);
-	}
-
 	@PostMapping(path = { "products" })
-	public String postAddItemToCart(
-			@RequestParam(required = false, name ="reset") boolean reset,
+	public String postAddItemFromProducts(
 			@RequestParam("id") Optional<Integer> productId,
 			@ModelAttribute("sessionModel") SessionModel session,
-			@RequestParam(required = false, name = "page") Optional<Integer> pathPage,
 			Model m) {
 		
 		productSegmentationService.prepareSegmentationModel(session.getCategoryModel());
 		ProductSearchConfig config = new ProductSearchConfig();
 		productSegmentationService.prepareProductConfig(session.getCategoryModel(), config);
 		
-		System.out.println("POST");
-
-		System.out.println("Reset:" + reset);
+		int currentPage = session.getProductPage();
 		
+		//TODO GÖR SHOPPINGCART SERVICE???
 		if(productId.isPresent())
 			session.getCart().addItem(productId.get());
-		int currentPage = 0;
-		if(!reset) {
-		  currentPage = pathPage.isPresent() ? pathPage.get() : session.getProductPage();
-		}
-		ServiceResponse<Product> response = productService.getProducts(config,currentPage > 0 ? currentPage - 1 : 0, 10);
-		System.out.println(response);
-		session.setProductPage(currentPage);
-		m.addAttribute("allProducts", response.getResponseObjects());
-		// Doesnt return Error Message? Empty list
 		
+		ServiceResponse<Product> response = productService.getProducts(config,currentPage > 0 ? currentPage - 1 : 0, 10);
+		if(response.isSucessful()) {
+			m.addAttribute("totalPages", response.getTotalPages());
+		}
+		else {
+			m.addAttribute("errorMessages", response.getErrorMessages());
+			m.addAttribute("totalPages", 1);
+		}
+		
+		m.addAttribute("allProducts", response.getResponseObjects());
 		m.addAttribute("linkMap", getLinks());
-		m.addAttribute("totalPages", response.getTotalPages());
 		return "displayProducts";
 	}
 	
@@ -152,36 +130,39 @@ public class ProductController {
 	@GetMapping("/products/product/{id}")
 	public String getProduct(Model m,@PathVariable("id") long productId,
 			@ModelAttribute("sessionModel") SessionModel session) {
-		System.out.println("GetProduct");
 		m.addAttribute("linkMap", getLinks());
 		ServiceResponse<Product> response = productService.getProductById(productId);
-		m.addAttribute("currentProduct", response.getResponseObjects().get(0));
+		if(response.isSucessful()) {			
+			m.addAttribute("currentProduct", response.getResponseObjects().get(0));
+		}
+		else {
+			m.addAttribute("errorMessage", response.getErrorMessages());
+			return "forward:/webshop/products";
+		}
 //		m.addAttribute("quantity", session.getCart().getProductMap())
 		return "displayProduct";
 	}
 	
-	@PostMapping(value = "/products/product/{id}",params = "cartAction=Add")
-	public String postAddItemToCart(Product product, @PathVariable("id") Optional<Integer> productId,@ModelAttribute("sessionModel") SessionModel session, Model m) {
-		if(productId.isPresent())
-			session.getCart().addItem(productId.get());
-		System.out.println("POST");
+	@PostMapping(value = "/products/product/{id}")
+	public String postChangeSpecificItemQuantity(Product product, 
+			@RequestParam(name ="action") Optional<String> action,
+			@PathVariable("id") Optional<Integer> productId,
+			@ModelAttribute("sessionModel") SessionModel session,
+			Model m) {
+		System.out.println("Action:"+action);
+		if(action.isPresent()) {
+			System.out.println(product);
+			String stringAction = action.get();
+			if(stringAction.compareToIgnoreCase("add")==0)
+				session.getCart().addItem(productId.get());
+			else if(stringAction.compareToIgnoreCase("remove")==0)
+				session.getCart().removeItem(productId.get());
+		}
 		m.addAttribute("currentProduct", product);
-		System.out.println(session.getCart());
 		m.addAttribute("linkMap", getLinks());
+		
 		return "displayProduct";
 	}
-	@PostMapping(value = "/products/product/{id}",params = "cartAction=Remove")
-	public String postRemoveItemToCart(Product product, @PathVariable("id") Optional<Integer> productId, @ModelAttribute("sessionModel") SessionModel session, Model m) {
-		if(productId.isPresent())
-		session.getCart().removeItem(productId.get());
-		System.out.println("POST");
-		m.addAttribute("currentProduct", product);
-		System.out.println(session.getCart());
-		m.addAttribute("linkMap", getLinks());
-		return "displayProduct";
-	}
-	
-	
 	
 	@GetMapping("shoppingcart")
 	public String getShoppingCart(@ModelAttribute SessionModel sesionModel, Model m) {
@@ -208,29 +189,5 @@ public class ProductController {
 	
 
 	
-
-//	@PostMapping("products")
-//	public String postProduct(Product product, Model m) {
-//		System.out.println(product);
-//		productService.create(product);
-//		m.addAttribute("newProduct", new Product());
-//		m.addAttribute("allProducts", productService.getAllProducts(0, 2).getResponseObjects());
-//		return "displayProducts";
-//	}
-//
-//	@PostMapping("/category/newCategory")
-//	public String postCategory(ProductFormModel postData, Model model) {
-//		System.out.println("Category:"+postData.getNewCategory());
-//		productCategoryService.save(new ProductCategory(postData.getNewCategory()));
-//		model.addAttribute("newProduct", new ProductFormModel());
-//		return "forward:/webshop/createNewProduct";
-//	}
-//	@PostMapping("/type/newType")
-//	public String postType(ProductFormModel postData, Model model) {
-//		System.out.println("Type:"+postData.getNewType());
-//		productTypeService.save(new ProductSubCategory(postData.getNewType()));
-//		model.addAttribute("newProduct", new ProductFormModel());
-//		return "forward:/webshop/";
-//	}
 
 }

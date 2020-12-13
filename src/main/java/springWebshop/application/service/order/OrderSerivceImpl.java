@@ -1,5 +1,6 @@
 package springWebshop.application.service.order;
 
+import java.time.LocalDate;
 import java.util.*;
 
 import org.springframework.context.annotation.Primary;
@@ -150,7 +151,7 @@ public class OrderSerivceImpl implements OrderService {
         if (hasValidCustomerAssociation(newOrder, errors)
                 && hasValidDeliveryAddress(newOrder, errors))
             try {
-                newOrder.setCreated(new Date());
+                newOrder.setCreated(LocalDate.now());
                 response.addResponseObject(orderRepository.save(newOrder));
             } catch (Exception e) {
                 response.addErrorMessage(ServiceErrorMessages.ORDER.couldNotCreate());
@@ -268,8 +269,9 @@ public class OrderSerivceImpl implements OrderService {
     }
 
     private boolean newStatusIsValidAndSet(Order order, OrderStatus requestedOrderStatus, List<String> errors) {
-        Date now = new Date();
+        LocalDate now = LocalDate.now();
         OrderStatus currentStatus = order.getOrderStatus();
+        System.out.println("ORDER:"+order);
 
         if (statusHierarchy.get(currentStatus) <= statusHierarchy.get(requestedOrderStatus)) {
             switch (requestedOrderStatus) {

@@ -21,6 +21,7 @@ public class OrderRepositoryCustomImpl extends AbstractCustomRepository<Order> i
         List<Predicate> predicates = new ArrayList<>();
 
         try {
+        	System.out.println("CONFIG:" + config);
             CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
             CriteriaQuery<Order> criteriaQuery = criteriaBuilder.createQuery(Order.class);
             Root<Order> orderRoot = criteriaQuery.from(Order.class);
@@ -29,6 +30,15 @@ public class OrderRepositoryCustomImpl extends AbstractCustomRepository<Order> i
                         orderRoot.get("customer").get("id"),
                         config.getCustomerId()));
             }
+//            if(config.getSentForDeliveryEarliest()!=null || config.getSentForDeliveryLatest() != null) {
+//            	predicates.add(criteriaBuilder.notEqual(orderRoot.get("inDelivery"), null));
+//            }
+//            else if(config.getDispatchedEarliest() !=null || config.getDispatchedLatest() !=null){
+//            	predicates.add(criteriaBuilder.notEqual(orderRoot.get("dispatched"), null));
+//            }
+//            else if(config.getCreatedEarliest()!=null || config.getCreatedLatest()!=null){
+//            	predicates.add(criteriaBuilder.notEqual(orderRoot.get("created"), null));
+//            }
             if (config.getCreatedEarliest() != null) {
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(orderRoot.get("created"), config.getCreatedEarliest()));
             }
@@ -53,14 +63,15 @@ public class OrderRepositoryCustomImpl extends AbstractCustomRepository<Order> i
             if (config.getMaxTotalSum() != null) {
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(orderRoot.get("totalSum"), config.getMaxTotalSum()));
             }
+//            predicates.add(criteriaBuilder.equal(orderRoot.get("orderStatus"), config.getOrderStatus()));
 
             criteriaQuery.select(orderRoot).where(predicates.toArray(new Predicate[0])).distinct(true);
             if (config.getSortBy() != null) {
                 criteriaQuery.orderBy(criteriaBuilder.desc(orderRoot.get(config.getSortBy().name())));
             }
-
+            
             TypedQuery<Order> typedQuery = em.createQuery(criteriaQuery);
-
+            System.out.println("TQ:"+typedQuery);
             return getPaginatedResult(page, size, predicates, typedQuery);
         } catch (NoResultException e) {
             return null;

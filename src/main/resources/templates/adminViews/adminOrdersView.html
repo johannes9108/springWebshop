@@ -86,7 +86,7 @@
 
         .dataRow {
             display: grid;
-            grid-template-columns: 1fr 3fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr auto;
             background-color: azure;
         }
 
@@ -107,26 +107,58 @@
     </style>
     <script type="text/javascript" th:src="@{/js/jquery-3.5.1.min.js}"></script>
     <script th:inline="javascript">
+
+        function findAllCheckedOrders() {
+            let array = [];
+            $(".dataRow input[id]").each(function () {
+                if ($(this).prop("checked"))
+                    array.push($(this).prop("id"))
+                // array.push($(this).val());
+            });
+            return array;
+
+
+        }
         $(document).ready(function () {
-            let categoriesObject = /*[[${sessionModel.categoryModel}]]*/;
             let session = /*[[${session}]]*/;
-            let segmentation = /*[[${sessionModel.categoryModel}]]*/;
+            let orderStatus = /*[[${selectedStatus}]]*/;
+            $('#orderFilter').val(orderStatus);
+
 
             $('#orderFilter').on('change', function () {
                 $('<input />').attr("type", "hidden")
                     .attr("name", "action")
                     .attr("value", "filter").appendTo(document.forms['filter']);
+                $('<input />').attr("type", "hidden")
+                    .attr("name", "actionValue")
+                    .attr("value", this.value).appendTo(document.forms['filter']);
 
                 document.forms['filter'].submit();
+            });
+            $('#expediteOrders').click(function () {
+                $('<input />').attr("type", "hidden")
+                    .attr("name", "action")
+                    .attr("value", "approve").appendTo(document.forms['expediteOrders']);
+                listOfCheckOrders = findAllCheckedOrders();
+
+
+                console.log(listOfCheckOrders);
+
+                $('<input />').attr("type", "hidden")
+                    .attr("name", "expeditedList")
+                    .attr("value", listOfCheckOrders).appendTo(document.forms['expediteOrders']);
+
+                document.forms['expediteOrders'].submit();
             });
 
         });
     </script>
 </head>
 
-<body th:with="currentPage=(${sessionModel.productPage})">
+<body th:with="currentPage=(${sessionModel.orderPage})">
     <!-- <h1 th:text="|${currentPage} ${totalPages}|"></h1> -->
     <div th:replace="fragments/header.html :: header(title=Admin,links=${linkMap})"></div>
+    <p th:text="${selectedStatus}"></p>
     <main>
         <section class="product">
             <div class="productTable">
@@ -134,12 +166,14 @@
                     <span>ID</span>
                     <span>Name</span>
                     <span>Price</span>
+                    <span th:if="${#strings.equalsIgnoreCase(__selectedStatus__, 'NOT_HANDLED') }">Expedited</span>
                 </div>
-                <a th:each="order : ${allOrders}">
-                    <div class="dataRow">
-                        <span th:text="${order.id}">ID</span>
-                    </div>
-                </a>
+                <div class="dataRow" th:each="order : ${allOrders}">
+                    <span th:text="${order.id}">ID</span>
+                    <span th:text="${order.id}">ID</span>
+                    <span th:text="${order.id}">ID</span>
+                    <input th:if="${#strings.equalsIgnoreCase(__selectedStatus__, 'NOT_HANDLED') }" type="checkbox" th:text="${order.id}" th:id="${order.id}" />
+                </div>
 
                 <div class="pages">
                     <a th:if="${currentPage > 1}"
@@ -167,7 +201,9 @@
                     </select>
 
                 </form>
-                <div class="segmentationRow">123</div>
+                <form name="expediteOrders" th:if="${#strings.equalsIgnoreCase(__selectedStatus__, 'NOT_HANDLED') }" th:action="@{/webshop/admin/orders}" method="POST">
+                    <input id="expediteOrders" class="segmentationRow" value="Expedite Selected Orders"/>
+                </form>
                 <div class="segmentationRow">123</div>
                 <div class="segmentationRow">432</div>
                 <div class="segmentationRow">12312</div>

@@ -18,6 +18,8 @@
 
 
 
+
+
         .customerInfo {
             box-sizing: border-box;
             display: grid;
@@ -84,11 +86,11 @@
                     </div>
                     <div class="itemEdit">
                         <form method="POST" th:action="@{/webshop/shoppingcart(id=__${product.key.id}__,action=add)}">
-                            <input type="submit" value="Increase" />
+                            <input type="submit" value="+" />
                         </form>
                         <form method="POST"
                             th:action="@{/webshop/shoppingcart(id=__${product.key.id}__,action=remove)}">
-                            <input type="submit" value="Decrease" />
+                            <input type="submit" value="-" />
                         </form>
 
                     </div>

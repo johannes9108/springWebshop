@@ -1,18 +1,26 @@
 package springWebshop.application.model.domain.order;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Embeddable;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.NotBlank;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.util.CollectionUtils;
 import springWebshop.application.model.domain.user.Customer;
 
 @Getter
@@ -31,11 +39,13 @@ public class Order {
     private double totalDiscount;
     private double totalPayable;
     private Currency currency;
-    private Date created;
-    private Date dispatched;
-    private Date inDelivery;
-    private Date deliveryComplete;
-    private Date canceled;
+    private LocalDate created;
+    private LocalDate dispatched;
+    private LocalDate inDelivery;
+    private LocalDate deliveryComplete;
+    private LocalDate canceled;
+    private OrderStatus orderStatus;
+    
     @Embedded
     private DeliveryAddress deliveryAddress;
     @ManyToOne
@@ -43,6 +53,7 @@ public class Order {
 
     public Order() {
         orderLines = new ArrayList<OrderLine>();
+        this.orderStatus = OrderStatus.NOT_HANDLED;
     }
 
     public Order(int totalNumberOfItem, double totalSum, double totalVatSum, double totalDiscount,
@@ -53,8 +64,9 @@ public class Order {
         this.totalVatSum = totalVatSum;
         this.totalDiscount = totalDiscount;
         this.totalPayable = totalPayable;
+        this.orderStatus = OrderStatus.NOT_HANDLED;
     }
-
+    
     @Override
     public String toString() {
         return "OrderId =" + id + " OrderStatus =" + getOrderStatus() + orderLines + "\nTotalNumberOfItem=" + totalNumberOfItem
@@ -63,13 +75,13 @@ public class Order {
                 + "]";
     }
 
-    public OrderStatus getOrderStatus() {
-        if (this.canceled != null) return OrderStatus.CANCELED;
-        if (this.deliveryComplete != null) return OrderStatus.DELIVERY_COMPLETED;
-        if (this.inDelivery != null) return OrderStatus.DELIVERY;
-        if (this.dispatched != null) return OrderStatus.DISPATCHED;
-        return OrderStatus.NOT_HANDLED;
-    }
+//    public OrderStatus getOrderStatus() {
+//        if (this.canceled != null) return OrderStatus.CANCELED;
+//        if (this.deliveryComplete != null) return OrderStatus.DELIVERY_COMPLETED;
+//        if (this.inDelivery != null) return OrderStatus.DELIVERY;
+//        if (this.dispatched != null) return OrderStatus.DISPATCHED;
+//        return OrderStatus.NOT_HANDLED;
+//    }
 
     public boolean isCancelable(){
         return this.getOrderStatus() == OrderStatus.NOT_HANDLED;
