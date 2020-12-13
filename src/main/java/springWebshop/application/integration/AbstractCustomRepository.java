@@ -21,8 +21,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.ClassUtils;
-import springWebshop.application.model.domain.Order;
+
 import springWebshop.application.model.domain.Product;
+import springWebshop.application.model.domain.order.Order;
 
 import static javax.xml.xpath.XPathFactory.newInstance;
 
@@ -31,6 +32,7 @@ import static javax.xml.xpath.XPathFactory.newInstance;
 public abstract class AbstractCustomRepository<T> {
 	
 	@PersistenceContext
+	protected
 	EntityManager em;
 
 	protected Page<T> getPaginatedResult(int page, int size, List<Predicate> predicates,

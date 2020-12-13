@@ -1,17 +1,26 @@
 package springWebshop.application.service.user;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import springWebshop.application.integration.AccountRepository;
-import springWebshop.application.integration.AdminRepository;
-import springWebshop.application.integration.CustomerRepository;
-import springWebshop.application.integration.RoleRepository;
-import springWebshop.application.model.domain.Order;
-import springWebshop.application.model.domain.user.*;
+
+import springWebshop.application.integration.account.AccountRepository;
+import springWebshop.application.integration.account.AdminRepository;
+import springWebshop.application.integration.account.CustomerRepository;
+import springWebshop.application.integration.account.RoleRepository;
+import springWebshop.application.model.domain.user.Account;
+import springWebshop.application.model.domain.user.Admin;
+import springWebshop.application.model.domain.user.Customer;
+import springWebshop.application.model.domain.user.ERole;
+import springWebshop.application.model.domain.user.Role;
 import springWebshop.application.service.ServiceErrorMessages;
 import springWebshop.application.service.ServiceResponse;
-
-import java.util.*;
 
 
 @Service

@@ -4,16 +4,16 @@ package springWebshop.application.model.domain.user;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import springWebshop.application.model.domain.order.Order;
 
 @Getter
 @Setter
@@ -54,4 +54,12 @@ public class Customer extends Account implements Serializable {
 		super(firstName, lastName, password, email, phoneNumber, mobileNumber);
 		this.addresses = addresses;
 	}
+
+
+
+	
+
+
+
+
 }

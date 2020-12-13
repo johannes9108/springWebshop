@@ -1,10 +1,7 @@
 package springWebshop.application.integration.order;
 
-import org.springframework.data.domain.Page;
-
-import springWebshop.application.integration.product.AbstractCustomRepository;
-import springWebshop.application.model.domain.order.Order;
-import springWebshop.application.service.order.OrderSearchConfig;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
@@ -12,16 +9,18 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.util.ArrayList;
-import java.util.List;
 
+import org.springframework.data.domain.Page;
+
+import springWebshop.application.integration.AbstractCustomRepository;
+import springWebshop.application.model.domain.order.Order;
+import springWebshop.application.service.order.OrderSearchConfig;
 public class OrderRepositoryCustomImpl extends AbstractCustomRepository<Order> implements OrderRepositoryCustom {
     @Override
     public Page<Order> getOrders(OrderSearchConfig config, int page, int size) {
         List<Predicate> predicates = new ArrayList<>();
 
         try {
-        	System.out.println("CONFIG:" + config);
             CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
             CriteriaQuery<Order> criteriaQuery = criteriaBuilder.createQuery(Order.class);
             Root<Order> orderRoot = criteriaQuery.from(Order.class);
@@ -30,15 +29,6 @@ public class OrderRepositoryCustomImpl extends AbstractCustomRepository<Order> i
                         orderRoot.get("customer").get("id"),
                         config.getCustomerId()));
             }
-//            if(config.getSentForDeliveryEarliest()!=null || config.getSentForDeliveryLatest() != null) {
-//            	predicates.add(criteriaBuilder.notEqual(orderRoot.get("inDelivery"), null));
-//            }
-//            else if(config.getDispatchedEarliest() !=null || config.getDispatchedLatest() !=null){
-//            	predicates.add(criteriaBuilder.notEqual(orderRoot.get("dispatched"), null));
-//            }
-//            else if(config.getCreatedEarliest()!=null || config.getCreatedLatest()!=null){
-//            	predicates.add(criteriaBuilder.notEqual(orderRoot.get("created"), null));
-//            }
             if (config.getCreatedEarliest() != null) {
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(orderRoot.get("created"), config.getCreatedEarliest()));
             }
@@ -58,21 +48,48 @@ public class OrderRepositoryCustomImpl extends AbstractCustomRepository<Order> i
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(orderRoot.get("inDelivery"), config.getSentForDeliveryLatest()));
             }
             if (config.getMinTotalSum() != null) {
-                predicates.add(criteriaBuilder.lessThanOrEqualTo(orderRoot.get("totalSum"), config.getMinTotalSum()));
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(orderRoot.get("totalSum"), config.getMinTotalSum()));
             }
             if (config.getMaxTotalSum() != null) {
-                predicates.add(criteriaBuilder.greaterThanOrEqualTo(orderRoot.get("totalSum"), config.getMaxTotalSum()));
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(orderRoot.get("totalSum"), config.getMaxTotalSum()));
+                predicates.add(criteriaBuilder.isNotNull(orderRoot.get("totalSum")));
             }
-//            predicates.add(criteriaBuilder.equal(orderRoot.get("orderStatus"), config.getOrderStatus()));
 
-            criteriaQuery.select(orderRoot).where(predicates.toArray(new Predicate[0])).distinct(true);
+            if (config.getStatus() != null) {
+                if (config.getStatus() == Order.OrderStatus.CANCELED) {
+                    predicates.add(criteriaBuilder.isNotNull(orderRoot.get("canceled")));
+                } else {
+                    predicates.add(criteriaBuilder.isNull(orderRoot.get("canceled")));
+                    switch (config.getStatus()) {
+                        case NOT_HANDLED:
+                            predicates.add(criteriaBuilder.isNull(orderRoot.get("dispatched")));
+                            predicates.add(criteriaBuilder.isNull(orderRoot.get("inDelivery")));
+                            predicates.add(criteriaBuilder.isNull(orderRoot.get("deliveryComplete")));
+                            break;
+                        case DISPATCHED:
+                            predicates.add(criteriaBuilder.isNotNull(orderRoot.get("dispatched")));
+                            predicates.add(criteriaBuilder.isNull(orderRoot.get("inDelivery")));
+                            predicates.add(criteriaBuilder.isNull(orderRoot.get("deliveryComplete")));
+                            break;
+                        case DELIVERY:
+                            predicates.add(criteriaBuilder.isNotNull(orderRoot.get("inDelivery")));
+                            predicates.add(criteriaBuilder.isNull(orderRoot.get("deliveryComplete")));
+                            break;
+                        case DELIVERY_COMPLETED:
+                            predicates.add(criteriaBuilder.isNotNull(orderRoot.get("deliveryComplete")));
+                            break;
+                    }
+                }
+            }
+
+            criteriaQuery.select(orderRoot).distinct(true).where(predicates.toArray(new Predicate[0]));
             if (config.getSortBy() != null) {
                 criteriaQuery.orderBy(criteriaBuilder.desc(orderRoot.get(config.getSortBy().name())));
             }
-            
+
             TypedQuery<Order> typedQuery = em.createQuery(criteriaQuery);
-            System.out.println("TQ:"+typedQuery);
-            return getPaginatedResult(page, size, predicates, typedQuery);
+
+            return getPaginatedResult(page, size, predicates, typedQuery, Order.class);
         } catch (NoResultException e) {
             return null;
         }

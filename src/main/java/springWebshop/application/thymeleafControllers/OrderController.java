@@ -49,7 +49,6 @@ public class OrderController {
 		
 		System.out.println(sessionModel.getCart().getTotalItems());
 		System.out.println(sessionModel.getUser().getId());
-		System.out.println(sessionModel.getUser().getAddresses().get(0));
 		ServiceResponse<Order> response = orderService.createOrderFromShoppingCart(sessionModel.getCart(), sessionModel.getUser().getId(), sessionModel.getUser().getAddresses().get(0));
 		System.out.println(response);
 		if(response.isSucessful()) {

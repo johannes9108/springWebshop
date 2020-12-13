@@ -13,6 +13,7 @@ import javax.persistence.criteria.Root;
 import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Propagation;
 
+import springWebshop.application.integration.AbstractCustomRepository;
 import springWebshop.application.model.domain.Product;
 import springWebshop.application.service.product.ProductSearchConfig;
 public class ProductRepositoryCustomImpl extends AbstractCustomRepository<Product> implements ProductRepositoryCustom {
@@ -57,7 +58,7 @@ public class ProductRepositoryCustomImpl extends AbstractCustomRepository<Produc
 			}
 			criteriaQuery.select(product).distinct(true).where(predicates.toArray(new Predicate[0]));
 			TypedQuery<Product> typedQuery = em.createQuery(criteriaQuery);
-			return getPaginatedResult(page, size, predicates, typedQuery);
+			return getPaginatedResult(page, size, predicates, typedQuery,Product.class);
 		} catch (NoResultException e) {
 			System.out.println("Exception:" + e);
 			return null;

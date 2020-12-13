@@ -27,7 +27,7 @@ public abstract class Account {
 
 	@NotBlank(message = "Please provide first name.")
 	private String firstName;
-	@NotBlank(message = "Please provide last name.")
+	@NotBlank(message = "Please provide first name.")
 	private String lastName;
 
 	@NotBlank()
@@ -37,9 +37,9 @@ public abstract class Account {
 	@NotBlank(message = "Email can't be empty.")
 	@Email(message = "Please provide a valid email address.")
 	private String email;
-
 	private String username;
-	
+	private String phoneNumber;
+	private String mobileNumber;
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "account_roles",
@@ -51,11 +51,25 @@ public abstract class Account {
 		this.roles.add(role);
 	}
 
-	private String phoneNumber;
-	private String mobileNumber;
 	@Override
 	public String toString() {
 		return "Account [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", password=" + password
 				+ ", email=" + email + ", phoneNumber=" + phoneNumber + ", mobileNumber=" + mobileNumber + "]";
 	}
+
+
+
+
+	public Account(String firstName, String lastName, String password, String email, String phoneNumber,
+			String mobileNumber) {
+		super();
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.password = password;
+		this.email = email;
+		this.phoneNumber = phoneNumber;
+		this.mobileNumber = mobileNumber;
+	}
+	
+	
 }

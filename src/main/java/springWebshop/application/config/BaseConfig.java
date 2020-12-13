@@ -13,13 +13,16 @@ import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.thymeleaf.templateresolver.FileTemplateResolver;
 import org.thymeleaf.templateresolver.ITemplateResolver;
 
 import springWebshop.application.integration.account.AccountRepository;
+import springWebshop.application.integration.account.AdminRepository;
 import springWebshop.application.integration.account.CompanyRepository;
 import springWebshop.application.integration.account.CustomerAddressRespoitory;
 import springWebshop.application.integration.account.CustomerRepository;
+import springWebshop.application.integration.account.RoleRepository;
 import springWebshop.application.integration.order.OrderRepository;
 import springWebshop.application.integration.product.ProductCategoryRepository;
 import springWebshop.application.integration.product.ProductRepository;
@@ -32,7 +35,13 @@ import springWebshop.application.model.domain.order.OrderLine;
 import springWebshop.application.model.domain.segmentation.ProductCategory;
 import springWebshop.application.model.domain.segmentation.ProductSubCategory;
 import springWebshop.application.model.domain.segmentation.ProductType;
-import springWebshop.application.model.domain.user.*;
+import springWebshop.application.model.domain.user.Account;
+import springWebshop.application.model.domain.user.Admin;
+import springWebshop.application.model.domain.user.Company;
+import springWebshop.application.model.domain.user.Customer;
+import springWebshop.application.model.domain.user.CustomerAddress;
+import springWebshop.application.model.domain.user.ERole;
+import springWebshop.application.model.domain.user.Role;
 import springWebshop.application.model.dto.ShoppingCartDTO;
 import springWebshop.application.service.ServiceErrorMessages;
 import springWebshop.application.service.ServiceResponse;
@@ -64,7 +73,7 @@ public class BaseConfig {
                                              AccountRepository accountRepository, CompanyRepository companyRepository,
                                              OrderRepository orderRepository, OrderService orderService,
                                              CustomerRepository customerRepository, @Qualifier("ProductServiceImpl") ProductService productService
-            , CustomerAddressRespoitory addressRespoitory, AdminRepository adminRepository, RoleRepository roleRepository) {
+            , CustomerAddressRespoitory addressRespoitory, AdminRepository adminRepository, RoleRepository roleRepository, AccountService accountService) {
 
 
         return (args) -> {
@@ -81,11 +90,11 @@ public class BaseConfig {
 //        	productService.getProductById(1L).getResponseObjects().forEach(t->System.out.println(t.getId() + ":" + t.getName()));
 //        	productService.getProductByName("Johannes").getResponseObjects().forEach(t->System.out.println(t.getId() + ":" + t.getName()));
 //
-            createCustomers(customerRepository, 50);
+            prepareRoles(roleRepository);
+            createCustomers(customerRepository, companyRepository,roleRepository,accountService,50);
             Customer persistedCustomer = customerRepository.findById(1L).get();
             System.out.println(persistedCustomer);
             persistedCustomer.getAddresses().forEach(System.out::println);
-<<<<<<< Upstream, based on ExpeditingFromUI
 
 
 
@@ -115,20 +124,12 @@ public class BaseConfig {
 
             testSetOrderStatus(orderService, 1L);
 
-            orderSearchTest(orderService, productService, deliveryAddress, createOrderResponse);
-=======
             createAdmins(adminRepository, roleRepository, 10);
-            Account account = accountRepository.findByEmail("admin1@gmail.com").get();
-            System.out.println(account);
-
-            prepareRoles(roleRepository);
-            createCustomers(customerRepository, companyRepository, roleRepository, 50);
-            Customer persistedCustomer = customerRepository.findById(1L).get();
-            System.out.println(persistedCustomer);
-            persistedCustomer.getAddresses().forEach(System.out::println);
-            createAdmins(adminRepository, roleRepository, 10);
-            Account account = accountRepository.findByEmail("admin1@gmail.com").get();
-            System.out.println(account);
+//            Account account = accountRepository.findByEmail("admin1@gmail.com").get();
+//            System.out.println(account);
+//
+//           
+//            System.out.println(account);
 
             createOrderTest(orderService);
             OrderSearchConfig orderConf = OrderSearchConfig.builder()
@@ -146,16 +147,8 @@ public class BaseConfig {
             } else searchOrderResult.getErrorMessages().forEach(System.out::println);
 
             System.out.println("End order search result print");
-
-            createOrderTest(orderService);
-            OrderSearchConfig orderConf = OrderSearchConfig.builder()
-                    .minTotalSum(10.00)
-                    .maxTotalSum(90.00)
-                    .sortBy(OrderSearchConfig.SortBy.totalSum)
-                    .build();
-            System.out.println(orderConf);
-            ServiceResponse<Order> searchOrderResult = orderService.getOrders(orderConf);
-            List<Order> orderList = searchOrderResult.getResponseObjects();
+            
+            
             System.out.println("Start order search result print");
             System.out.println(searchOrderResult.isSucessful() ? orderList : searchOrderResult.getErrorMessages());
             System.out.println("End order search result print");
@@ -168,7 +161,6 @@ public class BaseConfig {
 //            searchOrderResponse.getResponseObjects().forEach(order -> {
 //                System.out.println(order);
 //            });
->>>>>>> 5e74aa2 :bug: Fixing a bug in AbstractCustomRepository by adding expected Class as param, example: getPaginatedResult(..., Order.class)
 
 //           
 
@@ -197,43 +189,9 @@ public class BaseConfig {
                 ServiceResponse<Order> setStatusResponse = orderService.setStatus(i, statusList.get(randomBetween(0, 3)));
                 System.out.println("Changed status successfully: " + setStatusResponse.isSucessful() + setStatusResponse.getErrorMessages());
             }
+        }
 
-		    ServiceResponse response = orderService.setStatus(i, statusList.get(randomBetween(0,3)));
-		    System.out.println("Changed status successfully: " + response.isSucessful() + response.getErrorMessages());
-		}
-//		OrderSearchConfig orderSearchConfig = new OrderSearchConfig();
-//		orderSearchConfig.setMaxTotalSum(350.00);
-//		orderSearchConfig.setSortBy(OrderSearchConfig.SortBy.totalSum);
-//		ServiceResponse<Order> searchOrderResponse = orderService.getOrders(orderSearchConfig, 0,30);
-//		System.out.println(searchOrderResponse);
-//		searchOrderResponse.getResponseObjects().forEach(order -> {
-//		    System.out.println(order);
-//		});
-	}
-        }
-//        OrderSearchConfig orderSearchConfig = new OrderSearchConfig();
-//        orderSearchConfig.setMaxTotalSum(350.00);
-//        orderSearchConfig.setSortBy(OrderSearchConfig.SortBy.totalSum);
-//        ServiceResponse<Order> searchOrderResponse = orderService.getOrders(orderSearchConfig, 0, 30);
-//        System.out.println(searchOrderResponse);
-//        searchOrderResponse.getResponseObjects().forEach(order -> {
-//            System.out.println(order);
-//        });
     }
-=======
-            ServiceResponse<Order> setStatusResponse = orderService.setStatus(i, statusList.get(randomBetween(0, 3)));
-            System.out.println("Changed status successfully: " + setStatusResponse.isSucessful() + setStatusResponse.getErrorMessages());
-        }
-//        OrderSearchConfig orderSearchConfig = new OrderSearchConfig();
-//        orderSearchConfig.setMaxTotalSum(350.00);
-//        orderSearchConfig.setSortBy(OrderSearchConfig.SortBy.totalSum);
-//        ServiceResponse<Order> searchOrderResponse = orderService.getOrders(orderSearchConfig, 0, 30);
-//        System.out.println(searchOrderResponse);
-//        searchOrderResponse.getResponseObjects().forEach(order -> {
-//            System.out.println(order);
-//        });
-    }
->>>>>>> 5e74aa2 :bug: Fixing a bug in AbstractCustomRepository by adding expected Class as param, example: getPaginatedResult(..., Order.class)
 
     private void productSearchTest(ProductService productService) {
         ProductSearchConfig prodConf = new ProductSearchConfig();
@@ -294,7 +252,7 @@ public class BaseConfig {
         roleRepository.save(role2);
     }
 
-    private void createCustomers(CustomerRepository customerRepository, CompanyRepository companyRepository, RoleRepository roleRepository, int quantity) {
+    private void createCustomers(CustomerRepository customerRepository, CompanyRepository companyRepository, RoleRepository roleRepository, AccountService accountService, int quantity) {
         Role customerRole = roleRepository.findByName(ERole.CUSTOMER).get();
 
         for (int i = 0; i < quantity; i++) {
@@ -328,7 +286,7 @@ public class BaseConfig {
     }
 
 
-    private void createAdmins(AccountService accountService, int quantity) {
+    private void createAdmins(AccountService accountService,CustomerRepository customerRepository,CompanyRepository companyRepository, int quantity) {
         for (int i = 0; i < quantity; i++) {
             Admin admin = new Admin();
             admin.setFirstName("Admin");

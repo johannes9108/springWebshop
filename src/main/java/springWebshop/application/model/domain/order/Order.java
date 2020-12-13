@@ -1,3 +1,4 @@
+
 package springWebshop.application.model.domain.order;
 
 import java.time.LocalDate;
@@ -39,13 +40,11 @@ public class Order {
     private double totalDiscount;
     private double totalPayable;
     private Currency currency;
-    private LocalDate created;
+	private LocalDate created;
     private LocalDate dispatched;
     private LocalDate inDelivery;
     private LocalDate deliveryComplete;
     private LocalDate canceled;
-    private OrderStatus orderStatus;
-    
     @Embedded
     private DeliveryAddress deliveryAddress;
     @ManyToOne
@@ -53,7 +52,6 @@ public class Order {
 
     public Order() {
         orderLines = new ArrayList<OrderLine>();
-        this.orderStatus = OrderStatus.NOT_HANDLED;
     }
 
     public Order(int totalNumberOfItem, double totalSum, double totalVatSum, double totalDiscount,
@@ -64,9 +62,15 @@ public class Order {
         this.totalVatSum = totalVatSum;
         this.totalDiscount = totalDiscount;
         this.totalPayable = totalPayable;
-        this.orderStatus = OrderStatus.NOT_HANDLED;
     }
-    
+
+    public String getHeaderString() {
+        return "OrderId =" + id + " OrderStatus =" + getOrderStatus() + "\nTotalNumberOfItem=" + totalNumberOfItem
+                + ", totalSum=" + totalSum + ", totalVatSum=" + totalVatSum + ", vatPercentages=" + getVatPercentages()
+                + ", totalDiscount=" + totalDiscount + ", totalPayable=" + totalPayable + ", currency=" + currency
+                + "]";
+    }
+
     @Override
     public String toString() {
         return "OrderId =" + id + " OrderStatus =" + getOrderStatus() + orderLines + "\nTotalNumberOfItem=" + totalNumberOfItem
@@ -75,13 +79,13 @@ public class Order {
                 + "]";
     }
 
-//    public OrderStatus getOrderStatus() {
-//        if (this.canceled != null) return OrderStatus.CANCELED;
-//        if (this.deliveryComplete != null) return OrderStatus.DELIVERY_COMPLETED;
-//        if (this.inDelivery != null) return OrderStatus.DELIVERY;
-//        if (this.dispatched != null) return OrderStatus.DISPATCHED;
-//        return OrderStatus.NOT_HANDLED;
-//    }
+    public OrderStatus getOrderStatus() {
+        if (this.canceled != null) return OrderStatus.CANCELED;
+        if (this.deliveryComplete != null) return OrderStatus.DELIVERY_COMPLETED;
+        if (this.inDelivery != null) return OrderStatus.DELIVERY;
+        if (this.dispatched != null) return OrderStatus.DISPATCHED;
+        return OrderStatus.NOT_HANDLED;
+    }
 
     public boolean isCancelable(){
         return this.getOrderStatus() == OrderStatus.NOT_HANDLED;
