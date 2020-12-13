@@ -23,15 +23,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/css/**",
                         "/webshop/products/**",
                         "/login",
+                        "/register",
                         "/webshop/shoppingcart/**").permitAll()
                 .antMatchers("/webshop/admin/**").hasAuthority(ERole.ADMIN.name())
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
-//                .loginPage("/login")
-                .permitAll()
-                .and()
+                .loginPage("/login")
+                	.loginProcessingUrl("/login")
+//                	.defaultSuccessUrl("/webshop/products", true)
+                	.failureUrl("/login?error=true")
+                	.permitAll()
+                	.and()
                 .logout()
+                .deleteCookies("JSESSIONID")
                 .permitAll();
 
         http.csrf().disable();

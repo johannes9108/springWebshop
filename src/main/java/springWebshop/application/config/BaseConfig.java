@@ -91,30 +91,31 @@ public class BaseConfig {
 //        	productService.getProductByName("Johannes").getResponseObjects().forEach(t->System.out.println(t.getId() + ":" + t.getName()));
 //
             prepareRoles(roleRepository);
-            createCustomers(customerRepository, companyRepository,roleRepository,accountService,50);
-            Customer persistedCustomer = customerRepository.findById(1L).get();
-            System.out.println(persistedCustomer);
-            persistedCustomer.getAddresses().forEach(System.out::println);
-
-
-
-            ShoppingCartDTO randomShoppingCartDTO = getRandomShoppingCartDTO(productService, 1, 100);
-            Address deliveryAddress = persistedCustomer.getAddresses()
-                    .stream()
-                    .filter(address -> address.isDefaultAddress())
-                    .findFirst().get();
-
-            System.out.println("Input shoppingCart: \n" + randomShoppingCartDTO
-                    + "\nInput deliveryAddress: \n" + deliveryAddress);
-
-            ServiceResponse<Order> createOrderResponse = orderService.createOrderFromShoppingCart(randomShoppingCartDTO, 1L, deliveryAddress);
-            System.out.println("Created order - response: " + createOrderResponse);
-
-
-
-            if (createOrderResponse.isSucessful()) {
-                System.out.println(createOrderResponse.getResponseObjects());
-            }
+            createCustomers(customerRepository, companyRepository,roleRepository,accountService,2);
+            createAdmins(adminRepository, roleRepository, 2);
+//            Customer persistedCustomer = customerRepository.findById(1L).get();
+//            System.out.println(persistedCustomer);
+//            persistedCustomer.getAddresses().forEach(System.out::println);
+//
+//
+//
+//            ShoppingCartDTO randomShoppingCartDTO = getRandomShoppingCartDTO(productService, 1, 100);
+//            Address deliveryAddress = persistedCustomer.getAddresses()
+//                    .stream()
+//                    .filter(address -> address.isDefaultAddress())
+//                    .findFirst().get();
+//
+//            System.out.println("Input shoppingCart: \n" + randomShoppingCartDTO
+//                    + "\nInput deliveryAddress: \n" + deliveryAddress);
+//
+//            ServiceResponse<Order> createOrderResponse = orderService.createOrderFromShoppingCart(randomShoppingCartDTO, 1L, deliveryAddress);
+//            System.out.println("Created order - response: " + createOrderResponse);
+//
+//
+//
+//            if (createOrderResponse.isSucessful()) {
+//                System.out.println(createOrderResponse.getResponseObjects());
+//            }
 
             productSearchTest(productService);
 
@@ -122,9 +123,9 @@ public class BaseConfig {
 
 
 
-            testSetOrderStatus(orderService, 1L);
+            
 
-            createAdmins(adminRepository, roleRepository, 10);
+            
 //            Account account = accountRepository.findByEmail("admin1@gmail.com").get();
 //            System.out.println(account);
 //
@@ -146,6 +147,7 @@ public class BaseConfig {
                 orderList.forEach(order -> System.out.println(order.getHeaderString()));
             } else searchOrderResult.getErrorMessages().forEach(System.out::println);
 
+//            testSetOrderStatus(orderService, 1L);
             System.out.println("End order search result print");
             
             
@@ -276,8 +278,8 @@ public class BaseConfig {
             } else System.out.println("NEEEEEEEEEEEEEEEEEEEJ!!-->: " + resp);;
         }
         List<Customer> customerList = new ArrayList<>();
-        customerList.add(accountService.getCustomerById(10L).getResponseObjects().get(0));
-        customerList.add(accountService.getCustomerById(20L).getResponseObjects().get(0));
+        customerList.add(accountService.getCustomerById(1L).getResponseObjects().get(0));
+        customerList.add(accountService.getCustomerById(2L).getResponseObjects().get(0));
 
         Company company = new Company();
         company.setVAT("SE556587983701");
