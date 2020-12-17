@@ -4,11 +4,51 @@
 <head>
     <meta charset="ISO-8859-1">
     <title>Manage the users here</title>
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+
 </head>
 
-<body>
-    <h1>Manage the users</h1>
+<style>
+    main {
+        display: grid;
+        grid-template-columns: 4fr 2fr;
+    }
 
+    .userForm {
+        width: 30%;
+        display: flex;
+        flex-direction: column;
+    }
+</style>
+
+<body>
+    <div th:replace="fragments/header.html :: header(title='New User',links=${links})"></div>
+    <main>
+        <form class="userForm" th:object="${newCustomer}" th:action="@{${#request.getRequestURL()}}" method="POST">
+            <label for="firstName">First Name</label>
+            <input type="text" th:field="*{firstName}" required>
+            <label for="lastName">Last Name</label>
+            <input type="text" th:field="*{lastName}" required>
+            <label for="password">Password</label>
+            <input type="password" th:field="*{password}" required>
+            <label for="repeatPassword">Repeat Password</label>
+            <input type="password" th:field="*{repeatPassword}" required>
+            <label for="email">Email</label>
+            <input type="text" th:field="*{email}" required>
+            <label for="username">Username</label>
+            <input type="text" th:field="*{username}">
+            <label for="phoneNumber">Phone Number</label>
+            <input type="text" th:field="*{phoneNumber}">
+            <label for="mobileNumber">Mobile Number</label>
+            <input type="text" th:field="*{mobileNumber}">
+            <input type="submit" value="Create User">
+        </form>
+
+
+    </main>
+    <footer>
+
+    </footer>
 </body>
 
 </html>

@@ -4,6 +4,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -21,6 +23,8 @@ import springWebshop.application.integration.account.CustomerRepository;
 import springWebshop.application.model.domain.Product;
 import springWebshop.application.model.domain.order.Order;
 import springWebshop.application.model.domain.order.Order.OrderStatus;
+import springWebshop.application.model.domain.user.Customer;
+import springWebshop.application.model.dto.AccountDTO;
 import springWebshop.application.model.dto.SegmentDTO;
 import springWebshop.application.model.dto.SegmentationModelObject;
 import springWebshop.application.model.dto.SessionModel;
@@ -31,6 +35,7 @@ import springWebshop.application.service.order.OrderService;
 import springWebshop.application.service.product.ProductSearchConfig;
 import springWebshop.application.service.product.ProductService;
 import springWebshop.application.service.product.SegmentationService;
+import springWebshop.application.service.user.AccountService;
 
 @Controller
 @RequestMapping("webshop/admin")
@@ -45,6 +50,8 @@ public class AdminController {
 	AdminService adminService;
 	@Autowired
 	OrderService orderService;
+	@Autowired
+	AccountService customerSerivce;
 
 	@Autowired
 	@Qualifier("ProductServiceImpl")
@@ -436,7 +443,6 @@ public class AdminController {
 	
 	@PostMapping("/orders/{id}")
 	public String dispatchOrder(@PathVariable("id") Optional<Long> orderId, Model m) {
-		System.out.println("POST TILL ORDER");
 		ServiceResponse<Order> currentOrder = orderService.getOrderById(orderId.get());
 		if(currentOrder.isSucessful()) {
 			ServiceResponse<Order> statusChange =  orderService.setStatus(orderId.get(), OrderStatus.DISPATCHED);
@@ -458,9 +464,36 @@ public class AdminController {
 	}
 
 	@GetMapping(path = { "users" })
-	public String getAllUsers(Model m) {
+	public String getUserForm(Model m) {
+		m.addAttribute("newCustomer", new AccountDTO());
 
 		return "adminViews/adminUsersView";
 	}
-
+	@PostMapping(path = { "users" })
+	public String postUserForm(@Valid AccountDTO newAccount, BindingResult result, Model m) {
+		System.out.println(newAccount);
+		if(result.hasErrors()) {
+			m.addAttribute("newCustomer", newAccount);
+			m.addAttribute("errorMessage", "Incorrect Format");
+		}
+		else {
+			ServiceResponse<Customer> response = customerSerivce.createCustomer(customerAccountDTO(newAccount));
+			if(response.isSucessful()) {
+				m.addAttribute("success", "New Customer created with ID:" + response.getResponseObjects().get(0));
+				m.addAttribute("newCustomer", new AccountDTO());
+			}
+			else {
+				m.addAttribute("errorMessage", response.getErrorMessages());
+				m.addAttribute("newCustomer", newAccount);
+			}
+			
+		}
+		return "adminViews/adminUsersView";
+	}
+	
+	private Customer customerAccountDTO(@Valid AccountDTO account) {
+		Customer c = new Customer(account.getFirstName(), account.getLastName(), account.getPassword(), account.getEmail(),
+				account.getPhoneNumber(),account.getMobileNumber(),null);
+		return c;
+	}
 }
