@@ -23,7 +23,9 @@
         function reset(element) {
             element.val('0');
         }
+
         $(document).ready(function () {
+            console.log("Test")
             let categoriesObject = /*[[${sessionModel.categoryModel}]]*/;
             let session = /*[[${session}]]*/;
             console.log(session)
@@ -65,6 +67,17 @@
 
         });
     </script>
+    <style>
+        .filterOptions {
+            margin: auto;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .search {
+            display: flex;
+        }
+    </style>
 </head>
 
 
@@ -72,7 +85,7 @@
     <!-- <p th:text="|CP:${currentPage},TP:${totalPages}|"></p>
     <button type="button" th:onclick="showAlert()">Show Alert</button> -->
 
-    <div th:replace="fragments/header.html :: header(title=Browsing...,links=${linkMap})"></div>
+    <div th:replace="fragments/header.html :: header(title=Browsing...,links=${links})"></div>
 
     <main>
         <!-- <p th:text="${sessionModel.categoryModel}"></p> -->
@@ -98,24 +111,35 @@
                     Types</option>
                 </select>
             </form>
+            <div class="search">
+                <form method="POST" th:action="@{/webshop/products}">
+                    <input type="text" name="searchInput" th:value="${searchInput}" placeholder="Search for name">
+                    <input type="submit" id="search" value="Search">
+                </form>
+                <form method="POST" th:action="@{/webshop/products}">
+                    <input type="hidden" name="reset" value="true" />
+                    <input type="submit" id="search" value="Reset">
+                </form>
+            </div>
 
         </div>
         <div class="productContainer">
             <div th:each="product : ${allProducts}" class="productItem">
                 <a th:href="@{__${#request.getRequestURL()}__/product/__${product.id}__}">
-                        <span th:text="${product.name}">test</span></a>
-                        <!-- <span th:text="${product.productType}"></span> -->
-                        <!-- <span th:text="${product.productType.toString()}"></span> -->
-                        <form method="POST" th:action="@{/webshop/products(id=__${product.id}__)}">
-                            <input  type="submit" value="Add to cart"/>
-                        </form>
-                    </div>
-                </div>
+                    <span th:text="${product.name}">test</span></a>
+                <!-- <span th:text="${product.productType}"></span> -->
+                <!-- <span th:text="${product.productType.toString()}"></span> -->
+                <form method="POST" th:action="@{/webshop/products}">
+                    <input type="hidden" name="addToCart" th:value="${product.id}" />
+                    <input type="submit" value="Add to cart" />
+                </form>
+            </div>
+        </div>
 
 
-            </main>
-        <!-- Save this for admin UI -->
-        <!-- <section th:object="${newProduct}">
+    </main>
+    <!-- Save this for admin UI -->
+    <!-- <section th:object="${newProduct}">
 
             <form class="formLayout" method="POST" th:action="@{/webshop/products}">
                 <label>Name</label>
@@ -131,14 +155,16 @@
         </section> -->
 
 
-        <footer>
-            <!-- <p th:text="${session.sessionModel.productPage}"></p> -->
-            <!-- <h1 th:text="${currentPage}">Welcome to all products page</h1> -->
-            <a th:if="${currentPage > 1}" th:href="@{/webshop/products(page=__${currentPage-1>0?currentPage-1:''}__)}">Back</a>
-            <a th:if="${currentPage!=totalPages}" th:href="@{/webshop/products(page=__${currentPage<2?2:currentPage+1}__)}">Next</a>
+    <footer>
+        <!-- <p th:text="${session.sessionModel.productPage}"></p> -->
+        <!-- <h1 th:text="${currentPage}">Welcome to all products page</h1> -->
+        <a th:if="${currentPage > 1}"
+            th:href="@{/webshop/products(page=__${currentPage-1>0?currentPage-1:''}__)}">Back</a>
+        <a th:if="${currentPage<totalPages}"
+            th:href="@{/webshop/products(page=__${currentPage<2?2:currentPage+1}__)}">Next</a>
 
-        </footer>
-   
+    </footer>
+
 </body>
 
 </html>

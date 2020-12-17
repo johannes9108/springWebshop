@@ -12,7 +12,7 @@ public class ProductSearchConfig {
     String searchString;
     
     public ProductSearchConfig() {
-    	searchString = null;
+    	searchString = "";
     }
 
 	@Override

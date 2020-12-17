@@ -1,7 +1,6 @@
 package springWebshop.application.config;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
@@ -12,7 +11,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.thymeleaf.templateresolver.FileTemplateResolver;
 import org.thymeleaf.templateresolver.ITemplateResolver;
@@ -53,7 +51,6 @@ import springWebshop.application.service.user.AccountService;
 
 @Configuration
 public class BaseConfig {
-    final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
     final PasswordEncoder passwordEncoder;
     private final ThymeleafProperties properties;
     @Autowired
@@ -72,8 +69,8 @@ public class BaseConfig {
                                              ProductCategoryRepository catRepo, ProductSubCategoryRepository subCatRepo,
                                              AccountRepository accountRepository, CompanyRepository companyRepository,
                                              OrderRepository orderRepository, OrderService orderService,
-                                             CustomerRepository customerRepository, @Qualifier("ProductServiceImpl") ProductService productService
-            , CustomerAddressRespoitory addressRespoitory, AdminRepository adminRepository, RoleRepository roleRepository, AccountService accountService) {
+                                             CustomerRepository customerRepository, @Qualifier("ProductServiceImpl") ProductService productService,
+                                             AccountService accountService, CustomerAddressRespoitory addressRespoitory, AdminRepository adminRepository, RoleRepository roleRepository) {
 
 
         return (args) -> {
@@ -90,47 +87,15 @@ public class BaseConfig {
 //        	productService.getProductById(1L).getResponseObjects().forEach(t->System.out.println(t.getId() + ":" + t.getName()));
 //        	productService.getProductByName("Johannes").getResponseObjects().forEach(t->System.out.println(t.getId() + ":" + t.getName()));
 //
+
             prepareRoles(roleRepository);
-            createCustomers(customerRepository, companyRepository,roleRepository,accountService,2);
-            createAdmins(adminRepository, roleRepository, 2);
-//            Customer persistedCustomer = customerRepository.findById(1L).get();
-//            System.out.println(persistedCustomer);
-//            persistedCustomer.getAddresses().forEach(System.out::println);
-//
-//
-//
-//            ShoppingCartDTO randomShoppingCartDTO = getRandomShoppingCartDTO(productService, 1, 100);
-//            Address deliveryAddress = persistedCustomer.getAddresses()
-//                    .stream()
-//                    .filter(address -> address.isDefaultAddress())
-//                    .findFirst().get();
-//
-//            System.out.println("Input shoppingCart: \n" + randomShoppingCartDTO
-//                    + "\nInput deliveryAddress: \n" + deliveryAddress);
-//
-//            ServiceResponse<Order> createOrderResponse = orderService.createOrderFromShoppingCart(randomShoppingCartDTO, 1L, deliveryAddress);
-//            System.out.println("Created order - response: " + createOrderResponse);
-//
-//
-//
-//            if (createOrderResponse.isSucessful()) {
-//                System.out.println(createOrderResponse.getResponseObjects());
-//            }
-
-            productSearchTest(productService);
-
-
-
-
-
-            
-
-            
-//            Account account = accountRepository.findByEmail("admin1@gmail.com").get();
-//            System.out.println(account);
-//
-//           
-//            System.out.println(account);
+            createCustomers(accountService, companyRepository, 2);
+            Customer persistedCustomer = customerRepository.findById(1L).get();
+            System.out.println(persistedCustomer);
+            persistedCustomer.getAddresses().forEach(System.out::println);
+            createAdmins(accountService, 2);
+            Account account = accountRepository.findByEmail("admin1@gmail.com").get();
+            System.out.println(account);
 
             createOrderTest(orderService);
             OrderSearchConfig orderConf = OrderSearchConfig.builder()
@@ -147,12 +112,6 @@ public class BaseConfig {
                 orderList.forEach(order -> System.out.println(order.getHeaderString()));
             } else searchOrderResult.getErrorMessages().forEach(System.out::println);
 
-//            testSetOrderStatus(orderService, 1L);
-            System.out.println("End order search result print");
-            
-            
-            System.out.println("Start order search result print");
-            System.out.println(searchOrderResult.isSucessful() ? orderList : searchOrderResult.getErrorMessages());
             System.out.println("End order search result print");
 
 //            OrderSearchConfig orderSearchConfig = new OrderSearchConfig();
@@ -163,8 +122,6 @@ public class BaseConfig {
 //            searchOrderResponse.getResponseObjects().forEach(order -> {
 //                System.out.println(order);
 //            });
-
-//           
 
 
         };
@@ -191,8 +148,16 @@ public class BaseConfig {
                 ServiceResponse<Order> setStatusResponse = orderService.setStatus(i, statusList.get(randomBetween(0, 3)));
                 System.out.println("Changed status successfully: " + setStatusResponse.isSucessful() + setStatusResponse.getErrorMessages());
             }
-        }
 
+        }
+//        OrderSearchConfig orderSearchConfig = new OrderSearchConfig();
+//        orderSearchConfig.setMaxTotalSum(350.00);
+//        orderSearchConfig.setSortBy(OrderSearchConfig.SortBy.totalSum);
+//        ServiceResponse<Order> searchOrderResponse = orderService.getOrders(orderSearchConfig, 0, 30);
+//        System.out.println(searchOrderResponse);
+//        searchOrderResponse.getResponseObjects().forEach(order -> {
+//            System.out.println(order);
+//        });
     }
 
     private void productSearchTest(ProductService productService) {
@@ -254,8 +219,7 @@ public class BaseConfig {
         roleRepository.save(role2);
     }
 
-    private void createCustomers(CustomerRepository customerRepository, CompanyRepository companyRepository, RoleRepository roleRepository, AccountService accountService, int quantity) {
-        Role customerRole = roleRepository.findByName(ERole.CUSTOMER).get();
+    private void createCustomers(AccountService accountService, CompanyRepository companyRepository, int quantity) {
 
         for (int i = 0; i < quantity; i++) {
             Customer customer = new Customer();
@@ -263,10 +227,7 @@ public class BaseConfig {
             customer.setLastName("Larsson");
             customer.setEmail("customer" + (i + 1) + "@gmail.com");
             customer.setPhoneNumber("46709408925");
-            customer.setPassword(bCryptPasswordEncoder.encode("password"));
-            HashSet roles = new HashSet();
-            roles.add(customerRole);
-            customer.setRoles(roles);
+            customer.setPassword("password");
 
             for (int j = 0; j < randomBetween(2, 3); j++) {
                 CustomerAddress address = new CustomerAddress("Storgatan " + (i + 1), randomBetween(11401, 94789), "City X", "Sweden");
@@ -288,7 +249,7 @@ public class BaseConfig {
     }
 
 
-    private void createAdmins(AccountService accountService,CustomerRepository customerRepository,CompanyRepository companyRepository, int quantity) {
+    private void createAdmins(AccountService accountService, int quantity) {
         for (int i = 0; i < quantity; i++) {
             Admin admin = new Admin();
             admin.setFirstName("Admin");
@@ -297,31 +258,6 @@ public class BaseConfig {
             admin.setPhoneNumber("46709408925");
             admin.setPassword("password");
             accountService.createAdmin(admin);
-        }
-        List<Customer> customerList = new ArrayList<>();
-        customerList.add(customerRepository.findById(10L).get());
-        customerList.add(customerRepository.findById(20L).get());
-
-        Company company = new Company();
-        company.setVAT("SE556587983701");
-        company.setCustomers(customerList);
-        companyRepository.save(company);
-    }
-
-
-    private void createAdmins(AdminRepository adminRepository, RoleRepository roleRepository, int quantity) {
-        Role adminRole = roleRepository.findByName(ERole.ADMIN).get();
-        for (int i = 0; i < quantity; i++) {
-            Admin admin = new Admin();
-            admin.setFirstName("Admin");
-            admin.setLastName("Number" + (i + 1));
-            admin.setEmail("admin" + (i + 1) + "@gmail.com");
-            admin.setPhoneNumber("46709408925");
-            admin.setPassword(bCryptPasswordEncoder.encode("password"));
-            HashSet roles = new HashSet();
-            roles.add(adminRole);
-            admin.setRoles(roles);
-            adminRepository.save(admin);
         }
     }
 
@@ -370,26 +306,25 @@ public class BaseConfig {
                                                         ProductTypeRepository typeRepo, ProductCategoryRepository catRepo, ProductSubCategoryRepository subCatRepo) {
         int noCat = 3, noSub = 4, noType = 5;
 
-       
 
-		for (int i = 1; i <= noCat; i++) {
-			ProductCategory category = new ProductCategory("Category " + (i));
-			catRepo.save(category);
+        for (int i = 0; i < noCat; i++) {
+            ProductCategory category = new ProductCategory("Category " + (i + 1));
+            catRepo.save(category);
 
-		}
-		for (int i = 1; i <= noSub; i++) {
-			long rand = new Random().nextInt(noCat)+1;
+        }
+        for (int i = 0; i < noSub; i++) {
+            long rand = new Random().nextInt(noCat) + 1;
 //			System.out.println("Cat Rand:"+rand);
-			ProductSubCategory subCategory = new ProductSubCategory("SubCategory " + (i),
-					catRepo.findById(rand).get());
-			subCatRepo.save(subCategory);
-		}
-		for (int i = 1; i <= noType; i++) {
-			long rand = new Random().nextInt(noSub)+1;
+            ProductSubCategory subCategory = new ProductSubCategory("SubCategory " + (i + 1),
+                    catRepo.findById(rand).get());
+            subCatRepo.save(subCategory);
+        }
+        for (int i = 0; i < noType; i++) {
+            long rand = new Random().nextInt(noSub) + 1;
 //			System.out.println("Sub Rand:"+rand);
-			ProductType prodType = new ProductType("ProductType " + (i),
-					subCatRepo.findById(rand).get());
-			typeRepo.save(prodType);
+            ProductType prodType = new ProductType("ProductType " + (i + 1),
+                    subCatRepo.findById(rand).get());
+            typeRepo.save(prodType);
 
         }
 
@@ -404,11 +339,11 @@ public class BaseConfig {
 //        ProductType prodType = new ProductType("Gungstol", subCat2);
 
 
-        for (int i = 1; i <= 100; i++) {
+        for (int i = 0; i < 40; i++) {
             long rand = new Random().nextInt(noType) + 1;
             Product product1 = new Product();
-            product1.setName("Product " + (i));
-            product1.setDescription("Testing this big product " + (i));
+            product1.setName("Product " + (i + 1));
+            product1.setDescription("Testing this big product " + (i + 1));
             product1.setBasePrice(new Random().nextInt(50));
             product1.setProductType(typeRepo.findById(rand).get());
             product1.setVatPercentage(i % 2 == 0 ? 0.25 : 0.12);

@@ -8,7 +8,6 @@
     <script th:src="@{/js/jquery-3.5.1.min.js}"></script>
     <style>
         main {
-            height: 100%;
             display: grid;
             grid-template-areas:
                 "itemFields segmentation"
@@ -76,6 +75,9 @@
         }
     </style>
     <script th:inline="javascript">
+        function reset(element) {
+            element.val('0');
+        }
         $(document).ready(function () {
             let categoriesObject = /*[[${sessionModel.categoryModel}]]*/;
             let session = /*[[${session}]]*/;
@@ -101,7 +103,8 @@
             $('#cat').on('change', function () {
                 let selectedVal = this.value;
                 console.log(selectedVal);
-
+                reset($('#sub'));
+                reset($('#type'));
 
                 $('<input />').attr('type', 'hidden')
                     .attr('name', "action")
@@ -118,6 +121,7 @@
                 let isDisable = (selectedVal == 0) ? false : true;
                 $('#cat').attr('disabled', isDisable);
 
+                reset($('#type'));
 
                 $('<input />').attr('type', 'hidden')
                     .attr('name', "action")
@@ -163,7 +167,6 @@
     <!-- <p th:text="$"></p> -->
     <div th:replace="fragments/header.html :: header(title=${abc.name},links=${linkMap})"></div>
     <!-- <p th:text="${sessionModel.categoryModel}"></p> -->
-    <p th:if="${errorMessage}" th:text="${errorMessage}"></p>
 
     <main>
         <form name="productUpdate" th:action="@{/webshop/admin/products/product/__${currentProduct.id}__}"
@@ -202,7 +205,7 @@
             <section class="actions">
 
                 <input id="updateProduct" type="submit" value="Update Product">
-                <input id="deleteProduct" type="submit" value="Delete Product" disabled>
+                <!-- <input id="deleteProduct" type="submit" value="Delete Product" disabled> -->
 
             </section>
         </form>
@@ -218,6 +221,7 @@
                     <div class="segmentationRow">
                         <span>Category</span>
                         <select id="cat" th:field="*{selectedCat}">
+                            <option value="0">All</option>
                             <option th:each="category : *{categories}" th:text="${category.name}"
                                 th:value="${category.id}">
                             </option>

@@ -1,8 +1,5 @@
 package springWebshop.application.thymeleafControllers;
 
-import java.sql.Date;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
@@ -30,7 +27,6 @@ import springWebshop.application.model.dto.SessionModel;
 import springWebshop.application.service.ServiceResponse;
 import springWebshop.application.service.admin.AdminService;
 import springWebshop.application.service.order.OrderSearchConfig;
-import springWebshop.application.service.order.OrderSearchConfig.SortBy;
 import springWebshop.application.service.order.OrderService;
 import springWebshop.application.service.product.ProductSearchConfig;
 import springWebshop.application.service.product.ProductService;
@@ -59,7 +55,7 @@ public class AdminController {
 
 	@ModelAttribute("sessionModel")
 	private SessionModel getSessionModel() {
-		return new SessionModel(productService, segmentationService, customerRepository);
+		return new SessionModel(productService, segmentationService);
 	}
 
 	@ModelAttribute("links")
@@ -101,8 +97,8 @@ public class AdminController {
 		m.addAttribute("searchInput", "");
 		m.addAttribute("newSegmentation", "");
 		session.setProductPage(currentPage);
-		m.addAttribute("linkMap", getLinks());
-		return "adminViews/adminHome";
+
+		return "adminViews/adminProductsView";
 	}
 
 	@PostMapping(path = { "/products" })
@@ -152,8 +148,8 @@ public class AdminController {
 		m.addAttribute("newSegmentation", "");
 		m.addAttribute("totalPages", response.getTotalPages());
 		session.setProductPage(currentPage);
-		m.addAttribute("linkMap", getLinks());
-		return "adminViews/adminHome";
+
+		return "adminViews/adminProductsView";
 	}
 
 	@GetMapping(path = { "/products/product/{id}" })
@@ -161,7 +157,7 @@ public class AdminController {
 			@PathVariable("id") long productId,
 			@RequestParam(required = false, name = "page", defaultValue = "1") Optional<Integer> pathPage, Model m) {
 		System.out.println("GetProduct");
-		m.addAttribute("linkMap", getLinks());
+
 		ServiceResponse<Product> response = productService.getProductById(productId);
 		Product currentProduct = response.getResponseObjects().get(0);
 		ServiceResponse<SegmentationModelObject> adminResponse = segmentationService.fullSegmentation(currentProduct);
@@ -198,7 +194,8 @@ public class AdminController {
 
 				if (session.getCategoryModel().getSelectedCat() > 0 && session.getCategoryModel().getSelectedSub() > 0
 						&& session.getCategoryModel().getSelectedType() > 0) {
-					ServiceResponse<Product> response = adminService.updateProduct(product, productId);
+					ServiceResponse<Product> response = adminService.updateProduct(product,
+							session.getCategoryModel().getSelectedType());
 					if (response.isSucessful()) {
 						product = response.getResponseObjects().get(0);
 					} else {
@@ -228,7 +225,7 @@ public class AdminController {
 				segmentationService.prepareProductConfig(session.getCategoryModel(), config);
 
 			} else if (ac.compareToIgnoreCase("type") == 0) {
-				adminService.updateSegmentationOfProduct("type", session.getCategoryModel(), productId);
+//				adminService.updateSegmentationOfProduct("type", session.getCategoryModel(), productId);
 			} else {
 
 			}
@@ -244,7 +241,7 @@ public class AdminController {
 		}
 //		System.out.println("Cat:" + session.getCategoryModel());
 //		System.out.println("POST Admin Single product");
-		m.addAttribute("linkMap", getLinks());
+
 		m.addAttribute("newSegmentation", "");
 
 		m.addAttribute("currentProduct", product);
@@ -255,6 +252,8 @@ public class AdminController {
 	@GetMapping("products/new")
 	public String getNewProduct(Model m, @ModelAttribute("sessionModel") SessionModel session) {
 		m.addAttribute("newProduct", new Product());
+		m.addAttribute("newSegmentation", "");
+
 		return "adminViews/newProduct";
 	}
 
@@ -287,12 +286,14 @@ public class AdminController {
 				segmentationService.prepareProductConfig(session.getCategoryModel(), config);
 
 			}
+
 		} else {
 			if (session.getCategoryModel().getSelectedCat() > 0 && session.getCategoryModel().getSelectedSub() > 0
 					&& session.getCategoryModel().getSelectedType() > 0) {
-				ServiceResponse<Product> response = adminService.createProduct(newProduct);
+				ServiceResponse<Product> response = adminService.createProduct(newProduct, session.getCategoryModel());
 				if (response.isSucessful()) {
 					m.addAttribute("createdProduct", response.getResponseObjects().get(0));
+					m.addAttribute("success", "New Product created");
 					newProduct = new Product();
 				} else {
 					m.addAttribute("errorMessage", response.getErrorMessages());
@@ -309,32 +310,32 @@ public class AdminController {
 	}
 
 	@GetMapping(path = { "orders" })
-	public String getAllOrders(Model m, @ModelAttribute("sessionModel") SessionModel session,
+	public String getOrders(Model m, @ModelAttribute("sessionModel") SessionModel session,
 			@RequestParam(required = false, name = "page", defaultValue = "1") Optional<Integer> pathPage) {
 
 		OrderSearchConfig config = new OrderSearchConfig();
+
 		int currentPage = pathPage.isPresent() ? pathPage.get() : session.getOrderPage();
 
 		ServiceResponse<Order> allOrdersResponse = orderService.getOrders(config, currentPage > 0 ? currentPage - 1 : 0,
 				20);
 		if (allOrdersResponse.isSucessful()) {
-			session.setOrderPage(currentPage);
 
 		} else {
 			session.setOrderPage(1);
 			m.addAttribute("errorMessage", allOrdersResponse.getErrorMessages());
 		}
-
+		session.setOrderPage(currentPage);
 		m.addAttribute("totalPages", allOrdersResponse.getTotalPages());
 		m.addAttribute("orderStatuses", Order.OrderStatus.values());
-		m.addAttribute("selectedStatus", session.getOrderStatus());
+		m.addAttribute("selectedStatus", session.getOrderStatus() != null ? session.getOrderStatus() : "All");
 		m.addAttribute("allOrders", allOrdersResponse.getResponseObjects());
 
 		return "adminViews/adminOrdersView";
 	}
 
 	@PostMapping(path = { "orders" })
-	public String postAllOrders(Model m, @ModelAttribute("sessionModel") SessionModel session,
+	public String postOrders(Model m, @ModelAttribute("sessionModel") SessionModel session,
 			@RequestParam(required = false, name = "page", defaultValue = "1") Optional<Integer> pathPage,
 			@RequestParam(required = false, name = "action") Optional<String> action,
 			@RequestParam(required = false, name = "actionValue") Optional<String> orderStatus,
@@ -344,27 +345,26 @@ public class AdminController {
 		OrderSearchConfig config = new OrderSearchConfig();
 		if (action.isPresent()) {
 			switch (action.get()) {
-
 			case "filter":
-//				switch(orderStatus.get()) {
-//				case"NOT_HANDLED":
-//					config.setCreatedEarliest(new java.util.Date(1970, 5, 5));
-//					break;
-//				case "DISPATCHED":
-//					
-//					config.setDispatchedEarliest(new java.util.Date(1970, 5, 5));
-//					break;
-//				case "DELIVERY":
-//					config.setSentForDeliveryEarliest(new java.util.Date(1970, 5, 5));
-//					break;
-//				case "DELIVERY_COMPLETE":
-//					config.setSentForDeliveryEarliest(new java.util.Date(1970, 5, 5));
-//					break;
-//				case "CANCELLED":
-//					config.setSentForDeliveryEarliest(new java.util.Date(1970, 5, 5));
-//					break;
-//				}
-				System.out.println("Filter:" + orderStatus);
+				System.out.println("Filter");
+				System.out.println(orderStatus);
+				switch (orderStatus.get()) {
+				case "NOT_HANDLED":
+					config.setStatus(OrderStatus.NOT_HANDLED);
+					break;
+				case "DISPATCHED":
+					config.setStatus(OrderStatus.DISPATCHED);
+					break;
+				case "DELIVERY":
+					config.setStatus(OrderStatus.DELIVERY);
+					break;
+				case "DELIVERY_COMPLETE":
+					config.setStatus(OrderStatus.DELIVERY_COMPLETED);
+					break;
+				case "CANCELLED":
+					config.setStatus(OrderStatus.CANCELED);
+					break;
+				}
 				break;
 			case "approve":
 				if (expeditedOrders.isPresent()) {
@@ -373,34 +373,88 @@ public class AdminController {
 						orderService.setStatus(Long.valueOf(stringOrder), OrderStatus.DISPATCHED);
 					});
 				}
+				config.setStatus(session.getOrderStatus() != null ? session.getOrderStatus() : null);
 
 				break;
 
+			case "disapprove":
+				if (expeditedOrders.isPresent()) {
+					System.out.println(expeditedOrders + " should be reversed");
+
+					expeditedOrders.get().forEach(stringOrder -> {
+						orderService.setStatus(Long.valueOf(stringOrder), OrderStatus.NOT_HANDLED);
+					});
+				}
+				config.setStatus(session.getOrderStatus() != null ? session.getOrderStatus() : null);
+
+				break;
 			}
 
-		} else {
-
-		}
-
-		int currentPage = pathPage.isPresent() ? pathPage.get() : session.getProductPage();
-
+		} 
+		int currentPage = pathPage.isPresent() ? pathPage.get() : session.getOrderPage();
 		ServiceResponse<Order> filteredOrders = orderService.getOrders(config, currentPage > 0 ? currentPage - 1 : 0,
 				20);
 
 		if (filteredOrders.isSucessful()) {
-			session.setOrderStatus(OrderStatus.valueOf(orderStatus.get()));
+			if (orderStatus.isPresent()) {
+				filteredOrders.getResponseObjects().forEach(t -> System.out.println(t.getId()));
+				if (orderStatus.get().compareToIgnoreCase("All") == 0)
+					session.setOrderStatus(null);
+				else
+					session.setOrderStatus(OrderStatus.valueOf(orderStatus.get()));
+			}
 
 		} else {
 			m.addAttribute("errorMessage", filteredOrders.getErrorMessages());
 			session.setOrderPage(1);
 		}
-
+		
 		session.setOrderPage(currentPage);
+		m.addAttribute("totalPages", filteredOrders.getTotalPages());
 		m.addAttribute("orderStatuses", Order.OrderStatus.values());
-		m.addAttribute("selectedStatus", session.getOrderStatus());
+		m.addAttribute("selectedStatus", session.getOrderStatus() != null ? session.getOrderStatus() : "All");
 		m.addAttribute("allOrders", filteredOrders.getResponseObjects());
 
 		return "adminViews/adminOrdersView";
+	}
+	
+	@GetMapping("/orders/{id}")
+	public String getOrder(@PathVariable("id") Optional<Long> orderId, Model m) {
+		
+		ServiceResponse<Order> currentOrder = orderService.getOrderById(orderId.get());
+		if(currentOrder.isSucessful()) {
+			m.addAttribute("currentOrder", currentOrder.getResponseObjects().get(0));
+		}
+		else {
+			m.addAttribute("errorMessage", currentOrder.getErrorMessages());
+			return "redirect:/webshop/admin/orders";
+		}
+		
+		return "adminViews/singleOrderView";
+		
+	}
+	
+	@PostMapping("/orders/{id}")
+	public String dispatchOrder(@PathVariable("id") Optional<Long> orderId, Model m) {
+		System.out.println("POST TILL ORDER");
+		ServiceResponse<Order> currentOrder = orderService.getOrderById(orderId.get());
+		if(currentOrder.isSucessful()) {
+			ServiceResponse<Order> statusChange =  orderService.setStatus(orderId.get(), OrderStatus.DISPATCHED);
+			if(statusChange.isSucessful()) {
+				m.addAttribute("success", "Order Dispatched");
+			}
+			else {
+				m.addAttribute("errorMessage", statusChange.getErrorMessages());
+			}
+			m.addAttribute("currentOrder", currentOrder.getResponseObjects().get(0));
+		}
+		else {
+			m.addAttribute("errorMessage", currentOrder.getErrorMessages());
+			return "redirect:/webshop/admin/orders";
+		}
+		
+		return "adminViews/singleOrderView";
+		
 	}
 
 	@GetMapping(path = { "users" })

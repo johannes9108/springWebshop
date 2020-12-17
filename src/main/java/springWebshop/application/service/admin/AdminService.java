@@ -12,7 +12,7 @@ public interface AdminService {
 	ServiceResponse<Order> updateOrder();
 //	ServiceResponse<Account> updateAccount();
 	ServiceResponse<Product> updateSegmentationOfProduct(String action, SegmentationModelObject categoryModelObject, long id);
-	ServiceResponse<Product> createProduct(Product newProduct);
+	ServiceResponse<Product> createProduct(Product newProduct, SegmentationModelObject segmentationModelObject);
 	ServiceResponse<Integer> createNewSegmentation(String string, SegmentationModelObject categoryModel);
 	
 	

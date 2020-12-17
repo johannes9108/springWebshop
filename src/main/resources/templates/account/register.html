@@ -4,11 +4,64 @@
 <head>
     <meta charset="ISO-8859-1">
     <title>Register</title>
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+
 </head>
 
 <body>
-    <div th:replace="fragments/header.html :: header(title='Register',links=${linkMap})"></div>
-    <main></main>
+    <div th:replace="fragments/header.html :: header(title='Register',links=${links})"></div>
+    <main>
+        <form th:action="@{/register}" method="POST">
+
+            <div class="row">
+                <label for="">First Name</label>
+
+                <input name="firstName" type="text" placeholder="firstName" required="true" autofocus="true" />
+
+            </div>
+            <div class="row">
+                <label for="">Last Name</label>
+
+                <input name="lastName" type="text" placeholder="lastName" required="true" />
+            </div>
+
+            <div class="row">
+                <label for="">Password</label>
+                <input name="password" type="password" placeholder="Password" required="true" />
+            </div>
+            <div class="row">
+                <label for="">Repeat Password</label>
+                <input name="repeatPassword" type="password" placeholder="Password" required="true" />
+            </div>
+            <div class="row">
+                <label for="">Email</label>
+
+                <input name="email" type="text" placeholder="Email" required="true" />
+            </div>
+            <div class="row">
+                <label for="">Phonenumber</label>
+
+                <input name="Phonenumber" type="text" placeholder="Phonenumber" />
+            </div>
+            <div class="row">
+                <label for="">Mobile</label>
+
+                <input name="Mobile" type="text" placeholder="Mobile" />
+            </div>
+            <div class="row">
+
+                <input name="Submit" type="Submit" value="Register" />
+            </div>
+
+
+        </form>
+
+
+
+
+
+
+    </main>
     <footer></footer>
 </body>
 

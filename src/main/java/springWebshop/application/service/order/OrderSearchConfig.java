@@ -17,7 +17,7 @@ import springWebshop.application.model.domain.order.Order.OrderStatus;
 @AllArgsConstructor
 public class OrderSearchConfig {
 
-    OrderStatus	 status;
+    OrderStatus	status;
     LocalDate createdEarliest;
     LocalDate createdLatest;
     LocalDate dispatchedEarliest;

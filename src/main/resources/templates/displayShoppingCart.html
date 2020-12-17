@@ -24,11 +24,15 @@
                         <span th:text="|Cost: ${cart.getItemSum(product.key)}|"></span>
                     </div>
                     <div class="itemEdit">
-                        <form method="POST" th:action="@{/webshop/shoppingcart(id=__${product.key.id}__,action=add)}">
+                        <form method="POST" th:action="@{/webshop/shoppingcart}">
+                            <input type="hidden" name="action" value="add" />
+                            <input type="hidden" name="id" th:value="${product.key.id}" />
                             <input type="submit" value="Increase" />
                         </form>
-                        <form method="POST"
-                            th:action="@{/webshop/shoppingcart(id=__${product.key.id}__,action=remove)}">
+                        <form method="POST" th:action="@{/webshop/shoppingcart}">
+
+                            <input type="hidden" name="id" th:value="${product.key.id}" />
+                            <input type="hidden" name="action" value="remove" />
                             <input type="submit" value="Decrease" />
                         </form>
 

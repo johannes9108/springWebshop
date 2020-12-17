@@ -117,8 +117,6 @@ public class ProductServiceImpl implements ProductService {
 	public ServiceResponse<Product> create(Product newProduct) {
 		ServiceResponse<Product> response = new ServiceResponse<>();
 		List<String> errors = new ArrayList<>();
-		newProduct.setProductType(productTypeRepository.findById(1L).get());
-		System.out.println("In Create:" + newProduct);
 
 		if (isValidNewProduct(newProduct, errors))
 			try {

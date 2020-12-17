@@ -28,16 +28,17 @@ public class SessionModel {
 	public String toString() {
 		return "SessionModel [productPage=" + productPage + ", categoryModel=" + categoryModel + "]";
 	}
-
-	private Customer user;
 	private ShoppingCartDTO cart;
 	private int productPage;
 	private int orderPage;
 	private int accountPage;
+	private String searchString;
+	
 	private SegmentationModelObject categoryModel;
 	private OrderStatus orderStatus;
 	
-	public SessionModel(ProductService productService, SegmentationService productSegmentationService, CustomerRepository custRepo) {
+	
+	public SessionModel(ProductService productService, SegmentationService productSegmentationService) {
 		// Start session as guest
 		cart = new ShoppingCartDTO(productService);
 		List<CustomerAddress> addresses = new ArrayList<>();
@@ -45,15 +46,14 @@ public class SessionModel {
 			CustomerAddress address = new CustomerAddress("Storgatan " + j, (j*33), "City X", "Sweden");
 			addresses.add(address);
 		}
-		orderStatus = OrderStatus.NOT_HANDLED;
-		user = new Customer("Johannes", "Hedman", "Password", "Email@email.com", "12341234", "123412123",addresses);
-		custRepo.save(user);
 		productPage = 1;
 		orderPage = 1;
 		accountPage = 1;
+		searchString = "";
 		categoryModel = new SegmentationModelObject();
 		categoryModel.setCategories(productSegmentationService.getAllCategories().getResponseObjects());
 	}
+
 
 
 }

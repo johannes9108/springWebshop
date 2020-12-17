@@ -8,6 +8,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+
 import springWebshop.application.model.domain.user.ERole;
 
 @Configuration
@@ -22,20 +24,24 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/h2-console/**",
                         "/css/**",
                         "/webshop/products/**",
-                        "/login",
-                        "/register",
+                        "/webshop/login",
+                        "/webshop/register",
                         "/webshop/shoppingcart/**").permitAll()
                 .antMatchers("/webshop/admin/**").hasAuthority(ERole.ADMIN.name())
+                .antMatchers("/webshop/checkout/**").hasAuthority(ERole.CUSTOMER.name())
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
-                .loginPage("/login")
-                	.loginProcessingUrl("/login")
+                .loginPage("/webshop/login")
+                	.loginProcessingUrl("/webshop/processLogin")
 //                	.defaultSuccessUrl("/webshop/products", true)
-                	.failureUrl("/login?error=true")
+                	.successHandler(successHandler())
+                	.failureUrl("/webshop/login?error=true")
                 	.permitAll()
                 	.and()
                 .logout()
+                	.logoutUrl("/webshop/logout")
+                	.logoutSuccessUrl("/webshop/login")
                 .deleteCookies("JSESSIONID")
                 .permitAll();
 
@@ -48,5 +54,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
+    
+    @Bean
+    public AuthenticationSuccessHandler successHandler() {
+    	return new SimpleUrlAuthenticationSuccessHandler();
+    }
 
 }

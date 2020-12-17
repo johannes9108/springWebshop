@@ -24,6 +24,7 @@
         .segmentContainer {
             display: flex;
             flex-direction: column;
+            justify-content: center;
             padding: 2rem;
             background-color: red;
 
@@ -34,14 +35,14 @@
             justify-content: center;
             align-items: center;
             flex-direction: column;
-            background-color: royalblue;
-            border: 1px solid seagreen;
+            /* background-color: royalblue; */
+            /* border: 1px solid seagreen; */
             margin: 1rem;
             padding: 0 2rem;
         }
 
         .segmentationRow>* {
-            width: 50%;
+            width: 100%;
         }
 
         .category {
@@ -61,22 +62,21 @@
         }
 
 
-        .product {
+        .order {
             /* background-color: red; */
             display: grid;
-            height: 100%;
             grid-template-rows: 4fr 1fr;
             overflow: hidden;
 
         }
 
-        .productTable {
+        .orderTable {
             display: flex;
             flex-direction: column;
             overflow: auto;
         }
 
-        .productMeta {
+        .orderMeta {
             padding: 1rem;
             display: flex;
             flex-direction: column;
@@ -85,18 +85,30 @@
         }
 
         .dataRow {
+            padding: 0 0.5rem;
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr auto;
+            grid-template-columns: 0.5fr 1fr 2fr 2fr 2fr 2fr 2fr;
             background-color: azure;
+            /* overflow: hidden; */
         }
 
-        .productTable>a:nth-of-type(odd)>.dataRow {
+        .dataRow>span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .dataRow>input {
+            margin: 0 auto 0 0;
+
+        }
+
+        .orderTable>a:nth-of-type(odd)>.dataRow {
             background-color: antiquewhite;
         }
 
         .headerRow {
-            font-style: italic;
             font-size: 1.2rem;
+            border-bottom: 0.1rem solid darkcyan;
         }
 
         .pages {
@@ -116,8 +128,15 @@
                 // array.push($(this).val());
             });
             return array;
-
-
+        }
+        function findAllUnCheckedOrders() {
+            let array = [];
+            $(".dataRow input[id]").each(function () {
+                if ($(this).prop("checked") == false)
+                    array.push($(this).prop("id"))
+                // array.push($(this).val());
+            });
+            return array;
         }
         $(document).ready(function () {
             let session = /*[[${session}]]*/;
@@ -150,6 +169,21 @@
 
                 document.forms['expediteOrders'].submit();
             });
+            $('#unoReverse').click(function () {
+                $('<input />').attr("type", "hidden")
+                    .attr("name", "action")
+                    .attr("value", "disapprove").appendTo(document.forms['expediteOrders']);
+                listOfUnCheckOrders = findAllUnCheckedOrders();
+
+
+                console.log(listOfUnCheckOrders);
+
+                $('<input />').attr("type", "hidden")
+                    .attr("name", "expeditedList")
+                    .attr("value", listOfUnCheckOrders).appendTo(document.forms['expediteOrders']);
+
+                document.forms['expediteOrders'].submit();
+            });
 
         });
     </script>
@@ -157,28 +191,40 @@
 
 <body th:with="currentPage=(${sessionModel.orderPage})">
     <!-- <h1 th:text="|${currentPage} ${totalPages}|"></h1> -->
-    <div th:replace="fragments/header.html :: header(title=Admin,links=${linkMap})"></div>
-    <p th:text="${selectedStatus}"></p>
+    <div th:replace="fragments/header.html :: header(title=Admin,links=${links})"></div>
     <main>
-        <section class="product">
-            <div class="productTable">
+        <section class="order">
+            <div class="orderTable">
                 <div class="dataRow headerRow">
                     <span>ID</span>
-                    <span>Name</span>
-                    <span>Price</span>
-                    <span th:if="${#strings.equalsIgnoreCase(__selectedStatus__, 'NOT_HANDLED') }">Expedited</span>
+                    <span>Items</span>
+                    <span>Sum</span>
+                    <span>Vat Sum</span>
+                    <span>Discount</span>
+                    <span>Payable</span>
+                    <span
+                        th:if="${#strings.equalsIgnoreCase(__selectedStatus__, 'NOT_HANDLED') || #strings.equalsIgnoreCase(__selectedStatus__, 'DISPATCHED') }">Expedited</span>
+                    <span th:if="${#strings.equalsIgnoreCase(__selectedStatus__, 'ALL') }">Status</span>
                 </div>
-                <div class="dataRow" th:each="order : ${allOrders}">
+                <a th:href="@{/webshop/admin/orders/__${order.id}__}" class="dataRow" th:each="order : ${allOrders}">
                     <span th:text="${order.id}">ID</span>
-                    <span th:text="${order.id}">ID</span>
-                    <span th:text="${order.id}">ID</span>
-                    <input th:if="${#strings.equalsIgnoreCase(__selectedStatus__, 'NOT_HANDLED') }" type="checkbox" th:text="${order.id}" th:id="${order.id}" />
-                </div>
+                    <span th:text="${order.totalNumberOfItem}">ID</span>
+                    <span th:text="${order.totalSum}">ID</span>
+                    <span th:text="${order.totalVatSum}">ID</span>
+                    <span th:text="${order.totalDiscount}">ID</span>
+                    <span th:text="${order.totalPayable}">ID</span>
+                    <input
+                        th:if="${#strings.equalsIgnoreCase(__selectedStatus__, 'NOT_HANDLED') || #strings.equalsIgnoreCase(__selectedStatus__, 'DISPATCHED')  }"
+                        th:checked="${#strings.equalsIgnoreCase(__selectedStatus__, 'DISPATCHED')}" type="checkbox"
+                        th:id="${order.id}" />
+                    <span th:if="${#strings.equalsIgnoreCase(__selectedStatus__, 'ALL') }"
+                        th:text="${order.getOrderStatus()}"></span>
+                </a>
 
                 <div class="pages">
                     <a th:if="${currentPage > 1}"
                         th:href="@{/webshop/admin/orders(page=__${currentPage-1>0?currentPage-1:''}__)}">Back</a>
-                    <a th:if="${currentPage!=totalPages}"
+                    <a th:if="${currentPage<totalPages}"
                         th:href="@{/webshop/admin/orders(page=__${currentPage<2?2:currentPage+1}__)}">Next</a>
                 </div>
 
@@ -196,17 +242,23 @@
                 <form name="filter" class="segmentationRow" method="POST" th:action="@{/webshop/admin/orders/}">
                     <label for="orderStatus">Order Status</label>
                     <select id="orderFilter" name="orderStatus" th:field="${selectedStatus}">
+                        <option value="All">All</option>
                         <option th:each="orderStatus : ${orderStatuses}" th:text="${orderStatus}"
                             th:value="${orderStatus}"></option>
                     </select>
 
                 </form>
-                <form name="expediteOrders" th:if="${#strings.equalsIgnoreCase(__selectedStatus__, 'NOT_HANDLED') }" th:action="@{/webshop/admin/orders}" method="POST">
-                    <input id="expediteOrders" class="segmentationRow" value="Expedite Selected Orders"/>
+                <form name="expediteOrders" class="segmentationRow"
+                    th:if="${#strings.equalsIgnoreCase(__selectedStatus__, 'NOT_HANDLED') || #strings.equalsIgnoreCase(__selectedStatus__, 'DISPATCHED')  }"
+                    th:action="@{/webshop/admin/orders}" method="POST">
+                    <input th:if="${#strings.equalsIgnoreCase(__selectedStatus__, 'NOT_HANDLED')}" id="expediteOrders"
+                        type="submit" value="Expedite Selected Orders" />
+                    <input th:if="${#strings.equalsIgnoreCase(__selectedStatus__, 'DISPATCHED')}" id="unoReverse"
+                        type="submit" value="Reverse Orders" />
                 </form>
-                <div class="segmentationRow">123</div>
+                <!-- <div class="segmentationRow">123</div>
                 <div class="segmentationRow">432</div>
-                <div class="segmentationRow">12312</div>
+                <div class="segmentationRow">12312</div> -->
 
 
 

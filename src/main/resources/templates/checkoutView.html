@@ -1,7 +1,6 @@
 <!DOCTYPE html>
-<html lang="en"
-      xmlns:th="https://www.thymeleaf.org"
-      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<html lang="en" xmlns:th="https://www.thymeleaf.org"
+    xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <!--<html xmlns:th="https://www.thymeleaf.org">-->
 
 <head>
@@ -74,8 +73,8 @@
     </style>
 </head>
 
-<body th:with="cart=${session.sessionModel.cart},user=${session.sessionModel.user}">
-    <div th:replace="fragments/header.html :: header(title='Checkout',links=${linkMap})"></div>
+<body th:with="cart=${session.sessionModel.cart}">
+    <div th:replace="fragments/header.html :: header(title='Checkout',links=${links})"></div>
     <main class="container">
         <section class="wrapper" th:object="${cart}">
 
@@ -109,11 +108,10 @@
         </section>
 
 
-        <form th:object="${sessionModel.user}" class="customerInfo" method="POST" th:action="@{/webshop/checkout}">
+        <form th:object="${customer}" class="customerInfo" method="POST" th:action="@{/webshop/checkout}">
 
 
             <div class="userDetails">
-<<<<<<< Upstream, based on ExpeditingFromUI
                 <div class="userDataRow">
                     <span>First Name</span>
                     <input type="text" th:field="*{firstName}" />
@@ -140,7 +138,7 @@
                 </div>
             </div>
             <div class="addressContainer">
-                <div th:each="address,meta: *{addresses}" class="address" th:object="${address}">
+                <div th:if="*{addresses}" th:each="address,meta: *{addresses}" class="address" th:object="${address}">
                     <div class="userDataRow">
                         <address>Street</address>
                         <input type="text" th:value="*{street}" placeholder="*{street}" />
@@ -168,15 +166,6 @@
                     </div>
 
                 </div>
-
-=======
-                <span sec:authentication="principal.firstName"></span>
-                <span sec:authentication="principal.lastName"></span>
-                <span>Name</span>
-                <span>Name</span>
-                <span>Name</span>
-                <span>Name</span>
->>>>>>> 9aa97f5 :fix: added current user first and last name to checkout view
             </div>
             <div class="actions">
                 <!-- <a th:href="@{/webshop/checkout(action=updateUserDetail)}">Update user details</a> -->

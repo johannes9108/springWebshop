@@ -27,7 +27,10 @@ public class UserDetailsImpl implements UserDetails {
     @JsonIgnore
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
-
+    
+    
+    //TODO
+    //Move the entire implementation to Account Model Object for improved Segmentation
     public static UserDetailsImpl build(Account user) {
         List<GrantedAuthority> authorities = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName().name()))

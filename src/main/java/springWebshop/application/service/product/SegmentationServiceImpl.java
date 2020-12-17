@@ -114,7 +114,6 @@ public class SegmentationServiceImpl implements SegmentationService {
 	public ServiceResponse<ProductType> getProductTypeById(long id) {
 		
 		
-		
 		ServiceResponse<ProductType> response = new ServiceResponse<>();
 		try {
 			Optional<ProductType> productType = productTypeRepository.findById(id);

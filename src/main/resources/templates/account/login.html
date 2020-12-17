@@ -28,14 +28,14 @@
 </head>
 
 <body>
-    <div th:replace="fragments/header.html :: header(title='Login',links=${linkMap})"></div>
+    <div th:replace="fragments/header.html :: header(title='Login',links=${links})"></div>
     <main>
-        <form method="POST" th:action="@{/login}">
+        <form method="POST" th:action="@{/webshop/processLogin}">
             <p th:if="${param.error}">Invalid credentials</p>
             <div class="row">
                 <label for="">Email</label>
 
-                <input name="username" type="text" placeholder="Username" required="true" autofocus="true" />
+                <input name="username" type="text" placeholder="Email" required="true" autofocus="true" />
             </div>
 
             <div class="row">
@@ -44,7 +44,7 @@
             </div>
             <div class="row buttons">
                 <input type="submit" value="Log in" />
-                <a th:href="@{/register}">Register</a>
+                <a th:href="@{/webshop/register}">Register</a>
             </div>
 
 

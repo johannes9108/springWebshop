@@ -28,15 +28,24 @@ public class AdminServiceImpl implements AdminService {
 	
 	@Override
 	public ServiceResponse<Product> updateProduct(Product product, long typeId) {
+		try {
 		Product persistedProduct = productService.getProductById(product.getId()).getResponseObjects().get(0);
 		persistedProduct = product;
+		System.out.println(typeId);
 		ServiceResponse<ProductType> typeResponse = segmentationService.getProductTypeById(typeId);
 		System.out.println("TYPE:" + typeResponse.getResponseObjects().get(0));
 		persistedProduct.setProductType(typeResponse.isSucessful()?typeResponse.getResponseObjects().get(0)
 				:
-			segmentationService.getProductTypeById(1L).getResponseObjects().get(0));
-
+					segmentationService.getProductTypeById(1L).getResponseObjects().get(0));
 		return productService.update(persistedProduct);
+		}catch(Exception e) {
+			System.out.println(e);
+			ServiceResponse<Product> response = new ServiceResponse<Product>();
+			response.addErrorMessage(e.getLocalizedMessage());
+			return response;
+		}
+		
+
 
 	}
 
@@ -65,8 +74,29 @@ public class AdminServiceImpl implements AdminService {
 	}
 
 	@Override
-	public ServiceResponse<Product> createProduct(Product newProduct) {
-			return productService.create(newProduct);
+	public ServiceResponse<Product> createProduct(Product newProduct,SegmentationModelObject segmentationModel) {
+			ServiceResponse<Product> response = new ServiceResponse<Product>();
+			try {
+				ServiceResponse<ProductType> typeResponse = segmentationService.getProductTypeById(segmentationModel.getSelectedType());
+				if(typeResponse.isSucessful()) {
+					newProduct.setProductType(typeResponse.getResponseObjects().get(0));
+					ServiceResponse<Product> productResponse = productService.create(newProduct);
+					if(productResponse.isSucessful()) {
+						return  productResponse;
+					}
+					else {
+						response.setErrorMessages(productResponse.getErrorMessages());
+						return response;
+					}
+				}else {
+					response.addErrorMessage("Couldn't fetch product type");
+					return response;
+				}
+			}catch(Exception e) {
+				System.err.println(e);
+				response.addErrorMessage(e.getLocalizedMessage());
+				return response;
+			}
 	}
 
 	@Override

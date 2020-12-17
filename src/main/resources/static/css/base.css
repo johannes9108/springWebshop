@@ -74,6 +74,11 @@ footer > a {
   border-radius: 10px;
   padding: 2rem;
 }
+.accountLinks {
+  display: flex;
+  flex-flow: column;
+  align-items: end;
+}
 
 a:link,
 a:visited {
@@ -86,4 +91,12 @@ a:hover {
 }
 textarea {
   resize: none;
+}
+.errorMessage {
+  color: red;
+  font-style: italic;
+}
+.success {
+  color: green;
+  font-weight: bold;
 }
