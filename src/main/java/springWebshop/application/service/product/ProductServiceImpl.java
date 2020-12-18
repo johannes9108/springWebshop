@@ -118,12 +118,17 @@ public class ProductServiceImpl implements ProductService {
 		ServiceResponse<Product> response = new ServiceResponse<>();
 		List<String> errors = new ArrayList<>();
 
-		if (isValidNewProduct(newProduct, errors))
+		if (isValidNewProduct(newProduct, errors)) {
+			System.out.println("Validation OK");
 			try {
+				System.out.println("Time to save to repo");
 				response.addResponseObject(productRepository.save(newProduct));
+				System.out.println("Save complete");
 			} catch (Exception e) {
+				System.out.println("Exception:"+e.getLocalizedMessage());
 				response.addErrorMessage(ServiceErrorMessages.PRODUCT.couldNotCreate());
 			}
+		}
 		response.setErrorMessages(errors);
 		return response;
 	}

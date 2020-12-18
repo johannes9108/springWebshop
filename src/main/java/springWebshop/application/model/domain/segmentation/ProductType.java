@@ -41,9 +41,9 @@ public class ProductType {
 		return "Type:"+name+"|"+productSubCategory.toString();
 	}
     
-	public String getFullyQualifiedName() {
-		return productSubCategory.getFullyQualifiedName() + "/" +  name;
-	}
+//	public String getFullyQualifiedName() {
+//		return productSubCategory.getFullyQualifiedName() + "/" +  name;
+//	}
 
 	@Override
 	public boolean equals(Object obj) {

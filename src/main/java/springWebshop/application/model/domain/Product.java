@@ -6,6 +6,9 @@ import springWebshop.application.model.domain.segmentation.ProductSubCategory;
 import springWebshop.application.model.domain.segmentation.ProductType;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;

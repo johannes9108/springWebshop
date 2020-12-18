@@ -13,6 +13,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotBlank;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
 
 @Entity
@@ -22,7 +24,7 @@ public class ProductCategory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     long id;
     String name;
-
+    @JsonIgnore
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE,
     mappedBy = "productCategory")
     private Set<ProductSubCategory> subCategories;
@@ -60,7 +62,7 @@ public class ProductCategory {
         return "Category:"+name;
         
     }
-	public String getFullyQualifiedName() {
-		return name;
-	}
+//	public String getFullyQualifiedName() {
+//		return name;
+//	}
 }

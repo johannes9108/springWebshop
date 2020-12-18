@@ -89,7 +89,7 @@ public class BaseConfig {
 //
 
             prepareRoles(roleRepository);
-            createCustomers(accountService, companyRepository, 2);
+            createCustomers(accountService, companyRepository, 10);
             Customer persistedCustomer = customerRepository.findById(1L).get();
             System.out.println(persistedCustomer);
             persistedCustomer.getAddresses().forEach(System.out::println);

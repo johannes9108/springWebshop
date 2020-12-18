@@ -9,6 +9,8 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.GeneratorType;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -31,7 +33,7 @@ public class ProductSubCategory {
     @ManyToOne
     @NotNull
     private ProductCategory productCategory;
-
+    @JsonIgnore
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE,
     mappedBy = "productSubCategory")
     private Set<ProductType> productTypes;
@@ -65,9 +67,9 @@ public class ProductSubCategory {
         return Objects.hash(id);
     }
 
-	public String getFullyQualifiedName() {
-		return productCategory.getFullyQualifiedName() + "/" + name ;
-	}
+//	public String getFullyQualifiedName() {
+//		return productCategory.getFullyQualifiedName() + "/" + name ;
+//	}
 
 	@Override
 	public String toString() {

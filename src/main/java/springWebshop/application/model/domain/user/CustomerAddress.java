@@ -5,6 +5,8 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,6 +24,7 @@ public class CustomerAddress implements Address, Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     long id;
+    @JsonIgnore
     @ManyToOne
     private Customer customer;
     @NotBlank

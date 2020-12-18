@@ -23,6 +23,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/",
                         "/h2-console/**",
                         "/css/**",
+                        "/webshop/api/**",
                         "/webshop/products/**",
                         "/webshop/login",
                         "/webshop/register",
