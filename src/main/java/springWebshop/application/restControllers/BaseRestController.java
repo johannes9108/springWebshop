@@ -85,9 +85,9 @@ public class BaseRestController {
 		}
 	}
 
-	@PostMapping(value = { "products/new" })
-	public ResponseEntity<Product> postSingleProduct(Optional<Product> product) {
-		System.out.println(product);
+	@PostMapping(value = { "products/new" },consumes = {MediaType.APPLICATION_JSON_VALUE})
+	public ResponseEntity<Product> postSingleProduct(@RequestBody Optional<Product> product) {
+//		System.out.println(product);
 		if (product.isPresent()) {
 			ServiceResponse<Product> productResponse = productService.create(product.get());
 

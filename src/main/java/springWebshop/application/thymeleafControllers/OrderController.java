@@ -48,7 +48,10 @@ public class OrderController {
 		if(authentication!=null) {
 				long id = ((UserDetailsImpl)authentication.getPrincipal()).getId();
 				ServiceResponse<Customer> customerResponse = customerService.getCustomerById(id);
+				System.out.println(customerResponse.getResponseObjects());
+				System.out.println(customerResponse);
 				if(customerResponse.isSucessful()) {
+					
 					m.addAttribute("customer", customerResponse.getResponseObjects().get(0));
 				}
 				else {
@@ -69,11 +72,12 @@ public class OrderController {
 		System.out.println(sessionModel.getCart().getTotalItems());
 		//TODO Use ID from Authentication and lookup User
 //		System.out.println(sessionModel.getUser().getId());
+		
 		if(authentication!=null) {
 			long id = ((UserDetailsImpl)authentication.getPrincipal()).getId();
 			List<CustomerAddress> addresses = new ArrayList<>();
 			addresses.add(new CustomerAddress());
-			
+		
 			ServiceResponse<Order> response = orderService.createOrderFromShoppingCart(sessionModel.getCart(), id,new CustomerAddress());
 			System.out.println(response);
 			if(response.isSucessful()) {

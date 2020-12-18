@@ -212,7 +212,7 @@
                     <div class="segmentationRow">
                         <span>Category</span>
                         <select id="cat" th:field="*{selectedCat}">
-                            <option value="0">All</option>
+                            <option value="0">New</option>
                             <option th:each="category : *{categories}" th:text="${category.name}"
                                 th:value="${category.id}">
                             </option>
@@ -221,7 +221,7 @@
                     <div class="segmentationRow">
                         <span>SubCategory</span>
                         <select id="sub" th:field="*{selectedSub}" disabled>
-                            <option value="0">All</option>
+                            <option value="0">New</option>
                             <option th:each="subCategory : *{subCategories}" th:text="${subCategory.name}"
                                 th:value="${subCategory.id}">
                                 Subcategories</option>
@@ -230,7 +230,7 @@
                     <div class="segmentationRow">
                         <span>Type</span>
                         <select id="type" th:field="*{selectedType}" disabled>
-                            <option value="0">All</option>
+                            <option value="0">New</option>
                             <option th:each="type : *{types}" th:text="${type.name}" th:value="${type.id}"></option>
                             Types</option>
                         </select>

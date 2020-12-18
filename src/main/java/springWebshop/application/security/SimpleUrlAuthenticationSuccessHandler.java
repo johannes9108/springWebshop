@@ -52,6 +52,8 @@ public class SimpleUrlAuthenticationSuccessHandler implements AuthenticationSucc
 	    protected String determineTargetUrl(final Authentication authentication) {
 
 	        Map<String, String> roleTargetUrlMap = new HashMap<>();
+	        
+	        //TODO Redirect back to origin page for customer
 	        roleTargetUrlMap.put("CUSTOMER", "/webshop/profile");
 	        roleTargetUrlMap.put("ADMIN", "/webshop/admin/products");
 

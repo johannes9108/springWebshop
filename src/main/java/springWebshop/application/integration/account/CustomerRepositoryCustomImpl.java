@@ -26,7 +26,7 @@ public class CustomerRepositoryCustomImpl implements CustomerRepositoryCustom {
             Root<Customer> customer = criteriaQuery.from(Customer.class);
             customer.fetch("addresses", JoinType.INNER);
             criteriaQuery.select(customer)
-                    .where(criteriaBuilder.equal(customer.get("id"),id))
+            .where(criteriaBuilder.equal(customer.get("id"),id))
                     .distinct(true);
             TypedQuery<Customer> typedQuery = em.createQuery(criteriaQuery);
             return Optional.of(typedQuery.getSingleResult());

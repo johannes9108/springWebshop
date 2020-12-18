@@ -365,10 +365,10 @@ public class AdminController {
 				case "DELIVERY":
 					config.setStatus(OrderStatus.DELIVERY);
 					break;
-				case "DELIVERY_COMPLETE":
+				case "DELIVERY_COMPLETED":
 					config.setStatus(OrderStatus.DELIVERY_COMPLETED);
 					break;
-				case "CANCELLED":
+				case "CANCELED":
 					config.setStatus(OrderStatus.CANCELED);
 					break;
 				}

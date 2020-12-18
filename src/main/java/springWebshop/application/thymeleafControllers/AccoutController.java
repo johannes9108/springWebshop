@@ -111,7 +111,7 @@ public class AccoutController {
 	public String getProfile(@ModelAttribute("sessionModel") SessionModel session,Model model) {
 		
 		
-		return "profile";
+		return "account/profile";
 	}
 
 	private Customer customerAccountDTO(@Valid AccountDTO account) {
