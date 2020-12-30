@@ -4,6 +4,7 @@ package springWebshop.application.model.domain.user;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -30,6 +31,7 @@ public class CustomerAddress implements Address, Serializable {
     @NotBlank
     private String street;
     @NotNull
+//    @Pattern(regexp ="\\d*",message = "Must be 5 digits")
     private int zipCode;
     @NotBlank
     private String city;

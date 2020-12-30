@@ -1,5 +1,6 @@
 package springWebshop.application.thymeleafControllers;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import javax.servlet.http.HttpServletRequest;
@@ -7,7 +8,6 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import springWebshop.application.model.domain.user.Customer;
+import springWebshop.application.model.domain.user.CustomerAddress;
 import springWebshop.application.model.dto.AccountDTO;
 import springWebshop.application.model.dto.SessionModel;
 import springWebshop.application.security.UserDetailsServiceImpl;
@@ -116,7 +117,7 @@ public class AccoutController {
 
 	private Customer customerAccountDTO(@Valid AccountDTO account) {
 		Customer c = new Customer(account.getFirstName(), account.getLastName(), account.getPassword(), account.getEmail(),
-				account.getPhoneNumber(),account.getMobileNumber(),null);
+				account.getPhoneNumber(),account.getMobileNumber(),new ArrayList<CustomerAddress>());
 		
 	return c;
 	

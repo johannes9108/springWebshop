@@ -2,18 +2,20 @@
 
 </html>
 <header th:fragment="header(title,links)">
-    <h1 th:text="${title}"></h1>
+    <div class="headerItem">
+        <h1 th:text="${title}"></h1>
+    </div>
     <p class="errorMessage" th:if="${errorMessage}" th:text="${errorMessage}"></p>
     <p class="success" th:if="${success}" th:text="${success}"></p>
-    <nav class="navigationLinks">
+    <nav class="navigationLinks headerItem">
         <a th:each="link,meta : ${links}" th:text="${link.key}" th:href="@{${link.value}}"></a>
     </nav>
 
-    <nav sec:authorize="!isAuthenticated()" class="accountLinks">
+    <nav sec:authorize="!isAuthenticated()" class="accountLinks headerItem">
         <a th:href="@{/webshop/login}">Login</a>
         <a th:href="@{/webshop/register}">Register</a>
     </nav>
-    <nav sec:authorize="isAuthenticated()" class="accountLinks">
+    <nav sec:authorize="isAuthenticated()" class="accountLinks headerItem">
         <div>
             <span>Logged in as </span>
             <strong>

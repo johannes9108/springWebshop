@@ -58,6 +58,34 @@ public class AccountService {
         return response;
     }
 
+    public ServiceResponse<Customer> updateCustomer(Customer updatedCustomer){
+
+    	 ServiceResponse<Customer> response = new ServiceResponse<>();
+         List<String> errors = new ArrayList<>();
+
+             try {
+            	 Optional<Customer> persistedCustomer = customerRepository.findById(updatedCustomer.getId());
+            	 System.out.println(persistedCustomer.get());
+            	 if(persistedCustomer.isPresent()) {
+            		 Customer c = persistedCustomer.get();
+            		 c = updatedCustomer;
+            		 System.out.println("PC:" + c);
+            		 response.addResponseObject(customerRepository.save(c));
+            		 
+            	 }
+            	 else {
+            		 response.addErrorMessage(ServiceErrorMessages.CUSTOMER.couldNotUpdate(updatedCustomer.getId()));
+            	 }
+            	 
+            	 
+             } catch (Exception e) {
+                 response.addErrorMessage(ServiceErrorMessages.CUSTOMER.couldNotCreate());
+             }
+         response.setErrorMessages(errors);
+         return response;
+    }
+    
+    
     public ServiceResponse<Admin> createAdmin(Admin admin) {
         ServiceResponse<Admin> response = new ServiceResponse<>();
         List<String> errors = new ArrayList<>();
@@ -123,4 +151,6 @@ public class AccountService {
             return false;
         }
     }
+    
+    
 }

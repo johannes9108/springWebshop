@@ -28,10 +28,10 @@ public class Customer extends Account implements Serializable {
 //	@OneToMany (mappedBy = "customer")
 //	private List<Order> orders;
 
-//	@Override
-//	public String toString() {
-//		return "Customer [addresses="  + " toString()=" + super.toString() + "]";
-//	}
+	@Override
+	public String toString() {
+		return "Customer [addresses=" + addresses + " toString()=" + super.toString() + "]";
+	}
 	
 	public Customer() {
 		addresses = new ArrayList<>();

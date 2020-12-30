@@ -4,13 +4,18 @@
 <head>
     <meta charset="ISO-8859-1">
     <title>Register</title>
-    <link rel="stylesheet" th:href="@{/css/base.css}">
-
+    <link rel="stylesheet" th:href="@{/resources/css/base.css}">
+    <style>
+        main {
+            padding: 1rem;
+        }
+    </style>
 </head>
 
 <body>
     <div th:replace="fragments/header.html :: header(title='Register',links=${links})"></div>
     <main>
+
         <form th:action="@{/webshop/register}" method="POST">
 
             <div class="row">

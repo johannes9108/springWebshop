@@ -5,12 +5,10 @@
 
     <meta charset="ISO-8859-1">
     <title>Products Page</title>
-    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/resources/css/base.css}">
+    <script type="text/javascript" th:src="@{/resources/js/jquery-3.5.1.min.js}"></script>
 
-    <script type="text/javascript" th:src="@{/js/categoriesScript.js}"></script>
-    <script th:src="@{/js/jquery-3.5.1.min.js}"></script>
-
-    <script th:inline="javascript">
+    <script type="text/javascript" th:inline="javascript">
         function selectedCategory() {
             var container = document.getElementById("categoryParent")
             console.log(container)
@@ -68,12 +66,6 @@
         });
     </script>
     <style>
-        .filterOptions {
-            margin: auto;
-            display: flex;
-            justify-content: space-around;
-        }
-
         .search {
             display: flex;
         }
@@ -89,52 +81,57 @@
 
     <main>
         <!-- <p th:text="${sessionModel.categoryModel}"></p> -->
-        <div class="filterOptions" id="categoryParent">
-            <form name="filter" th:action="@{/webshop/products}" method="POST"
-                th:object="${sessionModel.categoryModel}">
-                <select id="cat" th:field="*{selectedCat}">
-                    <option th:text="All" th:value="0">Categories</option>
+        <div class="productsWrapper">
 
-                    <option th:each="category : *{categories}" th:text="${category.name}" th:value="${category.id}">
-                    </option>
-                    Categories</option>
-                </select>
+            <div class="filterOptions" id="categoryParent">
+                <form name="filter" th:action="@{/webshop/products}" method="POST"
+                    th:object="${sessionModel.categoryModel}">
+                    <select id="cat" th:field="*{selectedCat}">
+                        <option th:text="All" th:value="0">Categories</option>
 
-                <select id="sub" disabled th:field="*{selectedSub}">
-                    <option th:text="All" th:value="0">Subcategories</option>
-                    <option th:each="subCategory : *{subCategories}" th:text="${subCategory.name}"
-                        th:value="${subCategory.id}">Subcategories</option>
-                </select>
-                <select id="type" disabled th:field="*{selectedType}">
-                    <option th:text="All" th:value="0">Types</option>
-                    <option th:each="type : *{types}" th:text="${type.name}" th:value="${type.id}"></option>
-                    Types</option>
-                </select>
-            </form>
-            <div class="search">
-                <form method="POST" th:action="@{/webshop/products}">
-                    <input type="text" name="searchInput" th:value="${searchInput}" placeholder="Search for name">
-                    <input type="submit" id="search" value="Search">
+                        <option th:each="category : *{categories}" th:text="${category.name}" th:value="${category.id}">
+                        </option>
+                        Categories</option>
+                    </select>
+
+                    <select id="sub" disabled th:field="*{selectedSub}">
+                        <option th:text="All" th:value="0">Subcategories</option>
+                        <option th:each="subCategory : *{subCategories}" th:text="${subCategory.name}"
+                            th:value="${subCategory.id}">Subcategories</option>
+                    </select>
+                    <select id="type" disabled th:field="*{selectedType}">
+                        <option th:text="All" th:value="0">Types</option>
+                        <option th:each="type : *{types}" th:text="${type.name}" th:value="${type.id}"></option>
+                        Types</option>
+                    </select>
                 </form>
-                <form method="POST" th:action="@{/webshop/products}">
-                    <input type="hidden" name="reset" value="true" />
-                    <input type="submit" id="search" value="Reset">
-                </form>
+                <div class="search">
+                    <form method="POST" th:action="@{/webshop/products}">
+                        <input type="text" name="searchInput" th:value="${searchInput}" placeholder="Search for name">
+                        <input type="submit" id="search" value="Search">
+                    </form>
+                    <form method="POST" th:action="@{/webshop/products}">
+                        <input type="hidden" name="reset" value="true" />
+                        <input type="submit" id="reset" value="Reset">
+                    </form>
+                </div>
+
             </div>
+            <div class="productContainer">
 
-        </div>
-        <div class="productContainer">
-            <div th:each="product : ${allProducts}" class="productItem">
-                <a th:href="@{__${#request.getRequestURL()}__/product/__${product.id}__}">
-                    <span th:text="${product.name}">test</span></a>
-                <!-- <span th:text="${product.productType}"></span> -->
-                <!-- <span th:text="${product.productType.toString()}"></span> -->
-                <form method="POST" th:action="@{/webshop/products}">
-                    <input type="hidden" name="addToCart" th:value="${product.id}" />
-                    <input type="submit" value="Add to cart" />
-                </form>
+                <div th:each="product : ${allProducts}" class="productItem">
+                    <a th:href="@{__${#request.getRequestURL()}__/product/__${product.id}__}">
+                        <span th:text="${product.name}">test</span></a>
+                    <!-- <span th:text="${product.productType}"></span> -->
+                    <!-- <span th:text="${product.productType.toString()}"></span> -->
+                    <form method="POST" th:action="@{/webshop/products}">
+                        <input type="hidden" name="addToCart" th:value="${product.id}" />
+                        <input type="submit" value="Add to cart" />
+                    </form>
+                </div>
             </div>
         </div>
+
 
 
     </main>

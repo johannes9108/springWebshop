@@ -4,8 +4,8 @@
 <head>
     <meta charset="ISO-8859-1">
     <title>Shopping Cart</title>
-    <link rel="stylesheet" th:href="@{/css/base.css}">
-    <link rel="stylesheet" th:href="@{/css/shoppingCart.css}">
+    <link rel="stylesheet" th:href="@{/resources/css/base.css}">
+    <link rel="stylesheet" th:href="@{/resources/css/shoppingCart.css}">
 
 </head>
 
@@ -13,7 +13,7 @@
     <div th:replace="fragments/header.html :: header(title='Shopping Cart',links=${linkMap})"></div>
 
     <main th:object="${cart}">
-        <article class="wrapper">
+        <article class="shoppingCartWrapper">
 
             <section class="cartContainer">
                 <div th:each="product : ${cart.productMap}" class="cartItem">

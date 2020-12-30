@@ -4,14 +4,18 @@
 <head>
     <meta charset="ISO-8859-1">
     <title>Logged IN</title>
-    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/resources/css/base.css}">
+    <style>
+        main {
+            padding: 1rem;
+        }
+    </style>
 </head>
 
 <body>
     <div th:replace="fragments/header.html :: header(title='My Account',links=${links})"></div>
     <main>
-        Success!
-
+        Display Info and Orders
 
     </main>
     <footer></footer>
