@@ -29,7 +29,7 @@
 <body>
     <div th:replace="fragments/header.html :: header(title='Login',links=${links})"></div>
     <main>
-        <form method="POST" th:action="@{/webshop/processLogin}">
+        <form method="POST" th:action="@{/webshop/login}">
             <p th:if="${param.error}">Invalid credentials</p>
             <div class="row">
                 <label for="">Email</label>
