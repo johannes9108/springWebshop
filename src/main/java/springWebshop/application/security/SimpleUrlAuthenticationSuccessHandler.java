@@ -16,11 +16,11 @@ import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
-public class SimpleUrlAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
+public class SimpleUrlAuthenticationSuccessHandler implements AuthenticationSuccessHandler{
 
 
 	    private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
-
+	    
 	    @Override
 	    public void onAuthenticationSuccess(HttpServletRequest request, 
 	      HttpServletResponse response, Authentication authentication)
@@ -44,8 +44,14 @@ public class SimpleUrlAuthenticationSuccessHandler implements AuthenticationSucc
 	                            + targetUrl);
 	            return;
 	        }
-
-	        redirectStrategy.sendRedirect(request, response, targetUrl);
+	        System.out.println(request.getRequestURI());
+	        if(targetUrl != null) {
+	        	
+	        	redirectStrategy.sendRedirect(request, response, targetUrl);
+	        }
+	        else {
+	        	redirectStrategy.sendRedirect(request, response, request.getRequestURI());
+	        }
 	    }
 
 	    
@@ -54,7 +60,7 @@ public class SimpleUrlAuthenticationSuccessHandler implements AuthenticationSucc
 	        Map<String, String> roleTargetUrlMap = new HashMap<>();
 	        
 	        //TODO Redirect back to origin page for customer
-	        roleTargetUrlMap.put("CUSTOMER", "/webshop/profile");
+	        roleTargetUrlMap.put("CUSTOMER", null);
 	        roleTargetUrlMap.put("ADMIN", "/webshop/admin/products");
 
 	        final Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();

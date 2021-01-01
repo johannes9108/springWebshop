@@ -64,16 +64,15 @@ public class AccoutController {
 	
 
 	@GetMapping("login")
-	public String getLogin(Model mode) {
+	public String getLogin(Model mode, HttpServletRequest request) {
 		System.out.println("Kom till GET LOGIN");
-		
 		return "account/login";
 	}
 	
 	@PostMapping("processLogin")
-	public String postLogin(Model model, UserDetails user, HttpServletRequest request) {
+	public String postLogin(Model model, HttpServletRequest request) {
 		System.out.println("Kom till POST LOGIN");
-		System.out.println(user);
+		
 		return "account/login";
 	}
 	

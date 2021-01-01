@@ -9,6 +9,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 
 import springWebshop.application.model.domain.user.ERole;
 
@@ -33,9 +34,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/webshop/checkout/**").hasAuthority(ERole.CUSTOMER.name())
                 .anyRequest().authenticated()
                 .and()
-                .formLogin()
-                .loginPage("/webshop/login")
-                	.loginProcessingUrl("/webshop/processLogin")
+                	.formLogin()
+                	.loginPage("/webshop/login")
+//                	.loginProcessingUrl("/webshop/processLogin")
 //                	.defaultSuccessUrl("/webshop/products", true)
                 	.successHandler(successHandler())
                 	.failureUrl("/webshop/login?error=true")
@@ -59,7 +60,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     
     @Bean
     public AuthenticationSuccessHandler successHandler() {
-    	return new SimpleUrlAuthenticationSuccessHandler();
+    	return new CustomSuccessHandler();
     }
 
 }
