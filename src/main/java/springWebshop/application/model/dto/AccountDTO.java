@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 import springWebshop.application.service.user.PasswordMatches;
 import springWebshop.application.service.user.ValidEmail;
+import springWebshop.application.service.user.ValidPassword;
 @Getter
 @Setter
 @PasswordMatches
@@ -23,8 +24,10 @@ public class AccountDTO {
 
 	@NotBlank
 	@Size(min = 6, message = "Password must be minimum 6 characters.")
+	@ValidPassword
 	private String password;
 	
+	@ValidPassword
 	private String repeatPassword;
 
 	@NotBlank(message = "Email can't be empty.")

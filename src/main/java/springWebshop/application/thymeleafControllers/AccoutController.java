@@ -86,7 +86,9 @@ public class AccoutController {
 	public String postRegister(@Valid AccountDTO account,BindingResult results,
 			@ModelAttribute("sessionModel") SessionModel session,
 			Model model) {
+		
 		if(!results.hasErrors()) {
+			
 			System.out.println(account);
 			Customer customerFromDTO = customerAccountDTO(account);
 			ServiceResponse<Customer> accountResponse = accountService.createCustomer(customerFromDTO);
@@ -100,6 +102,7 @@ public class AccoutController {
 			return "account/login";
 		}
 		else {
+			System.out.println(results.getFieldErrors());
 			model.addAttribute("errorMessage",results.getAllErrors());
 			return "account/register";
 		}
