@@ -5,11 +5,51 @@
     <meta charset="ISO-8859-1">
     <title>Register</title>
     <link rel="stylesheet" th:href="@{/resources/css/base.css}">
+    <script type="text/javascript" th:src="@{/resources/js/jquery-3.5.1.min.js}"></script>
+
     <style>
         main {
             padding: 1rem;
         }
     </style>
+    <script th:inline="javascript">
+        $(document).ready(() => {
+
+            var password = document.getElementById("password")
+                , confirm_password = document.getElementById("repeatPassword");
+
+            function validatePassword() {
+                console.log("Validerar")
+                if (password.value != confirm_password.value) {
+                    confirm_password.setCustomValidity("Passwords Don't Match");
+                } else {
+                    confirm_password.setCustomValidity('');
+                }
+            }
+
+            password.onchange = validatePassword;
+            confirm_password.onkeyup = validatePassword;
+
+            let emailComp = document.getElementById("email");
+            function validateEmail() {
+
+                let regEx = /^\D(\.?\w+)*@\w+\.(\w+\.)*\w+$/;
+                let result = regEx.test(emailComp.value);
+                console.log("Validerar Email:" + result + ":" + emailComp.value.length);
+                if (!result) {
+                    emailComp.setCustomValidity("Wrong Email format")
+                }
+                else {
+                    emailComp.setCustomValidity('');
+                }
+
+            }
+
+            emailComp.onblur = validateEmail;
+
+        })
+
+    </script>
 </head>
 
 <body>
@@ -32,16 +72,17 @@
 
             <div class="row">
                 <label for="">Password</label>
-                <input name="password" type="password" placeholder="Password" required="true" />
+                <input id="password" name="password" type="password" placeholder="Password" required="true" />
             </div>
             <div class="row">
                 <label for="">Repeat Password</label>
-                <input name="repeatPassword" type="password" placeholder="Password" required="true" />
+                <input id="repeatPassword" name="repeatPassword" type="password" placeholder="Password"
+                    required="true" />
             </div>
             <div class="row">
                 <label for="">Email</label>
 
-                <input name="email" type="text" placeholder="Email" required="true" />
+                <input id="email" name="email" type="text" placeholder="Email" required="true" />
             </div>
             <div class="row">
                 <label for="">Phonenumber</label>
