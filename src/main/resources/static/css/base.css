@@ -11,29 +11,37 @@ body {
 }
 
 header {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+header > span {
+  align-self: center;
+}
+.headerContainer {
   display: grid;
   box-sizing: border-box;
   grid-template-columns: 1fr 1fr 1fr;
 }
 
-header > .headerItem {
+.headerContainer > .headerItem {
   /* width: 20vw; */
   display: flex;
   align-items: center;
 }
-header > .navigationLinks {
+.headerContainer > .navigationLinks {
   justify-content: center;
 }
-header > .navigationLinks > a {
+.headerContainer > .navigationLinks > a {
   border-bottom: 1px darkcyan solid;
   border-top: 1px darkcyan solid;
   padding: 0.5rem 1rem;
   margin: 0 1rem;
 }
-header > .navigationLinks > a:hover {
+.headerContainer > .navigationLinks > a:hover {
   background-color: rgb(219, 226, 243);
 }
-header > .accountLinks {
+.headerContainer > .accountLinks {
   flex-direction: column;
   justify-content: center;
   align-items: flex-end;

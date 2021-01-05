@@ -56,6 +56,9 @@ public class ProductRepositoryCustomImpl extends AbstractCustomRepository<Produc
 				predicates.add(criteriaBuilder.like(product.get("name"), "%" + config.getSearchString() + "%"));
 				
 			}
+			if(config.isPublished()) {
+				predicates.add(criteriaBuilder.equal(product.get("published"),true));
+			}
 			criteriaQuery.select(product).distinct(true).where(predicates.toArray(new Predicate[0]));
 			TypedQuery<Product> typedQuery = em.createQuery(criteriaQuery);
 			return getPaginatedResult(page, size, predicates, typedQuery,Product.class);

@@ -9,6 +9,7 @@ public class ProductSearchConfig {
     long productCategoryId;
     long productSubCategoryId;
     long productTypeId;
+    boolean published;
     String searchString;
     
     public ProductSearchConfig() {

@@ -356,6 +356,7 @@ public class BaseConfig {
             product1.setBasePrice(new Random().nextInt(50));
             product1.setProductType(typeRepo.findById(rand).get());
             product1.setVatPercentage(i % 2 == 0 ? 0.25 : 0.12);
+            product1.setPublished(true);
             int imgRand = new Random().nextInt(3)+1;
             product1.setFullImageUrl(imgMap.get(imgRand));
             product1.setThumbnailUrl(imgMap.get(imgRand+3));

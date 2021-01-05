@@ -89,6 +89,8 @@ public class ProductController {
 
 		productSegmentationService.prepareSegmentationModel(session.getCategoryModel());
 		ProductSearchConfig config = new ProductSearchConfig();
+		config.setPublished(true);
+
 		productSegmentationService.prepareProductConfig(session.getCategoryModel(), config);
 		if(session.getSearchString().length()>0) {
 			config.setSearchString(session.getSearchString());
@@ -127,6 +129,7 @@ public class ProductController {
 		
 		productSegmentationService.prepareSegmentationModel(session.getCategoryModel());
 		ProductSearchConfig config = new ProductSearchConfig();
+		config.setPublished(true);
 		productSegmentationService.prepareProductConfig(session.getCategoryModel(), config);
 		
 		int currentPage = session.getProductPage();
