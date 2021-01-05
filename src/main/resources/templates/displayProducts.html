@@ -69,6 +69,15 @@
         .search {
             display: flex;
         }
+
+        .search :nth-child(1) {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .search :nth-child(1) :nth-child(1) {
+            margin: 0 1rem;
+        }
     </style>
 </head>
 
@@ -118,16 +127,23 @@
 
             </div>
             <div class="productContainer">
-
+                <p th:if="${allProducts.size() == 0}">
+                    Sorry products found in this category
+                </p>
                 <div th:each="product : ${allProducts}" class="productItem">
                     <a th:href="@{__${#request.getRequestURL()}__/product/__${product.id}__}">
-                        <span th:text="${product.name}">test</span></a>
-                    <!-- <span th:text="${product.productType}"></span> -->
-                    <!-- <span th:text="${product.productType.toString()}"></span> -->
-                    <form method="POST" th:action="@{/webshop/products}">
-                        <input type="hidden" name="addToCart" th:value="${product.id}" />
-                        <input type="submit" value="Add to cart" />
-                    </form>
+                        <img class="thumbnail" th:src="@{|/resources${product.thumbnailUrl}|}" />
+                    </a>
+                    <div class="productText">
+                        <span th:text="${product.name}">test</span>
+                        <!-- <span th:text="${product.productType}"></span> -->
+                        <!-- <span th:text="${product.productType.toString()}"></span> -->
+                        <form method="POST" th:action="@{/webshop/products}">
+                            <input type="hidden" name="addToCart" th:value="${product.id}" />
+                            <input type="submit" value="Add to cart" />
+                        </form>
+
+                    </div>
                 </div>
             </div>
         </div>

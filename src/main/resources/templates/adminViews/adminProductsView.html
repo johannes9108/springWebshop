@@ -4,7 +4,7 @@
 <head>
     <meta charset="ISO-8859-1">
     <title>Only for Admins</title>
-    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/resources/css/base.css}">
 
     <style>
         main {
@@ -19,12 +19,18 @@
             /* background-color: greenyellow; */
             display: grid;
             grid-template-rows: 4fr 1fr;
+
         }
 
-        .segmentationContainer>* {
+        .segmentationContainer {
             display: flex;
             flex-direction: column;
             align-items: center;
+        }
+
+        .segmentationContainer>* {
+            width: 50%;
+            margin: 0.5rem 0;
             box-sizing: border-box;
             /* background-color: seagreen; */
         }
@@ -32,11 +38,17 @@
         .segmentationRow {
             display: flex;
             flex-direction: column;
-            width: 50%;
+
+        }
+
+        .productMeta {
+            display: flex;
+            flex-direction: column;
+            /* justify-content: space-around; */
         }
 
         .segmentationInput {
-            width: 50%;
+
             display: flex;
             flex-direction: column;
             justify-content: space-around;
@@ -69,18 +81,14 @@
         }
 
         .productTable {
+            margin: 0.5rem 0;
+
             display: flex;
             flex-direction: column;
             overflow: auto;
         }
 
-        .productMeta {
-            padding: 1rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            /* justify-content: space-around; */
-        }
+
 
         .dataRow {
             display: grid;
@@ -88,16 +96,14 @@
             background-color: azure;
         }
 
-        .productTable>a:nth-of-type(odd)>.dataRow {
+        .productTable .dataRow:nth-child(odd) {
             background-color: antiquewhite;
         }
 
-        .headerRow {
+        /* .headerRow {
             font-style: italic;
             font-size: 1.2rem;
-        }
-
-        .pages {}
+        } */
     </style>
     <script type="text/javascript" th:src="@{/resources/js/jquery-3.5.1.min.js}"></script>
     <script type="text/javascript" th:inline="javascript">
@@ -140,6 +146,7 @@
 
                 document.forms['filter'].submit();
             });
+
         });
     </script>
 </head>
@@ -155,12 +162,11 @@
                     <span>Name</span>
                     <span>Price</span>
                 </div>
-                <a th:each="product : ${allProducts}" th:href="@{/webshop/admin/products/product/__${product.id}__}">
-                    <div class="dataRow">
-                        <span th:text="${product.id}">ID</span>
-                        <span th:text="${product.name}">Name</span>
-                        <span th:text="${product.basePrice}">Price</span>
-                    </div>
+                <a class="dataRow" th:each="product : ${allProducts}"
+                    th:href="@{/webshop/admin/products/product/__${product.id}__}">
+                    <span th:text="${product.id}">ID</span>
+                    <span th:text="${product.name}">Name</span>
+                    <span th:text="${product.basePrice}">Price</span>
                 </a>
 
 
@@ -217,13 +223,12 @@
                         <!-- <input type="submit" value="Delete Selected Category"> -->
                     </div>
                 </form>
-                <div class="productMeta">
-                    <form method="POST" th:action="@{/webshop/admin/products}">
-                        <input type="text" name="searchInput" th:value="${searchInput}" placeholder="Search for name">
-                        <input type="submit" id="search" value="Search">
-                    </form>
-                </div>
-                <a th:href="@{/webshop/admin/products/new}">Add New Product</a>
+                <form method="POST" th:action="@{/webshop/admin/products}" class="productMeta">
+                    <input type="text" name="searchInput" th:value="${searchInput}" placeholder="Search for name">
+                    <input type="submit" id="search" value="Search">
+                </form>
+                <a class="anchorButton" id="addNewProductButton" th:href="@{/webshop/admin/products/new}">Add New
+                    Product</a>
 
             </div>
 

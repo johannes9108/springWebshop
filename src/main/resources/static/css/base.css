@@ -1,5 +1,6 @@
 @charset "ISO-8859-1";
 body {
+  background-image: linear-gradient(white, rgb(239, 255, 250));
   padding: 0;
   margin: 0;
   height: 100vh;
@@ -39,7 +40,6 @@ header > .accountLinks {
 }
 
 main {
-  background-image: linear-gradient(white, rgb(239, 255, 250));
   border-bottom: 1px solid darkcyan;
   border-top: 1px solid darkcyan;
   box-sizing: border-box;
@@ -79,11 +79,24 @@ footer > a {
 }
 
 .productItem {
-  width: 10vw;
+  max-width: 10vw;
+  max-height: 10vh;
   margin: 0.5rem;
   border-radius: 10px;
   padding: 2rem;
   border: 1px solid darkcyan;
+  display: grid;
+  grid-template-rows: 80% auto;
+  text-align: center;
+}
+.productItem a {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.productItem form {
+  display: flex;
+  justify-content: center;
 }
 .productItem form > input {
   background-color: white;
@@ -93,6 +106,8 @@ footer > a {
   font-weight: bold;
   color: darkgray;
   padding: 0;
+}
+.productText {
 }
 .productItem form > input:hover {
   color: black;
@@ -107,15 +122,6 @@ footer > a {
   /* background: green; */
 }
 
-a:link,
-a:visited {
-  color: black;
-  text-decoration: none;
-}
-
-a:hover {
-  color: royalblue;
-}
 textarea {
   resize: none;
 }
@@ -132,4 +138,53 @@ textarea {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+}
+input[type="button"],
+input[type="submit"],
+.anchorButton {
+  margin: 0.2rem 0.2rem;
+  border: 1px solid lightblue;
+  padding: 0.1rem;
+  border-radius: 3px;
+  background: rgb(213, 245, 255);
+  display: flex;
+  justify-content: center;
+}
+
+a:link,
+a:visited {
+  color: black;
+  text-decoration: none;
+}
+
+input[type="button"]:hover,
+input[type="submit"]:hover,
+.anchorButton:hover,
+a:hover {
+  color: royalblue;
+}
+
+.thumbnail {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: scale-down;
+}
+.itemField {
+  display: flex;
+  flex-direction: column;
+}
+fieldset {
+  display: flex;
+  flex-direction: column;
+}
+
+fieldset > label {
+  display: flex;
+  flex-direction: column;
+}
+
+.headerRow {
+  font-size: 1.2rem;
+  border-bottom: 0.1rem solid darkcyan;
+  font-style: italic;
 }

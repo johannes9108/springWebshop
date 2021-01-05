@@ -8,20 +8,12 @@
     <style>
         main {
             padding: 1rem;
-
+            display: grid;
+            grid-template-columns: 30%;
         }
 
         .buttons {
-            flex-direction: row;
-        }
-
-        .buttons>* {
-            margin: 0 1rem 0 0;
-        }
-
-        p {
-            color: red;
-            border: red 1px solid;
+            display: flex;
         }
     </style>
 </head>
@@ -31,20 +23,22 @@
     <main>
         <form method="POST" th:action="@{/webshop/login}">
             <p th:if="${param.error}">Invalid credentials</p>
-            <div class="row">
-                <label for="">Email</label>
+            <fieldset>
+                <legend>Login</legend>
+                <label><strong>Email: </strong>
+                    <input name="username" type="text" placeholder="Email" required="true" />
 
-                <input name="username" type="text" placeholder="Email" required="true" />
-            </div>
+                </label>
+                <label for=""><strong>Password:</strong> <input name="password" type="password" placeholder="Password"
+                        required="true" />
+                </label>
+                <div class="buttons">
+                    <input type="submit" value="Log in" />
+                    <a class="anchorButton" th:href="@{/webshop/register}">Register</a>
 
-            <div class="row">
-                <label for="">Password</label>
-                <input name="password" type="password" placeholder="Password" required="true" />
-            </div>
-            <div class="row buttons">
-                <input type="submit" value="Log in" />
-                <a th:href="@{/webshop/register}">Register</a>
-            </div>
+                </div>
+            </fieldset>
+
 
 
         </form>

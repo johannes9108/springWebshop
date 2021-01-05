@@ -1,7 +1,9 @@
 package springWebshop.application.config;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -337,7 +339,14 @@ public class BaseConfig {
 //        ProductSubCategory subCat2 = new ProductSubCategory();
 //        subCat2.setId(1L);
 //        ProductType prodType = new ProductType("Gungstol", subCat2);
-
+        String baseImgUrl = "/img/";
+        Map<Integer,String> imgMap = new HashMap<>();
+        imgMap.put(1, baseImgUrl+"dog.jpg");
+        imgMap.put(2, baseImgUrl+"phone.jpg");
+        imgMap.put(3, baseImgUrl+"laptop.jpg");
+        imgMap.put(4, baseImgUrl+"dogThumbnail.jpg");
+        imgMap.put(5, baseImgUrl+"phoneThumbnail.jpg");
+        imgMap.put(6, baseImgUrl+"laptopThumbnail.jpg");
 
         for (int i = 0; i < 40; i++) {
             long rand = new Random().nextInt(noType) + 1;
@@ -347,6 +356,10 @@ public class BaseConfig {
             product1.setBasePrice(new Random().nextInt(50));
             product1.setProductType(typeRepo.findById(rand).get());
             product1.setVatPercentage(i % 2 == 0 ? 0.25 : 0.12);
+            int imgRand = new Random().nextInt(3)+1;
+            product1.setFullImageUrl(imgMap.get(imgRand));
+            product1.setThumbnailUrl(imgMap.get(imgRand+3));
+            
             if (i % 5 == 0) product1.setVatPercentage(0.06);
 //            ProductType prodType2 = new ProductType();
 //            prodType2.setId(1L);

@@ -321,6 +321,28 @@ public class AdminController {
 			@RequestParam(required = false, name = "page", defaultValue = "1") Optional<Integer> pathPage) {
 
 		OrderSearchConfig config = new OrderSearchConfig();
+		OrderStatus currentStatus = session.getOrderStatus();
+		if (currentStatus!= null) {
+	
+				switch (currentStatus) {
+				case NOT_HANDLED:
+					config.setStatus(OrderStatus.NOT_HANDLED);
+					break;
+				case DISPATCHED:
+					config.setStatus(OrderStatus.DISPATCHED);
+					break;
+				case DELIVERY:
+					config.setStatus(OrderStatus.DELIVERY);
+					break;
+				case DELIVERY_COMPLETED:
+					config.setStatus(OrderStatus.DELIVERY_COMPLETED);
+					break;
+				case CANCELED:
+					config.setStatus(OrderStatus.CANCELED);
+					break;
+				}
+				
+		}
 
 		int currentPage = pathPage.isPresent() ? pathPage.get() : session.getOrderPage();
 
@@ -397,7 +419,7 @@ public class AdminController {
 				break;
 			}
 
-		} 
+		}
 		int currentPage = pathPage.isPresent() ? pathPage.get() : session.getOrderPage();
 		ServiceResponse<Order> filteredOrders = orderService.getOrders(config, currentPage > 0 ? currentPage - 1 : 0,
 				20);
@@ -415,7 +437,7 @@ public class AdminController {
 			m.addAttribute("errorMessage", filteredOrders.getErrorMessages());
 			session.setOrderPage(1);
 		}
-		
+
 		session.setOrderPage(currentPage);
 		m.addAttribute("totalPages", filteredOrders.getTotalPages());
 		m.addAttribute("orderStatuses", Order.OrderStatus.values());
@@ -424,43 +446,40 @@ public class AdminController {
 
 		return "adminViews/adminOrdersView";
 	}
-	
+
 	@GetMapping("/orders/{id}")
 	public String getOrder(@PathVariable("id") Optional<Long> orderId, Model m) {
-		
+
 		ServiceResponse<Order> currentOrder = orderService.getOrderById(orderId.get());
-		if(currentOrder.isSucessful()) {
+		if (currentOrder.isSucessful()) {
 			m.addAttribute("currentOrder", currentOrder.getResponseObjects().get(0));
-		}
-		else {
+		} else {
 			m.addAttribute("errorMessage", currentOrder.getErrorMessages());
 			return "redirect:/webshop/admin/orders";
 		}
-		
+
 		return "adminViews/singleOrderView";
-		
+
 	}
-	
+
 	@PostMapping("/orders/{id}")
 	public String dispatchOrder(@PathVariable("id") Optional<Long> orderId, Model m) {
 		ServiceResponse<Order> currentOrder = orderService.getOrderById(orderId.get());
-		if(currentOrder.isSucessful()) {
-			ServiceResponse<Order> statusChange =  orderService.setStatus(orderId.get(), OrderStatus.DISPATCHED);
-			if(statusChange.isSucessful()) {
+		if (currentOrder.isSucessful()) {
+			ServiceResponse<Order> statusChange = orderService.setStatus(orderId.get(), OrderStatus.DISPATCHED);
+			if (statusChange.isSucessful()) {
 				m.addAttribute("success", "Order Dispatched");
-			}
-			else {
+			} else {
 				m.addAttribute("errorMessage", statusChange.getErrorMessages());
 			}
 			m.addAttribute("currentOrder", currentOrder.getResponseObjects().get(0));
-		}
-		else {
+		} else {
 			m.addAttribute("errorMessage", currentOrder.getErrorMessages());
 			return "redirect:/webshop/admin/orders";
 		}
-		
+
 		return "adminViews/singleOrderView";
-		
+
 	}
 
 	@GetMapping(path = { "users" })
@@ -469,31 +488,30 @@ public class AdminController {
 
 		return "adminViews/adminUsersView";
 	}
+
 	@PostMapping(path = { "users" })
 	public String postUserForm(@Valid AccountDTO newAccount, BindingResult result, Model m) {
 		System.out.println(newAccount);
-		if(result.hasErrors()) {
+		if (result.hasErrors()) {
 			m.addAttribute("newCustomer", newAccount);
 			m.addAttribute("errorMessage", "Incorrect Format");
-		}
-		else {
+		} else {
 			ServiceResponse<Customer> response = customerSerivce.createCustomer(customerAccountDTO(newAccount));
-			if(response.isSucessful()) {
+			if (response.isSucessful()) {
 				m.addAttribute("success", "New Customer created with ID:" + response.getResponseObjects().get(0));
 				m.addAttribute("newCustomer", new AccountDTO());
-			}
-			else {
+			} else {
 				m.addAttribute("errorMessage", response.getErrorMessages());
 				m.addAttribute("newCustomer", newAccount);
 			}
-			
+
 		}
 		return "adminViews/adminUsersView";
 	}
-	
+
 	private Customer customerAccountDTO(@Valid AccountDTO account) {
-		Customer c = new Customer(account.getFirstName(), account.getLastName(), account.getPassword(), account.getEmail(),
-				account.getPhoneNumber(),account.getMobileNumber(),null);
+		Customer c = new Customer(account.getFirstName(), account.getLastName(), account.getPassword(),
+				account.getEmail(), account.getPhoneNumber(), account.getMobileNumber(), null);
 		return c;
 	}
 }

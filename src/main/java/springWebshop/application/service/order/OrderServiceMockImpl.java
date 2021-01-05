@@ -124,6 +124,12 @@ public class OrderServiceMockImpl implements OrderService {
 		return null;
 	}
 
+	@Override
+	public ServiceResponse<Order> getAllOrdersByCustomerId(long id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 //	@Override
 //	public ServiceResponse<Order> getAllOrders(int page) {
 //		// TODO Auto-generated method stub

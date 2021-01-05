@@ -13,6 +13,8 @@ public interface OrderService {
     ServiceResponse<Order> getOrderById(long id);
 
     ServiceResponse<Order> getAllOrders();
+    
+    ServiceResponse<Order> getAllOrdersByCustomerId(long id);
 
 //    ServiceResponse<Order> getAllOrders();
 //

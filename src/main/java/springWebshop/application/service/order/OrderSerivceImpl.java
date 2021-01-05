@@ -280,4 +280,11 @@ public class OrderSerivceImpl implements OrderService {
             return false;
         }
     }
+
+	@Override
+	public ServiceResponse<Order> getAllOrdersByCustomerId(long id) {
+		OrderSearchConfig config = new OrderSearchConfig();
+		config.customerId = id;
+        return getAllOrdersPageAndSize(config, 0, defaultPageSize);
+	}
 }
