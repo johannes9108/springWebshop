@@ -41,11 +41,6 @@ public class SessionModel {
 	public SessionModel(ProductService productService, SegmentationService productSegmentationService) {
 		// Start session as guest
 		cart = new ShoppingCartDTO(productService);
-		List<CustomerAddress> addresses = new ArrayList<>();
-		for (int j = 0; j < 4; j++) {
-			CustomerAddress address = new CustomerAddress("Storgatan " + j, (j*33), "City X", "Sweden");
-			addresses.add(address);
-		}
 		productPage = 1;
 		orderPage = 1;
 		accountPage = 1;
