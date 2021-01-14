@@ -392,11 +392,11 @@ public class AdminController {
 			segmentationService.prepareSegmentationModel(session.getCategoryModel());
 			segmentationService.prepareProductConfig(session.getCategoryModel(), config);
 		} else if (action.isPresent()) {
-			String ac = action.get();
-			if (ac.compareToIgnoreCase("cat") == 0) {
+			String actionValue = action.get();
+			if (actionValue.compareToIgnoreCase("cat") == 0) {
 				prepareSegmentationByCategory(session, config);
 
-			} else if (ac.compareToIgnoreCase("sub") == 0) {
+			} else if (actionValue.compareToIgnoreCase("sub") == 0) {
 				prepareSegmentationBySubCategory(session, config);
 
 			}

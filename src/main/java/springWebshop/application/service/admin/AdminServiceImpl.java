@@ -1,5 +1,9 @@
 package springWebshop.application.service.admin;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +56,8 @@ public class AdminServiceImpl implements AdminService {
 				ServiceResponse<ProductType> typeResponse = segmentationService.getProductTypeById(segmentationModel.getSelectedType());
 				if(typeResponse.isSucessful()) {
 					newProduct.setProductType(typeResponse.getResponseObjects().get(0));
+					newProduct.setPublished(true);
+					generateRandImg(newProduct);
 					ServiceResponse<Product> productResponse = productService.create(newProduct);
 					if(productResponse.isSucessful()) {
 						return  productResponse;
@@ -76,7 +82,21 @@ public class AdminServiceImpl implements AdminService {
 		return segmentationService.create(string,segmentationModel);
 	}
 
-	
+	private void generateRandImg(Product newProduct) {
+		int rand = new Random(System.nanoTime()).nextInt(3) + 1;
+		String baseImgUrl = "/img/";
+		Map<Integer, String> imgMap = new HashMap<>();
+		imgMap.put(1, baseImgUrl + "dog.jpg");
+		imgMap.put(2, baseImgUrl + "phone.jpg");
+		imgMap.put(3, baseImgUrl + "laptop.jpg");
+		imgMap.put(4, baseImgUrl + "dogThumbnail.jpg");
+		imgMap.put(5, baseImgUrl + "phoneThumbnail.jpg");
+		imgMap.put(6, baseImgUrl + "laptopThumbnail.jpg");
+
+		newProduct.setFullImageUrl(imgMap.get(rand));
+		newProduct.setThumbnailUrl(imgMap.get(rand + 3));
+	}
+
 
 
 }

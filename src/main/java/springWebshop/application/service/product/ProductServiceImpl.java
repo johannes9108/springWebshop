@@ -1,8 +1,11 @@
 package springWebshop.application.service.product;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
@@ -60,22 +63,22 @@ public class ProductServiceImpl implements ProductService {
 
 	@Override
 	public ServiceResponse<Product> getProducts() {
-		return getAllProductPageAndSize(null,0, defaultPageSize);
+		return getAllProductPageAndSize(null, 0, defaultPageSize);
 	}
 
 	@Override
 	public ServiceResponse<Product> getProducts(int page) {
-		return getAllProductPageAndSize(null,page, defaultPageSize);
-	}
-	@Override
-	public ServiceResponse<Product> getProducts(int page, int size) {
-		return getAllProductPageAndSize(null,page, size);
+		return getAllProductPageAndSize(null, page, defaultPageSize);
 	}
 
-	
+	@Override
+	public ServiceResponse<Product> getProducts(int page, int size) {
+		return getAllProductPageAndSize(null, page, size);
+	}
+
 	@Override
 	public ServiceResponse<Product> getProducts(ProductSearchConfig productSearchConfig) {
-		return getAllProductPageAndSize(productSearchConfig,0, defaultPageSize);
+		return getAllProductPageAndSize(productSearchConfig, 0, defaultPageSize);
 	}
 
 	@Override
@@ -88,12 +91,14 @@ public class ProductServiceImpl implements ProductService {
 		return getAllProductPageAndSize(productSearchConfig, page, size);
 	}
 
-	private ServiceResponse<Product> getAllProductPageAndSize(ProductSearchConfig productSearchConfig,int page, int size) {
+	private ServiceResponse<Product> getAllProductPageAndSize(ProductSearchConfig productSearchConfig, int page,
+			int size) {
 		ServiceResponse<Product> serviceResponse = new ServiceResponse<>();
 		if (size <= maxPageSize)
 			try {
-				Page<Product> response = productSearchConfig!= null ? productRepository.getProducts(productSearchConfig, page, size):
-					productRepository.findAll(PageRequest.of(page, size));
+				Page<Product> response = productSearchConfig != null
+						? productRepository.getProducts(productSearchConfig, page, size)
+						: productRepository.findAll(PageRequest.of(page, size));
 				setPageMetaData(response, serviceResponse);
 				serviceResponse.setResponseObjects(response.getContent());
 			} catch (Exception e) {
@@ -127,6 +132,7 @@ public class ProductServiceImpl implements ProductService {
 		return response;
 	}
 
+
 	private boolean isValidNewProduct(Product newProduct, List<String> errors) {
 		boolean isValid = true;
 		if (!isNewProduct(newProduct)) {
@@ -156,7 +162,6 @@ public class ProductServiceImpl implements ProductService {
 		return response;
 	}
 
-
 	boolean hasValidProductType(Product product) {
 		return product.getProductType() != null ? productTypeRepository.existsById(product.getProductType().getId())
 				: false;
@@ -174,6 +179,5 @@ public class ProductServiceImpl implements ProductService {
 		}
 		return isExisting;
 	}
-
 
 }

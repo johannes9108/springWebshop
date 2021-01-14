@@ -191,15 +191,7 @@
                     <span>Vat Percentage</span>
                     <input th:field="${newProduct.vatPercentage}" />
                 </div>
-                <div class="itemField">
-                    <span>Full Picture URL</span>
-                    <input th:field="${newProduct.fullImageUrl}" />
-                </div>
-                <div class="itemField">
-                    <span>Thumbnail URL</span>
-                    <input th:field="${newProduct.thumbnailUrl}" />
-                </div>
-
+               
             </section>
 
             <section class="actions">
@@ -252,36 +244,7 @@
                 </form>
             </div>
         </section>
-        <!-- <section th:if="${createdProduct}" th:object="${createdProduct}">
-            <div class="itemField">
-                <span>Id</span>
-                <span th:text="*{id}" />
-            </div>
-            <div class="itemField">
-                <span>Name</span>
-                <span th:text="*{name}" />
-            </div>
-            <div class="itemField">
-                <span>Price</span>
-                <span th:text="*{basePrice}" />
-            </div>
-            <div class="itemField">
-                <span>Description</span>
-                <textarea th:text="*{description}">Empty</textarea>
-            </div>
-            <div class="itemField">
-                <span>Vat Percentage</span>
-                <span th:text="*{vatPercentage}" />
-            </div>
-            <div class="itemField">
-                <span>Full Picture URL</span>
-                <span th:text="*{fullImageUrl}" />
-            </div>
-            <div class="itemField">
-                <span>Thumbnail URL</span>
-                <span th:text="*{thumbnailUrl}" />
-            </div>
-        </section> -->
+     
     </main>
     <footer><a th:href="@{/webshop/admin/products(page=${session.sessionModel.productPage},return=true)}">Back</a>
     </footer>
