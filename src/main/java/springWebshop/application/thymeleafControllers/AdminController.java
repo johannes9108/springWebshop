@@ -84,7 +84,7 @@ public class AdminController {
 			@RequestParam(required = false, name = "page", defaultValue = "1") Optional<Integer> pathPage,
 			@RequestParam(required = false, name = "return", defaultValue = "false") boolean returnFlag, Model m) {
 
-		int currentPage = getCurrentPage(session, pathPage);
+		int currentPage = getCurrentPage(session.getProductPage(), pathPage);
 		ProductSearchConfig config = new ProductSearchConfig();
 		if (returnFlag) {
 			productsPageWithReturnFlag(session);
@@ -99,7 +99,7 @@ public class AdminController {
 			@RequestParam(required = false, name = "page", defaultValue = "1") Optional<Integer> pathPage,
 			Optional<String> searchInput, Optional<String> newSegmentation,
 			@RequestParam(required = false, name = "return", defaultValue = "false") boolean resetFlag, Model m) {
-		int currentPage = getCurrentPage(session, pathPage);
+		int currentPage = getCurrentPage(session.getProductPage(), pathPage);
 		if (newSegmentation.isPresent()) {
 			ServiceResponse<Integer> response = adminService.createNewSegmentation(newSegmentation.get(),
 					session.getCategoryModel());
@@ -139,74 +139,23 @@ public class AdminController {
 	public String postSingleProductEdit(@ModelAttribute("sessionModel") SessionModel session, BindingResult result,
 			@PathVariable("id") long productId,
 			@RequestParam(required = false, name = "action") Optional<String> action, Optional<String> newSegmentation,
-			@RequestParam(required = false, name = "actionValue") Optional<Long> actionValue,
+
 			@RequestParam(required = false, name = "page", defaultValue = "1") Optional<Integer> pathPage, Model m,
 			Product product) {
 		ProductSearchConfig config = new ProductSearchConfig();
-		if (newSegmentation.isPresent()) {
-			adminService.createNewSegmentation(newSegmentation.get(), session.getCategoryModel());
-			segmentationService.prepareSegmentationModel(session.getCategoryModel());
-			segmentationService.prepareProductConfig(session.getCategoryModel(), config);
-		}
-
-		else if (action.isPresent()) {
-			String ac = action.get();
-			// Handle by a service
-			switch(ac.toLowerCase()) {
-			case "updateProduct":
-				if (validateSegmentation(session)) {
-					ServiceResponse<Product> response = adminService.updateProduct(product,
-							session.getCategoryModel().getSelectedType());
-					if (response.isSucessful()) {
-						product = response.getResponseObjects().get(0);
-					} else {
-						m.addAttribute("errorMessage", response.getErrorMessages());
-					}
-
-				} else {
-					m.addAttribute("errorMessage", "Product Type must be specified");
-				}
-				break;
-			case "cat":
-				session.getCategoryModel().setSelectedSub(0);
-				session.getCategoryModel().setSelectedType(0);
-				segmentationService.prepareSegmentationModel(session.getCategoryModel());
-				segmentationService.prepareProductConfig(session.getCategoryModel(), config);
-				break;
-			case "sub":
-				session.getCategoryModel().setSelectedType(0);
-//				session.getCategoryModel().getTypes().clear();
-				segmentationService.prepareSegmentationModel(session.getCategoryModel());
-				segmentationService.prepareProductConfig(session.getCategoryModel(), config);
-				break;
-			case "type":
-				
-				break;
-			}
-	
-		}
+		handlePostActionsEdit(session, action, newSegmentation, m, product, config);
 
 		ServiceResponse<Product> response = productService.getProductById(productId);
-		if (response.isSucessful()) {
-			product = response.getResponseObjects().get(0);
-
-		} else {
-			product = new Product();
-
+		if (!response.isSucessful()) {
+			m.addAttribute("newSegmentation", "");
+			m.addAttribute("currentProduct", response.getResponseObjects().get(0));
+			m.addAttribute("errorMessage", "Couldn't update product with ID " + productId);
+			return "adminViews/adminProductsView";
 		}
-//		System.out.println("Cat:" + session.getCategoryModel());
-//		System.out.println("POST Admin Single product");
-
 		m.addAttribute("newSegmentation", "");
-
-		m.addAttribute("currentProduct", product);
+		m.addAttribute("currentProduct", response.getResponseObjects().get(0));
 
 		return "adminViews/editProduct";
-	}
-
-	private boolean validateSegmentation(SessionModel session) {
-		return session.getCategoryModel().getSelectedCat() > 0 && session.getCategoryModel().getSelectedSub() > 0
-				&& session.getCategoryModel().getSelectedType() > 0;
 	}
 
 	@GetMapping("products/new")
@@ -222,183 +171,43 @@ public class AdminController {
 			@RequestParam(required = false, name = "action") Optional<String> action, Optional<String> newSegmentation,
 			@RequestParam(required = false, name = "actionValue") Optional<Long> actionValue, Model m) {
 		ProductSearchConfig config = new ProductSearchConfig();
-		System.out.println("ACTION:" + action);
-		if (newSegmentation.isPresent()) {
-			System.out.println("New Segment:" + newSegmentation);
-			adminService.createNewSegmentation(newSegmentation.get(), session.getCategoryModel());
-			segmentationService.prepareSegmentationModel(session.getCategoryModel());
-			segmentationService.prepareProductConfig(session.getCategoryModel(), config);
-		} else if (action.isPresent()) {
-			String ac = action.get();
-			if (ac.compareToIgnoreCase("cat") == 0) {
-//				session.getCategoryModel().setSubCategories(segmentationService.getSubCategoriesByCategoryId(actionValue.get()).getResponseObjects());
-//				session.getCategoryModel().getTypes().clear();
-				session.getCategoryModel().setSelectedSub(0);
-				session.getCategoryModel().setSelectedType(0);
-				segmentationService.prepareSegmentationModel(session.getCategoryModel());
-				segmentationService.prepareProductConfig(session.getCategoryModel(), config);
-
-			} else if (ac.compareToIgnoreCase("sub") == 0) {
-//				session.getCategoryModel().setTypes(segmentationService.getTypesBySubCategoryId(actionValue.get()).getResponseObjects());
-				session.getCategoryModel().setSelectedType(0);
-//				session.getCategoryModel().getTypes().clear();
-				segmentationService.prepareSegmentationModel(session.getCategoryModel());
-				segmentationService.prepareProductConfig(session.getCategoryModel(), config);
-
-			}
-
-		} else {
-			if (validateSegmentation(session)) {
-				ServiceResponse<Product> response = adminService.createProduct(newProduct, session.getCategoryModel());
-				if (response.isSucessful()) {
-					m.addAttribute("createdProduct", response.getResponseObjects().get(0));
-					m.addAttribute("success", "New Product created");
-					newProduct = new Product();
-				} else {
-					m.addAttribute("errorMessage", response.getErrorMessages());
-				}
-
-			} else {
-				m.addAttribute("errorMessage", "Product Type must be specified");
-			}
-
-		}
+		newProduct = handlePostEventsNew(newProduct, session, action, newSegmentation, m, config);
 
 		m.addAttribute("newProduct", newProduct);
 		return "adminViews/newProduct";
 	}
 
+	
 	@GetMapping(path = { "orders" })
 	public String getOrders(Model m, @ModelAttribute("sessionModel") SessionModel session,
 			@RequestParam(required = false, name = "page", defaultValue = "1") Optional<Integer> pathPage) {
 
 		OrderSearchConfig config = new OrderSearchConfig();
 		OrderStatus currentStatus = session.getOrderStatus();
-		if (currentStatus != null) {
+		setStatusInConfig(config, currentStatus);
 
-			switch (currentStatus) {
-			case NOT_HANDLED:
-				config.setStatus(OrderStatus.NOT_HANDLED);
-				break;
-			case DISPATCHED:
-				config.setStatus(OrderStatus.DISPATCHED);
-				break;
-			case DELIVERY:
-				config.setStatus(OrderStatus.DELIVERY);
-				break;
-			case DELIVERY_COMPLETED:
-				config.setStatus(OrderStatus.DELIVERY_COMPLETED);
-				break;
-			case CANCELED:
-				config.setStatus(OrderStatus.CANCELED);
-				break;
-			}
+		int currentPage = getCurrentPage(session.getOrderPage(), pathPage);
 
-		}
-
-		int currentPage = pathPage.isPresent() ? pathPage.get() : session.getOrderPage();
-
-		ServiceResponse<Order> allOrdersResponse = orderService.getOrders(config, currentPage > 0 ? currentPage - 1 : 0,
-				20);
-		if (allOrdersResponse.isSucessful()) {
-
-		} else {
-			session.setOrderPage(1);
-			m.addAttribute("errorMessage", allOrdersResponse.getErrorMessages());
-		}
-		session.setOrderPage(currentPage);
-		m.addAttribute("totalPages", allOrdersResponse.getTotalPages());
-		m.addAttribute("orderStatuses", Order.OrderStatus.values());
-		m.addAttribute("selectedStatus", session.getOrderStatus() != null ? session.getOrderStatus() : "All");
-		m.addAttribute("allOrders", allOrdersResponse.getResponseObjects());
+		prepareOrdersPage(m, session, config, currentPage);
 
 		return "adminViews/adminOrdersView";
 	}
 
+	
 	@PostMapping(path = { "orders" })
 	public String postOrders(Model m, @ModelAttribute("sessionModel") SessionModel session,
 			@RequestParam(required = false, name = "page", defaultValue = "1") Optional<Integer> pathPage,
 			@RequestParam(required = false, name = "action") Optional<String> action,
 			@RequestParam(required = false, name = "actionValue") Optional<String> orderStatus,
 			@RequestParam(required = false, name = "expeditedList") Optional<List<String>> expeditedOrders) {
-		System.out.println(action);
-		System.out.println(expeditedOrders);
 		OrderSearchConfig config = new OrderSearchConfig();
-		if (action.isPresent()) {
-			switch (action.get()) {
-			case "filter":
-				System.out.println("Filter");
-				System.out.println(orderStatus);
-				switch (orderStatus.get()) {
-				case "NOT_HANDLED":
-					config.setStatus(OrderStatus.NOT_HANDLED);
-					break;
-				case "DISPATCHED":
-					config.setStatus(OrderStatus.DISPATCHED);
-					break;
-				case "DELIVERY":
-					config.setStatus(OrderStatus.DELIVERY);
-					break;
-				case "DELIVERY_COMPLETED":
-					config.setStatus(OrderStatus.DELIVERY_COMPLETED);
-					break;
-				case "CANCELED":
-					config.setStatus(OrderStatus.CANCELED);
-					break;
-				}
-				break;
-			case "approve":
-				if (expeditedOrders.isPresent()) {
-
-					expeditedOrders.get().forEach(stringOrder -> {
-						orderService.setStatus(Long.valueOf(stringOrder), OrderStatus.DISPATCHED);
-					});
-				}
-				config.setStatus(session.getOrderStatus() != null ? session.getOrderStatus() : null);
-
-				break;
-
-			case "disapprove":
-				if (expeditedOrders.isPresent()) {
-					System.out.println(expeditedOrders + " should be reversed");
-
-					expeditedOrders.get().forEach(stringOrder -> {
-						orderService.setStatus(Long.valueOf(stringOrder), OrderStatus.NOT_HANDLED);
-					});
-				}
-				config.setStatus(session.getOrderStatus() != null ? session.getOrderStatus() : null);
-
-				break;
-			}
-
-		}
-		int currentPage = pathPage.isPresent() ? pathPage.get() : session.getOrderPage();
-		ServiceResponse<Order> filteredOrders = orderService.getOrders(config, currentPage > 0 ? currentPage - 1 : 0,
-				20);
-
-		if (filteredOrders.isSucessful()) {
-			if (orderStatus.isPresent()) {
-				filteredOrders.getResponseObjects().forEach(t -> System.out.println(t.getId()));
-				if (orderStatus.get().compareToIgnoreCase("All") == 0)
-					session.setOrderStatus(null);
-				else
-					session.setOrderStatus(OrderStatus.valueOf(orderStatus.get()));
-			}
-
-		} else {
-			m.addAttribute("errorMessage", filteredOrders.getErrorMessages());
-			session.setOrderPage(1);
-		}
-
-		session.setOrderPage(currentPage);
-		m.addAttribute("totalPages", filteredOrders.getTotalPages());
-		m.addAttribute("orderStatuses", Order.OrderStatus.values());
-		m.addAttribute("selectedStatus", session.getOrderStatus() != null ? session.getOrderStatus() : "All");
-		m.addAttribute("allOrders", filteredOrders.getResponseObjects());
+		handlePostActionsOrders(session, action, orderStatus, expeditedOrders, config);
+		preparePostOrdersPage(m, session, pathPage, orderStatus, config);
 
 		return "adminViews/adminOrdersView";
 	}
 
+	
 	@GetMapping("/orders/{id}")
 	public String getOrder(@PathVariable("id") Optional<Long> orderId, Model m) {
 
@@ -461,6 +270,212 @@ public class AdminController {
 		return "adminViews/adminUsersView";
 	}
 
+	private void preparePostOrdersPage(Model m, SessionModel session, Optional<Integer> pathPage,
+			Optional<String> orderStatus, OrderSearchConfig config) {
+		int currentPage = getCurrentPage(session.getOrderPage(), pathPage);
+		ServiceResponse<Order> filteredOrders = orderService.getOrders(config, currentPage > 0 ? currentPage - 1 : 0,
+				20);
+
+		if (filteredOrders.isSucessful()) {
+			if (orderStatus.isPresent()) {
+				filteredOrders.getResponseObjects().forEach(t -> System.out.println(t.getId()));
+				if (orderStatus.get().compareToIgnoreCase("All") == 0)
+					session.setOrderStatus(null);
+				else
+					session.setOrderStatus(OrderStatus.valueOf(orderStatus.get()));
+			}
+
+		} else {
+			m.addAttribute("errorMessage", filteredOrders.getErrorMessages());
+			session.setOrderPage(1);
+		}
+
+		session.setOrderPage(currentPage);
+		m.addAttribute("totalPages", filteredOrders.getTotalPages());
+		m.addAttribute("orderStatuses", Order.OrderStatus.values());
+		m.addAttribute("selectedStatus", session.getOrderStatus() != null ? session.getOrderStatus() : "All");
+		m.addAttribute("allOrders", filteredOrders.getResponseObjects());
+	}
+
+	private void handlePostActionsOrders(SessionModel session, Optional<String> action, Optional<String> orderStatus,
+			Optional<List<String>> expeditedOrders, OrderSearchConfig config) {
+		if (action.isPresent()) {
+			switch (action.get()) {
+			case "filter":
+				switch (orderStatus.get()) {
+				case "NOT_HANDLED":
+					config.setStatus(OrderStatus.NOT_HANDLED);
+					break;
+				case "DISPATCHED":
+					config.setStatus(OrderStatus.DISPATCHED);
+					break;
+				case "DELIVERY":
+					config.setStatus(OrderStatus.DELIVERY);
+					break;
+				case "DELIVERY_COMPLETED":
+					config.setStatus(OrderStatus.DELIVERY_COMPLETED);
+					break;
+				case "CANCELED":
+					config.setStatus(OrderStatus.CANCELED);
+					break;
+				}
+				break;
+			case "approve":
+				if (expeditedOrders.isPresent()) {
+
+					expeditedOrders.get().forEach(stringOrder -> {
+						orderService.setStatus(Long.valueOf(stringOrder), OrderStatus.DISPATCHED);
+					});
+				}
+				config.setStatus(session.getOrderStatus() != null ? session.getOrderStatus() : null);
+
+				break;
+
+			case "disapprove":
+				if (expeditedOrders.isPresent()) {
+					System.out.println(expeditedOrders + " should be reversed");
+
+					expeditedOrders.get().forEach(stringOrder -> {
+						orderService.setStatus(Long.valueOf(stringOrder), OrderStatus.NOT_HANDLED);
+					});
+				}
+				config.setStatus(session.getOrderStatus() != null ? session.getOrderStatus() : null);
+
+				break;
+			}
+
+		}
+	}
+
+	private void prepareOrdersPage(Model m, SessionModel session, OrderSearchConfig config, int currentPage) {
+		ServiceResponse<Order> allOrdersResponse = orderService.getOrders(config, currentPage > 0 ? currentPage - 1 : 0,
+				20);
+		if (allOrdersResponse.isSucessful()) {
+
+		} else {
+			session.setOrderPage(1);
+			m.addAttribute("errorMessage", allOrdersResponse.getErrorMessages());
+		}
+		session.setOrderPage(currentPage);
+		m.addAttribute("totalPages", allOrdersResponse.getTotalPages());
+		m.addAttribute("orderStatuses", Order.OrderStatus.values());
+		m.addAttribute("selectedStatus", session.getOrderStatus() != null ? session.getOrderStatus() : "All");
+		m.addAttribute("allOrders", allOrdersResponse.getResponseObjects());
+	}
+
+	private void setStatusInConfig(OrderSearchConfig config, OrderStatus currentStatus) {
+		if (currentStatus != null) {
+
+			switch (currentStatus) {
+			case NOT_HANDLED:
+				config.setStatus(OrderStatus.NOT_HANDLED);
+				break;
+			case DISPATCHED:
+				config.setStatus(OrderStatus.DISPATCHED);
+				break;
+			case DELIVERY:
+				config.setStatus(OrderStatus.DELIVERY);
+				break;
+			case DELIVERY_COMPLETED:
+				config.setStatus(OrderStatus.DELIVERY_COMPLETED);
+				break;
+			case CANCELED:
+				config.setStatus(OrderStatus.CANCELED);
+				break;
+			}
+
+		}
+	}
+
+	private Product handlePostEventsNew(Product newProduct, SessionModel session, Optional<String> action,
+			Optional<String> newSegmentation, Model m, ProductSearchConfig config) {
+		if (newSegmentation.isPresent()) {
+			adminService.createNewSegmentation(newSegmentation.get(), session.getCategoryModel());
+			segmentationService.prepareSegmentationModel(session.getCategoryModel());
+			segmentationService.prepareProductConfig(session.getCategoryModel(), config);
+		} else if (action.isPresent()) {
+			String ac = action.get();
+			if (ac.compareToIgnoreCase("cat") == 0) {
+				prepareSegmentationByCategory(session, config);
+
+			} else if (ac.compareToIgnoreCase("sub") == 0) {
+				prepareSegmentationBySubCategory(session, config);
+
+			}
+
+		} else {
+			if (validateSegmentation(session)) {
+				ServiceResponse<Product> response = adminService.createProduct(newProduct, session.getCategoryModel());
+				if (response.isSucessful()) {
+					m.addAttribute("createdProduct", response.getResponseObjects().get(0));
+					m.addAttribute("success", "New Product created");
+					newProduct = new Product();
+				} else {
+					m.addAttribute("errorMessage", response.getErrorMessages());
+				}
+
+			} else {
+				m.addAttribute("errorMessage", "Product Type must be specified");
+			}
+
+		}
+		return newProduct;
+	}
+
+	
+	private void handlePostActionsEdit(SessionModel session, Optional<String> action, Optional<String> newSegmentation,
+			Model m, Product product, ProductSearchConfig config) {
+		if (newSegmentation.isPresent()) {
+			adminService.createNewSegmentation(newSegmentation.get(), session.getCategoryModel());
+			segmentationService.prepareSegmentationModel(session.getCategoryModel());
+			segmentationService.prepareProductConfig(session.getCategoryModel(), config);
+		}
+
+		else if (action.isPresent()) {
+			String actionValue = action.get();
+			// Handle by a service
+			switch (actionValue) {
+			case "updateProduct":
+				if (validateSegmentation(session)) {
+					ServiceResponse<Product> response = adminService.updateProduct(product,
+							session.getCategoryModel().getSelectedType());
+					if (response.isSucessful()) {
+						m.addAttribute("success", "Update Successful");
+					} else {
+						m.addAttribute("errorMessage", response.getErrorMessages());
+					}
+
+				} else {
+					m.addAttribute("errorMessage", "Product Type must be specified");
+				}
+				break;
+			case "cat":
+				prepareSegmentationByCategory(session, config);
+				break;
+			case "sub":
+				prepareSegmentationBySubCategory(session, config);
+				break;
+			}
+
+		}
+	}
+
+	private void prepareSegmentationBySubCategory(SessionModel session, ProductSearchConfig config) {
+		session.getCategoryModel().setSelectedType(0);
+		segmentationService.prepareSegmentationModel(session.getCategoryModel());
+		segmentationService.prepareProductConfig(session.getCategoryModel(), config);
+	}
+
+	private void prepareSegmentationByCategory(SessionModel session, ProductSearchConfig config) {
+		session.getCategoryModel().setSelectedSub(0);
+		prepareSegmentationBySubCategory(session, config);
+	}
+
+	private boolean validateSegmentation(SessionModel session) {
+		return session.getCategoryModel().getSelectedCat() > 0 && session.getCategoryModel().getSelectedSub() > 0
+				&& session.getCategoryModel().getSelectedType() > 0;
+	}
+
 	// UTILITY METHODS
 	private Customer customerAccountDTO(@Valid AccountDTO account) {
 		Customer c = new Customer(account.getFirstName(), account.getLastName(), account.getPassword(),
@@ -494,8 +509,8 @@ public class AdminController {
 		session.setCategoryModel(newSMO);
 	}
 
-	private int getCurrentPage(SessionModel session, Optional<Integer> pathPage) {
-		int currentPage = pathPage.isPresent() ? pathPage.get() : session.getProductPage();
+	private int getCurrentPage(int sessionPage, Optional<Integer> pathPage) {
+		int currentPage = pathPage.isPresent() ? pathPage.get() : sessionPage;
 		return currentPage;
 	}
 }

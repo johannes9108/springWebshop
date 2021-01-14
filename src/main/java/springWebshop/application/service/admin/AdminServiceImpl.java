@@ -31,8 +31,7 @@ public class AdminServiceImpl implements AdminService {
 	@Override
 	public ServiceResponse<Product> updateProduct(Product product, long typeId) {
 		try {
-		Product persistedProduct = productService.getProductById(product.getId()).getResponseObjects().get(0);
-		persistedProduct = product;
+		Product persistedProduct = product;
 		ServiceResponse<ProductType> typeResponse = segmentationService.getProductTypeById(typeId);
 		persistedProduct.setProductType(typeResponse.isSucessful()
 				? typeResponse.getResponseObjects().get(0)
