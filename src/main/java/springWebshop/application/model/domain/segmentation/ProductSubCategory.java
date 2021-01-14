@@ -67,10 +67,6 @@ public class ProductSubCategory {
         return Objects.hash(id);
     }
 
-//	public String getFullyQualifiedName() {
-//		return productCategory.getFullyQualifiedName() + "/" + name ;
-//	}
-
 	@Override
 	public String toString() {
 		return "Subcategory:" + name + "|"+ productCategory.getName() + "]";

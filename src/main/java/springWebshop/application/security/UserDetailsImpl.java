@@ -27,22 +27,19 @@ public class UserDetailsImpl implements UserDetails {
     @JsonIgnore
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
-    
-    
-    //TODO
-    //Move the entire implementation to Account Model Object for improved Segmentation
-    public static UserDetailsImpl build(Account user) {
-        List<GrantedAuthority> authorities = user.getRoles().stream()
+
+    public static UserDetailsImpl build(Account account) {
+        List<GrantedAuthority> authorities = account.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName().name()))
                 .collect(Collectors.toList());
 
         return new UserDetailsImpl(
-                user.getId(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getPassword(),
+                account.getId(),
+                account.getUsername(),
+                account.getEmail(),
+                account.getFirstName(),
+                account.getLastName(),
+                account.getPassword(),
                 authorities);
     }
 

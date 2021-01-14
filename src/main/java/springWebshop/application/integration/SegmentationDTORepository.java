@@ -2,7 +2,7 @@ package springWebshop.application.integration;
 
 import java.util.List;
 
-import springWebshop.application.model.dto.SegmentDTO;
+import springWebshop.application.model.viewModels.SegmentDTO;
 
 public interface SegmentationDTORepository {
 	public List<SegmentDTO> getAllCategoryDTO();

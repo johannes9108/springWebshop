@@ -36,8 +36,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 	.formLogin()
                 	.loginPage("/webshop/login")
-//                	.loginProcessingUrl("/webshop/processLogin")
-//                	.defaultSuccessUrl("/webshop/products", true)
                 	.successHandler(successHandler())
                 	.failureUrl("/webshop/login?error=true")
                 	.permitAll()

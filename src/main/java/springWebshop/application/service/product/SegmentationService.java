@@ -6,8 +6,8 @@ import springWebshop.application.model.domain.Product;
 import springWebshop.application.model.domain.segmentation.ProductCategory;
 import springWebshop.application.model.domain.segmentation.ProductSubCategory;
 import springWebshop.application.model.domain.segmentation.ProductType;
-import springWebshop.application.model.dto.SegmentDTO;
-import springWebshop.application.model.dto.SegmentationModelObject;
+import springWebshop.application.model.viewModels.SegmentDTO;
+import springWebshop.application.model.viewModels.SegmentationModelObject;
 import springWebshop.application.service.ServiceResponse;
 
 public interface SegmentationService{
@@ -23,14 +23,6 @@ public interface SegmentationService{
 	ServiceResponse<Object> prepareSegmentationModel(SegmentationModelObject categoryModel);
 	ServiceResponse<Object> prepareProductConfig(SegmentationModelObject categoryModel,ProductSearchConfig config);
 	ServiceResponse<SegmentationModelObject> fullSegmentation(Product currentProduct);
-	
-	int getNoCategories();
-	int getNoSubCategories();
-	int getNoTypes();
-	
-	ArrayList<ProductType> getTypeStore();
-	ArrayList<ProductSubCategory> getSubCategoryStore();
-	ArrayList<ProductCategory> getCategoryStore();
 	ServiceResponse<Integer> create(String string, SegmentationModelObject segmentationModel);
 	
 	

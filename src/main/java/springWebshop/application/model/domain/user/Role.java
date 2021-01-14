@@ -17,7 +17,6 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-//    @Setter
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
     private ERole name;

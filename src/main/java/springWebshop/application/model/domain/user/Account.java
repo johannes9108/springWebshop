@@ -11,11 +11,15 @@ import org.hibernate.validator.constraints.Length;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Abstract class holding basic data for main user groups/entities; Admin and Customer.
+ * Each entity is persisted in separate table per class.
+ * Account is also the class parsed to UserDetails in Spring Security context.
+ */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-//@Builder
 @Entity
 @Table(name = "Accounts")
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)

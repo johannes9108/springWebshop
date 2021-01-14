@@ -3,7 +3,7 @@ package springWebshop.application.service.user;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import springWebshop.application.model.dto.AccountDTO;
+import springWebshop.application.model.viewModels.AccountDTO;
 
 public class PasswordMatchesValidator 
 implements ConstraintValidator<PasswordMatches, Object> { 

@@ -13,16 +13,16 @@ import springWebshop.application.model.domain.user.Account;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     final
-    AccountRepository userRepository;
+    AccountRepository accountRepository;
 
-    public UserDetailsServiceImpl(AccountRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserDetailsServiceImpl(AccountRepository accountRepository) {
+        this.accountRepository = accountRepository;
     }
 
     @Transactional
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Account user = userRepository.findByEmail(email)
+        Account user = accountRepository.findByEmail(email)
                 .orElseThrow(()-> new UsernameNotFoundException("Hittade ingen användare med det användarnamnet."));
 
         return UserDetailsImpl.build(user);

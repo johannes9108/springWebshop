@@ -22,8 +22,8 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import springWebshop.application.model.domain.order.Order;
 import springWebshop.application.model.domain.user.Customer;
 import springWebshop.application.model.domain.user.CustomerAddress;
-import springWebshop.application.model.dto.AccountDTO;
-import springWebshop.application.model.dto.SessionModel;
+import springWebshop.application.model.viewModels.AccountDTO;
+import springWebshop.application.model.viewModels.SessionModel;
 import springWebshop.application.security.UserDetailsImpl;
 import springWebshop.application.security.UserDetailsServiceImpl;
 import springWebshop.application.service.ServiceResponse;
@@ -72,14 +72,11 @@ public class AccoutController {
 
 	@GetMapping("login")
 	public String getLogin(Model mode, HttpServletRequest request) {
-		System.out.println("Kom till GET LOGIN");
 		return "account/login";
 	}
 	
 	@PostMapping("processLogin")
 	public String postLogin(Model model, HttpServletRequest request) {
-		System.out.println("Kom till POST LOGIN");
-		
 		return "account/login";
 	}
 	
@@ -96,7 +93,6 @@ public class AccoutController {
 		
 		if(!results.hasErrors()) {
 			
-			System.out.println(account);
 			Customer customerFromDTO = customerAccountDTO(account);
 			ServiceResponse<Customer> accountResponse = accountService.createCustomer(customerFromDTO);
 			if(accountResponse.isSucessful()) {
@@ -109,7 +105,6 @@ public class AccoutController {
 			return "account/login";
 		}
 		else {
-			System.out.println(results.getFieldErrors());
 			model.addAttribute("errorMessage",results.getAllErrors());
 			return "account/register";
 		}

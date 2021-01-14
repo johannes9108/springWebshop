@@ -37,15 +37,6 @@ public abstract class AbstractCustomRepository<T> {
 
 	protected Page<T> getPaginatedResult(int page, int size, List<Predicate> predicates,
 			 TypedQuery<T> typedQuery, Class rootClass) {
-//		Class<?> clazz  = Product.class;
-//		Class rootClass = Order.class;
-//		try {
-//			clazz = Class.forName("Order");
-//		} catch (ClassNotFoundException e) {
-//			e.printStackTrace();
-//		}
-
-//		System.out.println("Skriver ut class" + clazz);
 
 		int firstResult = page * size;
 		CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();

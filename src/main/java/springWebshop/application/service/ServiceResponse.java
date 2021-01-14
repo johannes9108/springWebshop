@@ -24,7 +24,6 @@ public class ServiceResponse<T> {
         this.errorMessages = new ArrayList<>();
     }
 
-    //
     public ServiceResponse(List<T> responseObjects, List<String> errorMessages) {
         this.responseObjects = responseObjects;
         this.errorMessages = errorMessages;

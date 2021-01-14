@@ -3,6 +3,8 @@ package springWebshop.application.service.order;
 import java.time.LocalDate;
 import java.util.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -11,18 +13,20 @@ import springWebshop.application.integration.account.CustomerRepository;
 import springWebshop.application.integration.order.OrderRepository;
 import springWebshop.application.integration.product.ProductRepository;
 import springWebshop.application.model.domain.Product;
-import springWebshop.application.model.domain.order.Address;
+import springWebshop.application.model.domain.Address;
 import springWebshop.application.model.domain.order.Order;
 import springWebshop.application.model.domain.order.OrderLine;
 import springWebshop.application.model.domain.order.Order.OrderStatus;
 import springWebshop.application.model.domain.user.Customer;
-import springWebshop.application.model.dto.ShoppingCartDTO;
+import springWebshop.application.model.viewModels.ShoppingCart;
 import springWebshop.application.service.ServiceErrorMessages;
 import springWebshop.application.service.ServiceResponse;
+import springWebshop.application.service.admin.AdminServiceImpl;
 
 @Service("PROD")
 @Primary
 public class OrderSerivceImpl implements OrderService {
+    private static final Logger logger = LoggerFactory.getLogger(OrderSerivceImpl.class);
 
     private static final Map<OrderStatus, Integer> statusHierarchy;
 
@@ -94,7 +98,7 @@ public class OrderSerivceImpl implements OrderService {
                 setPageMetaData(response, serviceResponse);
                 serviceResponse.setResponseObjects(response.getContent());
             } catch (Exception e) {
-                System.out.println(e);
+                logger.error(e.toString());
                 serviceResponse.addErrorMessage(ServiceErrorMessages.ORDER.couldNotFind() + "s page " + page + ".");
             }
         else
@@ -148,7 +152,7 @@ public class OrderSerivceImpl implements OrderService {
     }
 
     @Override
-    public ServiceResponse<Order> createOrderFromShoppingCart(ShoppingCartDTO shoppingCartDTO,
+    public ServiceResponse<Order> createOrderFromShoppingCart(ShoppingCart shoppingCart,
                                                               long customerId, Address deliveryAddress) {
         ServiceResponse<Order> response = new ServiceResponse<>();
         List<String> errors = new ArrayList<>();
@@ -161,8 +165,8 @@ public class OrderSerivceImpl implements OrderService {
                 : null);
         newOrder.setDeliveryAddress(deliveryAddress);
 
-        if (validateAndFillProductList(shoppingCartDTO, productList, errors)
-                && prepareOrderFromShoppingCart(newOrder, shoppingCartDTO, productList, errors)) {
+        if (validateAndFillProductList(shoppingCart, productList, errors)
+                && prepareOrderFromShoppingCart(newOrder, shoppingCart, productList, errors)) {
             try {
                 return create(newOrder);
             } catch (Exception e) {
@@ -173,11 +177,11 @@ public class OrderSerivceImpl implements OrderService {
         return response;
     }
 
-    private boolean prepareOrderFromShoppingCart(Order order, ShoppingCartDTO shoppingCartDTO, List<Product> produstList, List<String> errors) {
+    private boolean prepareOrderFromShoppingCart(Order order, ShoppingCart shoppingCart, List<Product> produstList, List<String> errors) {
         try {
             produstList.forEach(product -> {
                 order.addOrderLine(getOrderLineFromProduct(product,
-                        shoppingCartDTO.getProductMap().getOrDefault(product, 0)));
+                        shoppingCart.getProductMap().getOrDefault(product, 0)));
             });
             return true;
         } catch (Error error) {
@@ -200,8 +204,8 @@ public class OrderSerivceImpl implements OrderService {
         return orderLine;
     }
 
-    private boolean validateAndFillProductList(ShoppingCartDTO shoppingCartDTO, List<Product> productList, List<String> errors) {
-        shoppingCartDTO.getProductMap().forEach((product, integer) -> {
+    private boolean validateAndFillProductList(ShoppingCart shoppingCart, List<Product> productList, List<String> errors) {
+        shoppingCart.getProductMap().forEach((product, integer) -> {
             try {
                 Optional<Product> validProduct = productRepository.findById(product.getId());
                 if (validProduct.isPresent()) {
@@ -213,7 +217,7 @@ public class OrderSerivceImpl implements OrderService {
                 errors.add("Severe error while validating adding products to order. Contact store admin.");
             }
         });
-        return shoppingCartDTO.getProductMap().size() == productList.size();
+        return shoppingCart.getProductMap().size() == productList.size();
     }
 
     @Override
@@ -237,7 +241,6 @@ public class OrderSerivceImpl implements OrderService {
     private boolean newStatusIsValidAndSet(Order order, OrderStatus requestedOrderStatus, List<String> errors) {
         LocalDate now = LocalDate.now();
         OrderStatus currentStatus = order.getOrderStatus();
-        System.out.println("ORDER:"+order);
 
         if (isValidNewStatus(currentStatus, requestedOrderStatus)) {
             switch (requestedOrderStatus) {

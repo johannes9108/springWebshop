@@ -75,13 +75,11 @@ public class ProductServiceImpl implements ProductService {
 	
 	@Override
 	public ServiceResponse<Product> getProducts(ProductSearchConfig productSearchConfig) {
-		// TODO Auto-generated method stub
 		return getAllProductPageAndSize(productSearchConfig,0, defaultPageSize);
 	}
 
 	@Override
 	public ServiceResponse<Product> getProducts(ProductSearchConfig productSearchConfig, int page) {
-		// TODO Auto-generated method stub
 		return getAllProductPageAndSize(productSearchConfig, page, defaultPageSize);
 	}
 

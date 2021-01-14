@@ -1,22 +1,24 @@
 package springWebshop.application.service.admin;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import springWebshop.application.model.domain.Product;
 import springWebshop.application.model.domain.order.Order;
-import springWebshop.application.model.domain.segmentation.ProductSubCategory;
 import springWebshop.application.model.domain.segmentation.ProductType;
-import springWebshop.application.model.dto.SegmentationModelObject;
-import springWebshop.application.model.dto.SegmentDTO;
+import springWebshop.application.model.viewModels.SegmentationModelObject;
+import springWebshop.application.security.CustomSuccessHandler;
 import springWebshop.application.service.ServiceResponse;
-import springWebshop.application.service.product.ProductSearchConfig;
 import springWebshop.application.service.product.ProductService;
 import springWebshop.application.service.product.SegmentationService;
 
 @Service("AdminServiceImpl")
 public class AdminServiceImpl implements AdminService {
+	private static final Logger logger = LoggerFactory.getLogger(AdminServiceImpl.class);
+
 
 	@Autowired
 	@Qualifier("ProductServiceImpl")
@@ -29,48 +31,18 @@ public class AdminServiceImpl implements AdminService {
 	@Override
 	public ServiceResponse<Product> updateProduct(Product product, long typeId) {
 		try {
-		Product persistedProduct = productService.getProductById(product.getId()).getResponseObjects().get(0);
-		persistedProduct = product;
-		System.out.println(typeId);
+		Product persistedProduct = product;
 		ServiceResponse<ProductType> typeResponse = segmentationService.getProductTypeById(typeId);
-		System.out.println("TYPE:" + typeResponse.getResponseObjects().get(0));
-		persistedProduct.setProductType(typeResponse.isSucessful()?typeResponse.getResponseObjects().get(0)
-				:
-					segmentationService.getProductTypeById(1L).getResponseObjects().get(0));
+		persistedProduct.setProductType(typeResponse.isSucessful()
+				? typeResponse.getResponseObjects().get(0)
+				: segmentationService.getProductTypeById(1L).getResponseObjects().get(0));
 		return productService.update(persistedProduct);
 		}catch(Exception e) {
-			System.out.println(e);
+			logger.error(e.toString());
 			ServiceResponse<Product> response = new ServiceResponse<Product>();
 			response.addErrorMessage(e.getLocalizedMessage());
 			return response;
 		}
-		
-
-
-	}
-
-	@Override
-	public ServiceResponse<Order> updateOrder() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ServiceResponse<Product> updateSegmentationOfProduct(String action, SegmentationModelObject categoryModelObject, long id) {
-		ServiceResponse<Product> response = productService.getProductById(id);
-		if (response.isSucessful()) {
-			Product product = response.getResponseObjects().get(0);
-				// TODO NOT WORKING WHEN SELECTING 0/ALL
-				// TODO EXTRACT ALL THIS LOGIC TO SERVICE CLASSES AS WELL IN THE PRODUCT
-				// CONTROLLER
-				long newType = categoryModelObject.getSelectedType();
-				updateProduct(product,newType<=1?1:newType);
-				response.addResponseObject(product);
-				
-		
-
-		}
-		return response;
 	}
 
 	@Override
@@ -93,7 +65,7 @@ public class AdminServiceImpl implements AdminService {
 					return response;
 				}
 			}catch(Exception e) {
-				System.err.println(e);
+				logger.error(e.toString());
 				response.addErrorMessage(e.getLocalizedMessage());
 				return response;
 			}

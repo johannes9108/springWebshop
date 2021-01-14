@@ -20,7 +20,7 @@ import org.thymeleaf.templateresolver.ITemplateResolver;
 import springWebshop.application.integration.account.AccountRepository;
 import springWebshop.application.integration.account.AdminRepository;
 import springWebshop.application.integration.account.CompanyRepository;
-import springWebshop.application.integration.account.CustomerAddressRespoitory;
+import springWebshop.application.integration.account.CustomerAddressRepository;
 import springWebshop.application.integration.account.CustomerRepository;
 import springWebshop.application.integration.account.RoleRepository;
 import springWebshop.application.integration.order.OrderRepository;
@@ -29,27 +29,26 @@ import springWebshop.application.integration.product.ProductRepository;
 import springWebshop.application.integration.product.ProductSubCategoryRepository;
 import springWebshop.application.integration.product.ProductTypeRepository;
 import springWebshop.application.model.domain.Product;
-import springWebshop.application.model.domain.order.Address;
+import springWebshop.application.model.domain.Address;
 import springWebshop.application.model.domain.order.Order;
 import springWebshop.application.model.domain.order.OrderLine;
 import springWebshop.application.model.domain.segmentation.ProductCategory;
 import springWebshop.application.model.domain.segmentation.ProductSubCategory;
 import springWebshop.application.model.domain.segmentation.ProductType;
-import springWebshop.application.model.domain.user.Account;
 import springWebshop.application.model.domain.user.Admin;
 import springWebshop.application.model.domain.user.Company;
 import springWebshop.application.model.domain.user.Customer;
 import springWebshop.application.model.domain.user.CustomerAddress;
 import springWebshop.application.model.domain.user.ERole;
 import springWebshop.application.model.domain.user.Role;
-import springWebshop.application.model.dto.ShoppingCartDTO;
+import springWebshop.application.model.viewModels.ShoppingCart;
 import springWebshop.application.service.ServiceErrorMessages;
 import springWebshop.application.service.ServiceResponse;
-import springWebshop.application.service.order.OrderSearchConfig;
 import springWebshop.application.service.order.OrderService;
 import springWebshop.application.service.product.ProductSearchConfig;
 import springWebshop.application.service.product.ProductService;
 import springWebshop.application.service.user.AccountService;
+
 
 @Configuration
 public class BaseConfig {
@@ -72,70 +71,30 @@ public class BaseConfig {
                                              AccountRepository accountRepository, CompanyRepository companyRepository,
                                              OrderRepository orderRepository, OrderService orderService,
                                              CustomerRepository customerRepository, @Qualifier("ProductServiceImpl") ProductService productService,
-                                             AccountService accountService, CustomerAddressRespoitory addressRespoitory, AdminRepository adminRepository, RoleRepository roleRepository) {
-
+                                             AccountService accountService, CustomerAddressRepository addressRespoitory, AdminRepository adminRepository, RoleRepository roleRepository) {
 
         return (args) -> {
-
-
-//        	orderService.getAllOrders().getResponseObjects().forEach(System.out::println);
-
-            testingRedesignedProductRepoAndService(productRepository, typeRepo, catRepo, subCatRepo);
-//        	productService.getAllProducts().getResponseObjects().forEach(t->System.out.println(t.getId() + ":" + t.getName()));
-//        	System.out.println();
-//        	productService.getAllProducts(2, 2).getResponseObjects().forEach(t->System.out.println(t.getId() + ":" + t.getName()));
-//        	System.out.println();
-//        	System.out.println();
-//        	productService.getProductById(1L).getResponseObjects().forEach(t->System.out.println(t.getId() + ":" + t.getName()));
-//        	productService.getProductByName("Johannes").getResponseObjects().forEach(t->System.out.println(t.getId() + ":" + t.getName()));
-//
-
-            prepareRoles(roleRepository);
-            createCustomers(accountService, companyRepository, 10);
-            Customer persistedCustomer = customerRepository.findById(1L).get();
-            System.out.println(persistedCustomer);
-            persistedCustomer.getAddresses().forEach(System.out::println);
-            createAdmins(accountService, 2);
-            Account account = accountRepository.findByEmail("admin1@gmail.com").get();
-            System.out.println(account);
-
-            createOrderTest(orderService);
-            OrderSearchConfig orderConf = OrderSearchConfig.builder()
-                    .minTotalSum(10.00)
-                    .maxTotalSum(90.00)
-                    .status(Order.OrderStatus.NOT_HANDLED)
-                    .sortBy(OrderSearchConfig.SortBy.totalSum)
-                    .build();
-            System.out.println(orderConf);
-            ServiceResponse<Order> searchOrderResult = orderService.getOrders(orderConf);
-            List<Order> orderList = searchOrderResult.getResponseObjects();
-            System.out.println("Start order search result print");
-            if (searchOrderResult.isSucessful()){
-                orderList.forEach(order -> System.out.println(order.getHeaderString()));
-            } else searchOrderResult.getErrorMessages().forEach(System.out::println);
-
-            System.out.println("End order search result print");
-
-//            OrderSearchConfig orderSearchConfig = new OrderSearchConfig();
-//            orderSearchConfig.setMaxTotalSum(350.00);
-//            orderSearchConfig.setSortBy(OrderSearchConfig.SortBy.totalSum);
-//            ServiceResponse<Order> searchOrderResponse = orderService.getOrders(orderSearchConfig, 0, 30);
-//            System.out.println(searchOrderResponse);
-//            searchOrderResponse.getResponseObjects().forEach(order -> {
-//                System.out.println(order);
-//            });
-
-
+            init(productRepository, typeRepo, catRepo, subCatRepo, companyRepository, orderService, accountService, roleRepository);
         };
 
 
     }
+    /**
+     * Preparing H2 DB for demo purpose
+     */
+    private void init(ProductRepository productRepository, ProductTypeRepository typeRepo, ProductCategoryRepository catRepo, ProductSubCategoryRepository subCatRepo, CompanyRepository companyRepository, OrderService orderService, AccountService accountService, RoleRepository roleRepository) {
+        testingRedesignedProductRepoAndService(productRepository, typeRepo, catRepo, subCatRepo);
+        prepareRoles(roleRepository);
+        createCustomers(accountService, companyRepository, 10);
+        createAdmins(accountService, 2);
+        createOrderTest(orderService);
+    }
 
     private void createOrderTest(OrderService orderService) {
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 50; i++) {
             Address deliveryAddress2 = new CustomerAddress("Storgatan " + (i + 1), randomBetween(11120, 98799), "Stockholm", "Sweden");
-            ShoppingCartDTO randomShoppingCartDTO = getRandomShoppingCartDTO(productService, 1, 100);
-            ServiceResponse<Order> createOrderResponse = orderService.createOrderFromShoppingCart(randomShoppingCartDTO, randomBetween(1, 50), deliveryAddress2);
+            ShoppingCart randomShoppingCart = getRandomShoppingCartDTO(productService, 1, 100);
+            ServiceResponse<Order> createOrderResponse = orderService.createOrderFromShoppingCart(randomShoppingCart, randomBetween(1, 10), deliveryAddress2);
             System.out.println("Created order - sucessfully: " + createOrderResponse.isSucessful());
         }
 
@@ -201,15 +160,15 @@ public class BaseConfig {
         System.out.println("Updated order ----> " + orderService.getOrderById(orderId).getResponseObjects().get(0));
     }
 
-    private ShoppingCartDTO getRandomShoppingCartDTO(ProductService productService, int productIdFrom, int productIdTo) {
-        ShoppingCartDTO shoppingCartDTO = new ShoppingCartDTO(productService);
+    private ShoppingCart getRandomShoppingCartDTO(ProductService productService, int productIdFrom, int productIdTo) {
+        ShoppingCart shoppingCart = new ShoppingCart(productService);
         for (int i = 0; i < 7; i++) {
             long randomProdId = randomBetween(productIdFrom, productIdTo);
             for (int j = 0; j < randomBetween(1, 3); j++) {
-                shoppingCartDTO.addItem(randomProdId);
+                shoppingCart.addItem(randomProdId);
             }
         }
-        return shoppingCartDTO;
+        return shoppingCart;
     }
 
     private void prepareRoles(RoleRepository roleRepository) {
@@ -305,6 +264,7 @@ public class BaseConfig {
     }
 
     private void testingRedesignedProductRepoAndService(ProductRepository productRepository,
+
                                                         ProductTypeRepository typeRepo, ProductCategoryRepository catRepo, ProductSubCategoryRepository subCatRepo) {
         int noCat = 3, noSub = 4, noType = 5;
 
@@ -382,123 +342,9 @@ public class BaseConfig {
         System.out.println("41 - 50!!!");
 //		productService.getAllProducts(4,10).forEach(product -> System.out.println(product.getName()));
     }
-//
-//    private void simpleServiceTest() {
-//        ProductCategory existingCategory = new ProductCategory("Alpha");
-//        catRepo.save(existingCategory);
-//        for (int i = 0; i < 10; i++) {
-//            Product product = new Product();
-//            product.setName("" + i);
-//            product.addProductCategory(new ProductCategory("" + (i - 25)));
-//            productService.save(product);
-//        }
-//
-//
-//        Optional<Product> product = productService.getProductByName("5");
-//        if (product.isPresent()) {
-//            System.out.println(product.get());
-//            Product localProduct = product.get();
-//            localProduct.addProductCategory(new ProductCategory("Beta"));
-//            Optional<ProductCategory> exCat = catRepo.findByName("Alpha");
-//            if (exCat.isPresent())
-//                localProduct.addProductCategory(exCat.get());
-//            productService.save(localProduct);
-//        }
-//        productService.getAllProducts().forEach(p -> System.out.println(p + "\n"));
-//    }
-//
-//    private void companyCustomerTests() {
-//        Company company1 = new Company();
-//        company1.setName("Ikea");
-//        Company company2 = new Company();
-//        company2.setName("ABAB");
-//        Company company3 = new Company();
-//        company3.setName("SWECO");
-//
-//        Customer customer1 = new Customer();
-//        customer1.setFirstName("Johannes");
-//        Customer customer2 = new Customer();
-//        customer2.setFirstName("Robert");
-//        Customer customer3 = new Customer();
-//        customer3.setFirstName("Kalle");
-//        Customer customer4 = new Customer();
-//        customer4.setFirstName("Tess");
-//        accountRepository.save(customer4);
-//
-//        company2.getCustomers().add(customer1);
-//        company2.getCustomers().add(customer2);
-//        company3.getCustomers().add(customer3);
-//
-//
-//        companyRepository.save(company1);
-//        companyRepository.save(company2);
-//        companyRepository.save(company3);
-//        companyRepository.test().forEach(company -> System.out.println(company + "\n"));
-//
-//        Optional<Company> oldCompany = companyRepository.findById(3L);
-//        if (oldCompany.isPresent()) {
-//            companyRepository.delete(oldCompany.get());
-//        }
-//    }
-//
-//    private void productTypeCategoryTests() {
-//        ProductSubCategory type1 = new ProductSubCategory();
-//        type1.setName("Furniture");
-//        ProductSubCategory type2 = new ProductSubCategory();
-//        type2.setName("Tools");
-//        ProductSubCategory type3 = new ProductSubCategory();
-//        type3.setName("Grocery");
-//        typeRepo.save(type1);
-//        typeRepo.save(type2);
-//        typeRepo.save(type3);
-//
-//        ProductCategory cat1 = new ProductCategory();
-//        cat1.setName("Sofa");
-//        ProductCategory cat2 = new ProductCategory();
-//        cat2.setName("Hammer");
-//        catRepo.save(cat1);
-//        catRepo.save(cat2);
-//
-//
-//        for (int i = 0; i < 100; i++) {
-//
-//            Product product = new Product();
-//            product.setName("Product " + i);
-//
-//            product.addProductType(i < 51
-//                    ? typeRepo.findByName("Furniture").get()
-//                    : typeRepo.findByName("Tools").get());
-//            product.getProductCategories().add(i < 51
-//                    ? catRepo.findByName("Sofa").get()
-//                    : catRepo.findByName("Hammer").get());
-//
-//            if (i % 3 == 0) {
-//                product.getProductTypes().add(typeRepo.findById(3L).get());
-//            }
-////            if (i == 77) product.addProductType(productTypeNuevo);
-//
-//            productRepository.save(product);
-//
-//        }
-//
-//        productRepository.findAll().forEach(product ->
-//                System.out.println(product));
-//
-//        productRepository.findByProductTypes_Name("Grocery").forEach(product ->
-//                System.out.println(product.getName()
-//                        + product.getProductTypes()
-//                        .stream()
-//                        .map(ProductSubCategory::getName)
-//                        .collect(Collectors.toList())
-//                        + product.getProductCategories()
-//                        .stream()
-//                        .map(ProductCategory::getName)
-//                        .collect(Collectors.toList()))
-//        );
-
-
-//    }
-
+    /**
+     * Hot swap for intelliJ
+     */
     @Bean
     public ITemplateResolver defaultTemplateResolver() {
         FileTemplateResolver resolver = new FileTemplateResolver();

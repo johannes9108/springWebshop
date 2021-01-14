@@ -22,11 +22,8 @@ import lombok.Setter;
 public class Customer extends Account implements Serializable {
 	
 	
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)//, mappedBy = "customer")
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 	private List<CustomerAddress> addresses;
-
-//	@OneToMany (mappedBy = "customer")
-//	private List<Order> orders;
 
 	@Override
 	public String toString() {

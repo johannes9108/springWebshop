@@ -26,13 +26,8 @@ public class CustomerRepositoryCustomImpl implements CustomerRepositoryCustom {
             CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
             CriteriaQuery<Customer> criteriaQuery = criteriaBuilder.createQuery(Customer.class);
             Root<Customer> customer = criteriaQuery.from(Customer.class);
-            Fetch<Customer, CustomerAddress> fetch = customer.fetch("addresses", JoinType.LEFT);
-            
-//            	System.out.println("No addresses associated for customer with ID: " + id);
-//                customer = criteriaQuery.from(Customer.class);
-//                throw new RuntimeException("No addresses associated");
-                
-          
+            customer.fetch("addresses", JoinType.LEFT);
+
 
             criteriaQuery.select(customer)
             .where(criteriaBuilder.equal(customer.get("id"),id))

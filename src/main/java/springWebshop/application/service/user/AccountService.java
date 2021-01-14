@@ -62,24 +62,17 @@ public class AccountService {
 
     	 ServiceResponse<Customer> response = new ServiceResponse<>();
          List<String> errors = new ArrayList<>();
-
              try {
             	 Optional<Customer> persistedCustomer = customerRepository.findById(updatedCustomer.getId());
-            	 System.out.println(persistedCustomer.get());
             	 if(persistedCustomer.isPresent()) {
-            		 Customer c = persistedCustomer.get();
-            		 c = updatedCustomer;
-            		 System.out.println("PC:" + c);
+            		 Customer c = updatedCustomer;
             		 response.addResponseObject(customerRepository.save(c));
-            		 
             	 }
             	 else {
             		 response.addErrorMessage(ServiceErrorMessages.CUSTOMER.couldNotUpdate(updatedCustomer.getId()));
             	 }
-            	 
-            	 
              } catch (Exception e) {
-                 response.addErrorMessage(ServiceErrorMessages.CUSTOMER.couldNotCreate());
+                 response.addErrorMessage(ServiceErrorMessages.CUSTOMER.couldNotUpdate(updatedCustomer.getId()));
              }
          response.setErrorMessages(errors);
          return response;

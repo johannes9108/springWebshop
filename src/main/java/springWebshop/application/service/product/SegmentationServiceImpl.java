@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,17 +17,19 @@ import springWebshop.application.model.domain.Product;
 import springWebshop.application.model.domain.segmentation.ProductCategory;
 import springWebshop.application.model.domain.segmentation.ProductSubCategory;
 import springWebshop.application.model.domain.segmentation.ProductType;
-import springWebshop.application.model.dto.SegmentDTO;
-import springWebshop.application.model.dto.SegmentationModelObject;
+import springWebshop.application.model.viewModels.SegmentDTO;
+import springWebshop.application.model.viewModels.SegmentationModelObject;
 import springWebshop.application.service.ServiceErrorMessages;
 import springWebshop.application.service.ServiceResponse;
+import springWebshop.application.service.order.OrderSerivceImpl;
 
 @Service("SegmentationServiceImpl")
 public class SegmentationServiceImpl implements SegmentationService {
+	private static final Logger logger = LoggerFactory.getLogger(SegmentationServiceImpl.class);
+
 
 	@Autowired
 	SegmentationDTORepositoryImpl segmentationDTORepository;
-
 	@Autowired
 	ProductCategoryRepository productCategoryRepository;
 	@Autowired
@@ -44,10 +48,6 @@ public class SegmentationServiceImpl implements SegmentationService {
 			response.addErrorMessage(ServiceErrorMessages.PRODUCT_CATEGORY.couldNotFind());
 		}
 		return response;
-
-//		return productCategoryRepository.findAll().stream()
-//				.map(productCategory -> new SegmentDTO(productCategory.getId(), productCategory.getName()))
-//				.collect(Collectors.toList());
 	}
 
 	@Override
@@ -61,9 +61,6 @@ public class SegmentationServiceImpl implements SegmentationService {
 			response.addErrorMessage(ServiceErrorMessages.PRODUCT_CATEGORY.couldNotFind());
 		}
 		return response;
-		
-		
-		
 	}
 
 	@Override
@@ -189,41 +186,6 @@ public class SegmentationServiceImpl implements SegmentationService {
 	}
 
 	@Override
-	public ArrayList<ProductType> getTypeStore() {
-		return null;
-	}
-
-	@Override
-	public ArrayList<ProductSubCategory> getSubCategoryStore() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ArrayList<ProductCategory> getCategoryStore() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int getNoCategories() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int getNoSubCategories() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int getNoTypes() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
 	public ServiceResponse<Object> prepareSegmentationModel(SegmentationModelObject categoryDTO) {
 		ServiceResponse<SegmentDTO> listOfSegmentDTOs = new ServiceResponse<>();
 		prepareCategoryModel(categoryDTO);
@@ -252,7 +214,6 @@ public class SegmentationServiceImpl implements SegmentationService {
 				if (listOfSegmentDTOs.isSucessful()) {
 					categoryDTO.setTypes(listOfSegmentDTOs.getResponseObjects());
 				}
-				System.out.println(categoryDTO);
 			} else {
 				categoryDTO.getTypes().clear();
 				categoryDTO.setSelectedType(0);
@@ -290,7 +251,6 @@ public class SegmentationServiceImpl implements SegmentationService {
 					response.addResponseObject(2);
 				}
 				break;
-				
 			case 3:
 				Optional<ProductSubCategory> persistedProductSubCategory = productSubCategoryRepository.findById(segmentationModel.getSelectedSub());
 				if(persistedProductSubCategory.isPresent()) {
@@ -299,27 +259,17 @@ public class SegmentationServiceImpl implements SegmentationService {
 				}
 				break;
 			}
-			
 			return response;
 		}
 		catch(Exception e) {
-			System.err.println(e);
+			logger.error(e.toString());
 			return response;
 		}
 	}
 
 	private int whichNewSegment(SegmentationModelObject segmentationModel) {
-		if(segmentationModel.getSelectedCat() == 0) {
-			return 1;
-		}
-		else {
-			if(segmentationModel.getSelectedSub()==0) {
-				return 2;
-			}
-			else {
-				return 3;
-			}
-		}
+		if(segmentationModel.getSelectedCat() == 0) return 1;
+		return segmentationModel.getSelectedSub() == 0 ? 2 : 3;
 	}
 
 }

@@ -1,25 +1,24 @@
-package springWebshop.application.model.dto;
+package springWebshop.application.model.viewModels;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import springWebshop.application.mockservices.ProductServiceMock;
 import springWebshop.application.model.domain.Product;
-import springWebshop.application.service.product.ProductService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ShoppingCartDTOTest {
+class ShoppingCartTest {
 
-    ShoppingCartDTO cart;
+    ShoppingCart cart;
     ProductServiceMock productServiceMock;
 
     @BeforeEach
     void init() {
         productServiceMock = new ProductServiceMock();
-        cart = new ShoppingCartDTO(productServiceMock);
+        cart = new ShoppingCart(productServiceMock);
     }
 
     private List<Product> createAndGetXProductsWithPriceY (int numberOfProducts, double price) {

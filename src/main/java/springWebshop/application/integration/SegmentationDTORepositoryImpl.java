@@ -18,7 +18,7 @@ import org.springframework.stereotype.Repository;
 import springWebshop.application.model.domain.segmentation.ProductCategory;
 import springWebshop.application.model.domain.segmentation.ProductSubCategory;
 import springWebshop.application.model.domain.segmentation.ProductType;
-import springWebshop.application.model.dto.SegmentDTO;
+import springWebshop.application.model.viewModels.SegmentDTO;
 
 @Repository
 public class SegmentationDTORepositoryImpl implements SegmentationDTORepository{

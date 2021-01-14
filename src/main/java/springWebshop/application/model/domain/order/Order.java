@@ -22,6 +22,7 @@ import javax.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import springWebshop.application.model.domain.Address;
 import springWebshop.application.model.domain.user.Customer;
 
 @Getter

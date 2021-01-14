@@ -6,8 +6,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -21,13 +19,10 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import springWebshop.application.integration.account.CustomerRepository;
 import springWebshop.application.model.domain.Product;
-import springWebshop.application.model.dto.SessionModel;
-import springWebshop.application.security.UserDetailsImpl;
+import springWebshop.application.model.viewModels.SessionModel;
 import springWebshop.application.service.ServiceResponse;
-import springWebshop.application.service.product.ProductCategoryService;
 import springWebshop.application.service.product.ProductSearchConfig;
 import springWebshop.application.service.product.ProductService;
-import springWebshop.application.service.product.ProductTypeService;
 import springWebshop.application.service.product.SegmentationService;
 
 @Controller
@@ -39,17 +34,9 @@ public class ProductController {
 	@Autowired
 	@Qualifier("ProductServiceImpl")
 	ProductService productService;
-
-	@Autowired
-	ProductCategoryService productCategoryService;
-
 	@Autowired
 	@Qualifier("SegmentationServiceImpl")
 	SegmentationService productSegmentationService;
-
-	@Autowired
-	ProductTypeService productTypeService;
-
 	@Autowired
 	CustomerRepository customerRepository;
 	@ModelAttribute("links")

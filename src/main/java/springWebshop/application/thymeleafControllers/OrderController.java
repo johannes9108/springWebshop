@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import springWebshop.application.model.domain.order.Order;
 import springWebshop.application.model.domain.user.Customer;
 import springWebshop.application.model.domain.user.CustomerAddress;
-import springWebshop.application.model.dto.SessionModel;
+import springWebshop.application.model.viewModels.SessionModel;
 import springWebshop.application.security.UserDetailsImpl;
 import springWebshop.application.service.ServiceErrorMessages;
 import springWebshop.application.service.ServiceResponse;

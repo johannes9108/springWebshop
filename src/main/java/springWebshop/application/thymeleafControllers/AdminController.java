@@ -24,10 +24,10 @@ import springWebshop.application.model.domain.Product;
 import springWebshop.application.model.domain.order.Order;
 import springWebshop.application.model.domain.order.Order.OrderStatus;
 import springWebshop.application.model.domain.user.Customer;
-import springWebshop.application.model.dto.AccountDTO;
-import springWebshop.application.model.dto.SegmentDTO;
-import springWebshop.application.model.dto.SegmentationModelObject;
-import springWebshop.application.model.dto.SessionModel;
+import springWebshop.application.model.viewModels.AccountDTO;
+import springWebshop.application.model.viewModels.SegmentDTO;
+import springWebshop.application.model.viewModels.SegmentationModelObject;
+import springWebshop.application.model.viewModels.SessionModel;
 import springWebshop.application.service.ServiceResponse;
 import springWebshop.application.service.admin.AdminService;
 import springWebshop.application.service.order.OrderSearchConfig;
@@ -115,25 +115,8 @@ public class AdminController {
 			@RequestParam(required = false, name = "return", defaultValue = "false") boolean resetFlag, Model m) {
 		int currentPage = pathPage.isPresent() ? pathPage.get() : session.getProductPage();
 		if (newSegmentation.isPresent()) {
-			System.out.println("New Segment:" + newSegmentation);
 			ServiceResponse<Integer> response = adminService.createNewSegmentation(newSegmentation.get(),
 					session.getCategoryModel());
-			// TODO DOG SHIT BÖRJAN FÖR ATT AUTO VÄLJA NYA KATEGORIN
-//			if(response.isSucessful()) {
-//				SegmentationModelObject model = session.getCategoryModel();
-//				switch(response.getResponseObjects().get(0)) {
-//				case 1:
-//					model.setSelectedCat(model.getCategories().size());
-//					break;
-//				case 2:
-//					model.setSelectedSub(model.getSubCategories().size());
-//					break;
-//				case 3:
-//					model.setSelectedType(model.getTypes().size());
-//					break;
-//				}
-//				
-//			}
 		}
 		ProductSearchConfig config = new ProductSearchConfig();
 		if (searchInput.isPresent())
