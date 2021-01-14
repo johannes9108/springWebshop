@@ -35,9 +35,6 @@ class ShoppingCartDTOTest {
         return productList;
     }
 
-    private void printCart(){
-        cart.getProductMap().forEach((product, integer) -> System.out.println("ProductId: " + product.getId() + ", Quantity: " + integer));
-    }
 
     @Test
     void getTotalSum() {

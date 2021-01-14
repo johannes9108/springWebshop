@@ -206,7 +206,7 @@ public class BaseRestController {
 				return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
 			}
 			if (orderResponse.isSucessful()) {
-				return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
+				return ResponseEntity.status(HttpStatus.OK).body(null);
 			} else {
 				System.out.println(orderResponse.getErrorMessages());
 				return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();

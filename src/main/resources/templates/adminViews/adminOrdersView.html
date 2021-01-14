@@ -277,7 +277,7 @@
                     th:action="@{/webshop/admin/orders}" method="POST">
                     <input th:if="${#strings.equalsIgnoreCase(__selectedStatus__, 'NOT_HANDLED')}" id="expediteOrders"
                         type="submit" value="Expedite Selected Orders" />
-                    <input th:if="${#strings.equalsIgnoreCase(__selectedStatus__, 'DISPATCHED')}" id="unoReverse"
+                    <input disabled th:if="${#strings.equalsIgnoreCase(__selectedStatus__, 'DISPATCHED')}" id="unoReverse"
                         type="submit" value="Reverse Orders" />
                 </form>
                 <!-- <div class="segmentationRow">123</div>

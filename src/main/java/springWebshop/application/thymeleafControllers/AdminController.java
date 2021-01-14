@@ -70,7 +70,7 @@ public class AdminController {
 		LinkedHashMap<String, String> linkMap = new LinkedHashMap<>();
 		linkMap.put("Products", "/webshop/admin/products");
 		linkMap.put("Orders", "/webshop/admin/orders");
-		linkMap.put("Users", "/webshop/admin/users");
+//		linkMap.put("Users", "/webshop/admin/users");
 		return linkMap;
 
 	}
