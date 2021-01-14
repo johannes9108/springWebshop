@@ -70,7 +70,6 @@ public class AdminController {
 		LinkedHashMap<String, String> linkMap = new LinkedHashMap<>();
 		linkMap.put("Products", "/webshop/admin/products");
 		linkMap.put("Orders", "/webshop/admin/orders");
-//		linkMap.put("Users", "/webshop/admin/users");
 		return linkMap;
 
 	}
@@ -85,25 +84,12 @@ public class AdminController {
 			@RequestParam(required = false, name = "page", defaultValue = "1") Optional<Integer> pathPage,
 			@RequestParam(required = false, name = "return", defaultValue = "false") boolean returnFlag, Model m) {
 
-		int currentPage = pathPage.isPresent() ? pathPage.get() : session.getProductPage();
+		int currentPage = getCurrentPage(session, pathPage);
 		ProductSearchConfig config = new ProductSearchConfig();
 		if (returnFlag) {
-			SegmentationModelObject newSMO = new SegmentationModelObject();
-			ServiceResponse<SegmentDTO> listOfCategories = segmentationService.getAllCategories();
-			newSMO.setCategories(listOfCategories.getResponseObjects());
-			session.setCategoryModel(newSMO);
+			productsPageWithReturnFlag(session);
 		}
-		segmentationService.prepareSegmentationModel(session.getCategoryModel());
-		segmentationService.prepareProductConfig(session.getCategoryModel(), config);
-
-		ServiceResponse<Product> response = productService.getProducts(config, currentPage > 0 ? currentPage - 1 : 0,
-				20);
-
-		m.addAttribute("allProducts", response.getResponseObjects());
-		m.addAttribute("totalPages", response.getTotalPages());
-		m.addAttribute("searchInput", "");
-		m.addAttribute("newSegmentation", "");
-		session.setProductPage(currentPage);
+		prepareProductsPage(session, m, currentPage, config);
 
 		return "adminViews/adminProductsView";
 	}
@@ -113,7 +99,7 @@ public class AdminController {
 			@RequestParam(required = false, name = "page", defaultValue = "1") Optional<Integer> pathPage,
 			Optional<String> searchInput, Optional<String> newSegmentation,
 			@RequestParam(required = false, name = "return", defaultValue = "false") boolean resetFlag, Model m) {
-		int currentPage = pathPage.isPresent() ? pathPage.get() : session.getProductPage();
+		int currentPage = getCurrentPage(session, pathPage);
 		if (newSegmentation.isPresent()) {
 			ServiceResponse<Integer> response = adminService.createNewSegmentation(newSegmentation.get(),
 					session.getCategoryModel());
@@ -121,23 +107,8 @@ public class AdminController {
 		ProductSearchConfig config = new ProductSearchConfig();
 		if (searchInput.isPresent())
 			config.setSearchString(searchInput.get());
-		if (resetFlag)
-			session.setCategoryModel(new SegmentationModelObject());
 
-		segmentationService.prepareSegmentationModel(session.getCategoryModel());
-		segmentationService.prepareProductConfig(session.getCategoryModel(), config);
-		ServiceResponse<Product> response = productService.getProducts(config, currentPage > 0 ? currentPage - 1 : 0,
-				20);
-		if (response.isSucessful()) {
-			m.addAttribute("allProducts", response.getResponseObjects());
-			System.out.println("AllProducts:" + response);
-		} else {
-			System.out.println(response.getErrorMessages());
-		}
-		m.addAttribute("searchInput", "");
-		m.addAttribute("newSegmentation", "");
-		m.addAttribute("totalPages", response.getTotalPages());
-		session.setProductPage(currentPage);
+		prepareProductsPage(session, m, currentPage, config);
 
 		return "adminViews/adminProductsView";
 	}
@@ -146,18 +117,22 @@ public class AdminController {
 	public String getSingleProductEdit(@ModelAttribute("sessionModel") SessionModel session, BindingResult result,
 			@PathVariable("id") long productId,
 			@RequestParam(required = false, name = "page", defaultValue = "1") Optional<Integer> pathPage, Model m) {
-		System.out.println("GetProduct");
 
 		ServiceResponse<Product> response = productService.getProductById(productId);
-		Product currentProduct = response.getResponseObjects().get(0);
-		ServiceResponse<SegmentationModelObject> adminResponse = segmentationService.fullSegmentation(currentProduct);
-		session.setCategoryModel(adminResponse.getResponseObjects().get(0));
-		m.addAttribute("sessionModel", session);
-//		handleFiltering(session.getCategoryModel(),config);
-		m.addAttribute("newSegmentation", "");
-		m.addAttribute("currentProduct", response.getResponseObjects().get(0));
+		if (response.isSucessful()) {
+			Product currentProduct = response.getResponseObjects().get(0);
+			ServiceResponse<SegmentationModelObject> adminResponse = segmentationService
+					.fullSegmentation(currentProduct);
+			if (adminResponse.isSucessful()) {
+				session.setCategoryModel(adminResponse.getResponseObjects().get(0));
+				m.addAttribute("sessionModel", session);
+				m.addAttribute("newSegmentation", "");
+				m.addAttribute("currentProduct", response.getResponseObjects().get(0));
+				return "adminViews/editProduct";
+			}
 
-		return "adminViews/editProduct";
+		}
+		return "adminViews/adminProductsView";
 	}
 
 	@PostMapping(path = { "/products/product/{id}" })
@@ -167,11 +142,8 @@ public class AdminController {
 			@RequestParam(required = false, name = "actionValue") Optional<Long> actionValue,
 			@RequestParam(required = false, name = "page", defaultValue = "1") Optional<Integer> pathPage, Model m,
 			Product product) {
-		System.out.println(product);
-		System.out.println(action + ":" + actionValue);
 		ProductSearchConfig config = new ProductSearchConfig();
 		if (newSegmentation.isPresent()) {
-			System.out.println("New Segment:" + newSegmentation);
 			adminService.createNewSegmentation(newSegmentation.get(), session.getCategoryModel());
 			segmentationService.prepareSegmentationModel(session.getCategoryModel());
 			segmentationService.prepareProductConfig(session.getCategoryModel(), config);
@@ -180,10 +152,9 @@ public class AdminController {
 		else if (action.isPresent()) {
 			String ac = action.get();
 			// Handle by a service
-			if (ac.compareToIgnoreCase("updateProduct") == 0) {
-
-				if (session.getCategoryModel().getSelectedCat() > 0 && session.getCategoryModel().getSelectedSub() > 0
-						&& session.getCategoryModel().getSelectedType() > 0) {
+			switch(ac.toLowerCase()) {
+			case "updateProduct":
+				if (validateSegmentation(session)) {
 					ServiceResponse<Product> response = adminService.updateProduct(product,
 							session.getCategoryModel().getSelectedType());
 					if (response.isSucessful()) {
@@ -195,30 +166,24 @@ public class AdminController {
 				} else {
 					m.addAttribute("errorMessage", "Product Type must be specified");
 				}
-
-			} else if (ac.compareToIgnoreCase("deleteProduct") == 0) {
-				System.out.println("make delete");
-				// NOT REQUIRED
-			} else if (ac.compareToIgnoreCase("cat") == 0) {
-//				session.getCategoryModel().setSubCategories(segmentationService.getSubCategoriesByCategoryId(actionValue.get()).getResponseObjects());
-//				session.getCategoryModel().getTypes().clear();
+				break;
+			case "cat":
 				session.getCategoryModel().setSelectedSub(0);
 				session.getCategoryModel().setSelectedType(0);
 				segmentationService.prepareSegmentationModel(session.getCategoryModel());
 				segmentationService.prepareProductConfig(session.getCategoryModel(), config);
-
-			} else if (ac.compareToIgnoreCase("sub") == 0) {
-//				session.getCategoryModel().setTypes(segmentationService.getTypesBySubCategoryId(actionValue.get()).getResponseObjects());
+				break;
+			case "sub":
 				session.getCategoryModel().setSelectedType(0);
 //				session.getCategoryModel().getTypes().clear();
 				segmentationService.prepareSegmentationModel(session.getCategoryModel());
 				segmentationService.prepareProductConfig(session.getCategoryModel(), config);
-
-			} else if (ac.compareToIgnoreCase("type") == 0) {
-//				adminService.updateSegmentationOfProduct("type", session.getCategoryModel(), productId);
-			} else {
-
+				break;
+			case "type":
+				
+				break;
 			}
+	
 		}
 
 		ServiceResponse<Product> response = productService.getProductById(productId);
@@ -237,6 +202,11 @@ public class AdminController {
 		m.addAttribute("currentProduct", product);
 
 		return "adminViews/editProduct";
+	}
+
+	private boolean validateSegmentation(SessionModel session) {
+		return session.getCategoryModel().getSelectedCat() > 0 && session.getCategoryModel().getSelectedSub() > 0
+				&& session.getCategoryModel().getSelectedType() > 0;
 	}
 
 	@GetMapping("products/new")
@@ -278,8 +248,7 @@ public class AdminController {
 			}
 
 		} else {
-			if (session.getCategoryModel().getSelectedCat() > 0 && session.getCategoryModel().getSelectedSub() > 0
-					&& session.getCategoryModel().getSelectedType() > 0) {
+			if (validateSegmentation(session)) {
 				ServiceResponse<Product> response = adminService.createProduct(newProduct, session.getCategoryModel());
 				if (response.isSucessful()) {
 					m.addAttribute("createdProduct", response.getResponseObjects().get(0));
@@ -305,26 +274,26 @@ public class AdminController {
 
 		OrderSearchConfig config = new OrderSearchConfig();
 		OrderStatus currentStatus = session.getOrderStatus();
-		if (currentStatus!= null) {
-	
-				switch (currentStatus) {
-				case NOT_HANDLED:
-					config.setStatus(OrderStatus.NOT_HANDLED);
-					break;
-				case DISPATCHED:
-					config.setStatus(OrderStatus.DISPATCHED);
-					break;
-				case DELIVERY:
-					config.setStatus(OrderStatus.DELIVERY);
-					break;
-				case DELIVERY_COMPLETED:
-					config.setStatus(OrderStatus.DELIVERY_COMPLETED);
-					break;
-				case CANCELED:
-					config.setStatus(OrderStatus.CANCELED);
-					break;
-				}
-				
+		if (currentStatus != null) {
+
+			switch (currentStatus) {
+			case NOT_HANDLED:
+				config.setStatus(OrderStatus.NOT_HANDLED);
+				break;
+			case DISPATCHED:
+				config.setStatus(OrderStatus.DISPATCHED);
+				break;
+			case DELIVERY:
+				config.setStatus(OrderStatus.DELIVERY);
+				break;
+			case DELIVERY_COMPLETED:
+				config.setStatus(OrderStatus.DELIVERY_COMPLETED);
+				break;
+			case CANCELED:
+				config.setStatus(OrderStatus.CANCELED);
+				break;
+			}
+
 		}
 
 		int currentPage = pathPage.isPresent() ? pathPage.get() : session.getOrderPage();
@@ -492,9 +461,41 @@ public class AdminController {
 		return "adminViews/adminUsersView";
 	}
 
+	// UTILITY METHODS
 	private Customer customerAccountDTO(@Valid AccountDTO account) {
 		Customer c = new Customer(account.getFirstName(), account.getLastName(), account.getPassword(),
 				account.getEmail(), account.getPhoneNumber(), account.getMobileNumber(), null);
 		return c;
+	}
+
+	private void prepareProductsPage(SessionModel session, Model m, int currentPage, ProductSearchConfig config) {
+		segmentationService.prepareSegmentationModel(session.getCategoryModel());
+		segmentationService.prepareProductConfig(session.getCategoryModel(), config);
+
+		ServiceResponse<Product> response = productService.getProducts(config, currentPage > 0 ? currentPage - 1 : 0,
+				20);
+
+		if (response.isSucessful()) {
+			m.addAttribute("allProducts", response.getResponseObjects());
+			System.out.println("AllProducts:" + response);
+		} else {
+			System.out.println(response.getErrorMessages());
+		}
+		m.addAttribute("totalPages", response.getTotalPages());
+		m.addAttribute("searchInput", "");
+		m.addAttribute("newSegmentation", "");
+		session.setProductPage(currentPage);
+	}
+
+	private void productsPageWithReturnFlag(SessionModel session) {
+		SegmentationModelObject newSMO = new SegmentationModelObject();
+		ServiceResponse<SegmentDTO> listOfCategories = segmentationService.getAllCategories();
+		newSMO.setCategories(listOfCategories.getResponseObjects());
+		session.setCategoryModel(newSMO);
+	}
+
+	private int getCurrentPage(SessionModel session, Optional<Integer> pathPage) {
+		int currentPage = pathPage.isPresent() ? pathPage.get() : session.getProductPage();
+		return currentPage;
 	}
 }
