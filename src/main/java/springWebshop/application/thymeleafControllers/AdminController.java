@@ -177,7 +177,6 @@ public class AdminController {
 		return "adminViews/newProduct";
 	}
 
-	
 	@GetMapping(path = { "orders" })
 	public String getOrders(Model m, @ModelAttribute("sessionModel") SessionModel session,
 			@RequestParam(required = false, name = "page", defaultValue = "1") Optional<Integer> pathPage) {
@@ -192,7 +191,6 @@ public class AdminController {
 
 		return "adminViews/adminOrdersView";
 	}
-
 	
 	@PostMapping(path = { "orders" })
 	public String postOrders(Model m, @ModelAttribute("sessionModel") SessionModel session,
@@ -206,7 +204,6 @@ public class AdminController {
 
 		return "adminViews/adminOrdersView";
 	}
-
 	
 	@GetMapping("/orders/{id}")
 	public String getOrder(@PathVariable("id") Optional<Long> orderId, Model m) {
@@ -269,7 +266,8 @@ public class AdminController {
 		}
 		return "adminViews/adminUsersView";
 	}
-
+	
+	// UTILITY METHODS
 	private void preparePostOrdersPage(Model m, SessionModel session, Optional<Integer> pathPage,
 			Optional<String> orderStatus, OrderSearchConfig config) {
 		int currentPage = getCurrentPage(session.getOrderPage(), pathPage);
@@ -421,7 +419,6 @@ public class AdminController {
 		}
 		return newProduct;
 	}
-
 	
 	private void handlePostActionsEdit(SessionModel session, Optional<String> action, Optional<String> newSegmentation,
 			Model m, Product product, ProductSearchConfig config) {
@@ -476,7 +473,6 @@ public class AdminController {
 				&& session.getCategoryModel().getSelectedType() > 0;
 	}
 
-	// UTILITY METHODS
 	private Customer customerAccountDTO(@Valid AccountDTO account) {
 		Customer c = new Customer(account.getFirstName(), account.getLastName(), account.getPassword(),
 				account.getEmail(), account.getPhoneNumber(), account.getMobileNumber(), null);

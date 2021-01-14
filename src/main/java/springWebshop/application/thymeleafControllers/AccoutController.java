@@ -126,6 +126,8 @@ public class AccoutController {
 		return "account/login";
 	}
 
+	// UTILITY METHODS
+	
 	private void prepareProfileData(Model model, ServiceResponse<Customer> customerResponse
 			) {
 		Customer loggedOnCustomer = customerResponse.getResponseObjects().get(0);

@@ -84,6 +84,7 @@ public class OrderController {
 		return "redirect:/webshop/checkout";
 	}
 
+	// Utility methods
 	private String handleNewOrder(SessionModel sessionModel, Model m, Optional<Integer> actionValue, long id,
 			ServiceResponse<Customer> customerResponse) {
 		Customer foundCustomer = customerResponse.getResponseObjects().get(0);
@@ -116,6 +117,7 @@ public class OrderController {
 			return "redirect:/webshop/login";
 		}
 	}
+
 	private String prepareCheckoutPage(Model m, Authentication authentication) {
 		long id = ((UserDetailsImpl) authentication.getPrincipal()).getId();
 		ServiceResponse<Customer> customerResponse = customerService.getCustomerById(id);

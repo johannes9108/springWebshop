@@ -30,7 +30,6 @@ import springWebshop.application.service.product.SegmentationService;
 @SessionAttributes({ "sessionModel" })
 public class ProductController {
 
-	/// ÄNDRADE FRÅN INTERFACE TILL KONKRETE IMPL FÖRATT KOMMA ÅT EGNA Metode
 	@Autowired
 	@Qualifier("ProductServiceImpl")
 	ProductService productService;
@@ -57,92 +56,26 @@ public class ProductController {
 	public String getAllProducts(@ModelAttribute("sessionModel") SessionModel session, BindingResult result,
 			@RequestParam(required = false, name = "page", defaultValue = "1") Optional<Integer> pathPage, Model m,
 			Authentication authentication) {
-		
-		//TODO
-		//Fetch ID from the authentication object only when required
-		// Skipp setting the sessionUser via custom object
-		
-//		if (authentication != null) {
-//			UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-//			System.out.println("UD:" + userDetails);
-//			System.out.println("Authentication:" + ((UserDetailsImpl) authentication.getPrincipal()).getPassword());
-//			
-//		}
-//		if (ctx != null)
-//			System.out.println(ctx);
 
-		System.out.println("GET");
-		int currentPage = pathPage.isPresent() ? pathPage.get() : session.getProductPage();
+		int currentPage = getCurrentPage(session.getProductPage(), pathPage);
 
-		productSegmentationService.prepareSegmentationModel(session.getCategoryModel());
-		ProductSearchConfig config = new ProductSearchConfig();
-		config.setPublished(true);
-
-		productSegmentationService.prepareProductConfig(session.getCategoryModel(), config);
-		if(session.getSearchString().length()>0) {
-			config.setSearchString(session.getSearchString());
-		}
-		ServiceResponse<Product> response = productService.getProducts(config, currentPage > 0 ? currentPage - 1 : 0,
-				10);
-
-		if (response.isSucessful()) {
-			session.setProductPage(currentPage);
-			m.addAttribute("totalPages", response.getTotalPages());
-			m.addAttribute("searchInput", config.getSearchString());
-			session.setSearchString(config.getSearchString());
-			
-		} else {
-			m.addAttribute("errorMessages", response.getErrorMessages());
-			m.addAttribute("totalPages", 1);
-			session.setProductPage(1);
-		}
-
-		m.addAttribute("allProducts", response.getResponseObjects());
-		m.addAttribute("linkMap", getLinks());
-		m.addAttribute("sessionModel", session);
+		ProductSearchConfig config = prepareProductSearchConfigGet(session);
+		prepareDisplayProductsGet(session, m, currentPage, config);
 		return "displayProducts";
 	}
-
+	
 	@PostMapping(path = { "products" })
 	public String postProducts(@RequestParam("addToCart") Optional<Integer> productId,
 			@ModelAttribute("sessionModel") SessionModel session, Model m,
 			@RequestParam("searchInput") Optional<String> searchTerm,
 			@RequestParam("reset") Optional<String> reset) {
 			
-		if(reset.isPresent()) {
-			System.out.println(reset);
-			session.setSearchString("");
-		}
-		
-		productSegmentationService.prepareSegmentationModel(session.getCategoryModel());
-		ProductSearchConfig config = new ProductSearchConfig();
-		config.setPublished(true);
-		productSegmentationService.prepareProductConfig(session.getCategoryModel(), config);
-		
 		int currentPage = session.getProductPage();
-		if(searchTerm.isPresent())
-			config.setSearchString(searchTerm.get());
-		else
-			config.setSearchString("");
-		// TODO GÖR SHOPPINGCART SERVICE???
-		if (productId.isPresent())
-			session.getCart().addItem(productId.get());
+		ProductSearchConfig config = prepareProductSearchConfigPost(productId, session, searchTerm, reset);
 
 		ServiceResponse<Product> response = productService.getProducts(config, currentPage > 0 ? currentPage - 1 : 0,
 				10);
-		if (response.isSucessful()) {
-			m.addAttribute("totalPages", response.getTotalPages());
-			System.out.println("TP:"+response.getTotalPages());
-			m.addAttribute("searchInput", config.getSearchString());
-			session.setSearchString(config.getSearchString());
-
-		} else {
-			m.addAttribute("errorMessages", response.getErrorMessages());
-			m.addAttribute("totalPages", 1);
-		}
-
-		m.addAttribute("allProducts", response.getResponseObjects());
-		m.addAttribute("linkMap", getLinks());
+		prepareDisplayProductsPost(session, m, config, response);
 		return "displayProducts";
 	}
 
@@ -157,7 +90,6 @@ public class ProductController {
 			m.addAttribute("errorMessage", response.getErrorMessages());
 			return "/webshop/products";
 		}
-//		m.addAttribute("quantity", session.getCart().getProductMap())
 		return "displayProduct";
 	}
 
@@ -170,21 +102,13 @@ public class ProductController {
 	public String postChangeSpecificItemQuantity(Product product,
 			@RequestParam(name = "action") Optional<String> action, @PathVariable("id") Optional<Integer> productId,
 			@ModelAttribute("sessionModel") SessionModel session, Model m) {
-		System.out.println("Action:" + action);
-		if (action.isPresent()) {
-			System.out.println(product);
-			String stringAction = action.get();
-			if (stringAction.compareToIgnoreCase("add") == 0)
-				session.getCart().addItem(productId.get());
-			else if (stringAction.compareToIgnoreCase("remove") == 0)
-				session.getCart().removeItem(productId.get());
-		}
+		handleCartActions(action, productId, session);
 		m.addAttribute("currentProduct", product);
 		m.addAttribute("linkMap", getLinks());
 
 		return "displayProduct";
 	}
-
+	
 	@GetMapping("shoppingcart")
 	public String getShoppingCart(@ModelAttribute SessionModel sesionModel, Model m) {
 		System.out.println(sesionModel);
@@ -205,6 +129,94 @@ public class ProductController {
 
 		m.addAttribute("linkMap", getLinks());
 		return "displayShoppingCart";
+	}
+
+	// Utility Methods
+	private void handleCartActions(Optional<String> action, Optional<Integer> productId, SessionModel session) {
+		if (action.isPresent()) {
+			String stringAction = action.get();
+			switch(action.get().toLowerCase()) {
+			case "add":
+				session.getCart().addItem(productId.get());
+				break;
+			case "remove":
+				session.getCart().removeItem(productId.get());
+				break;
+			}
+		}
+	}
+	
+	private void prepareDisplayProductsPost(SessionModel session, Model m, ProductSearchConfig config,
+			ServiceResponse<Product> response) {
+		if (response.isSucessful()) {
+			m.addAttribute("totalPages", response.getTotalPages());
+			m.addAttribute("searchInput", config.getSearchString());
+			session.setSearchString(config.getSearchString());
+
+		} else {
+			m.addAttribute("errorMessages", response.getErrorMessages());
+			m.addAttribute("totalPages", 1);
+		}
+
+		m.addAttribute("allProducts", response.getResponseObjects());
+		m.addAttribute("linkMap", getLinks());
+	}
+
+	private ProductSearchConfig prepareProductSearchConfigPost(Optional<Integer> productId, SessionModel session,
+			Optional<String> searchTerm, Optional<String> reset) {
+		if(reset.isPresent()) {
+			session.setSearchString("");
+		}
+		
+		productSegmentationService.prepareSegmentationModel(session.getCategoryModel());
+		ProductSearchConfig config = new ProductSearchConfig();
+		config.setPublished(true);
+		productSegmentationService.prepareProductConfig(session.getCategoryModel(), config);
+		
+		if(searchTerm.isPresent())
+			config.setSearchString(searchTerm.get());
+		else
+			config.setSearchString("");
+		if (productId.isPresent())
+			session.getCart().addItem(productId.get());
+		return config;
+	}
+	private int getCurrentPage(int pageType, Optional<Integer> pathPage) {
+		return pathPage.isPresent() ? pathPage.get() : pageType;
+	}
+	
+	private void prepareDisplayProductsGet(SessionModel session, Model m, int currentPage,
+			ProductSearchConfig config) {
+		ServiceResponse<Product> response = productService.getProducts(config, currentPage > 0 ? currentPage - 1 : 0,
+				10);
+
+		if (response.isSucessful()) {
+			session.setProductPage(currentPage);
+			m.addAttribute("totalPages", response.getTotalPages());
+			m.addAttribute("searchInput", config.getSearchString());
+			session.setSearchString(config.getSearchString());
+			
+		} else {
+			m.addAttribute("errorMessages", response.getErrorMessages());
+			m.addAttribute("totalPages", 1);
+			session.setProductPage(1);
+		}
+
+		m.addAttribute("allProducts", response.getResponseObjects());
+		m.addAttribute("linkMap", getLinks());
+		m.addAttribute("sessionModel", session);
+	}
+
+	private ProductSearchConfig prepareProductSearchConfigGet(SessionModel session) {
+		productSegmentationService.prepareSegmentationModel(session.getCategoryModel());
+		ProductSearchConfig config = new ProductSearchConfig();
+		config.setPublished(true);
+
+		productSegmentationService.prepareProductConfig(session.getCategoryModel(), config);
+		if(session.getSearchString().length()>0) {
+			config.setSearchString(session.getSearchString());
+		}
+		return config;
 	}
 
 }
