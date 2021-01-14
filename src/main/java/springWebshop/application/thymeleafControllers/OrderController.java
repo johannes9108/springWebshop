@@ -36,128 +36,99 @@ public class OrderController {
 	OrderService orderService;
 	@Autowired
 	AccountService customerService;
+
 	@ModelAttribute("links")
 	private LinkedHashMap<String, String> getLinks() {
 		LinkedHashMap<String, String> linkMap = new LinkedHashMap<>();
-		linkMap.put("Products","/webshop/products");
-		linkMap.put("Shopping Cart","/webshop/shoppingcart");
+		linkMap.put("Products", "/webshop/products");
+		linkMap.put("Shopping Cart", "/webshop/shoppingcart");
 		return linkMap;
-		
+
 	}
-	
 
 	@GetMapping("checkout")
 	public String getCheckout(@ModelAttribute SessionModel sessionModel, Model m, Authentication authentication) {
 		m.addAttribute("linkMap", getLinks());
-		if(authentication!=null) {
-				long id = ((UserDetailsImpl)authentication.getPrincipal()).getId();
-				System.out.println("ID for checkout:" + id);
-				ServiceResponse<Customer> customerResponse = customerService.getCustomerById(id);
-//				System.out.println(customerResponse.getResponseObjects());
-//				System.out.println(customerResponse);
-				if(customerResponse.isSucessful()) {
-					System.out.println("THE CUSTOMER TO CHECKOUT:" + customerResponse.getResponseObjects().get(0));
-					m.addAttribute("customer", customerResponse.getResponseObjects().get(0));
-				}
-				else {
-					m.addAttribute("errorMessage", customerResponse.getErrorMessages());
-					m.addAttribute("customer", new Customer());
-				}
-				m.addAttribute("newAddress", new CustomerAddress());
-				
-				return "checkoutView";
+		if (authentication != null) {
+			return prepareCheckoutPage(m, authentication);
 		}
-			return "redirect:/webshop/products";
+		return "redirect:/webshop/products";
 	}
-	
-	@PostMapping("checkout")
-	public String postCheckout(@ModelAttribute SessionModel sessionModel, Model m,Authentication authentication,
-			@RequestParam("action")  Optional<String> action,
-			@RequestParam("actionValue") Optional<Integer> actionValue,
-			@Valid Optional<CustomerAddress> newAddress, BindingResult result) {
-		
-		System.out.println(action);
-		System.out.println(newAddress);
-		
-			
-		//TODO Validation, navigation
-	
-		//TODO Use ID from Authentication and lookup User
-//		System.out.println(sessionModel.getUser().getId());
-		
-		if(authentication!=null) {
-			if(action.isPresent()) {
-				long id = ((UserDetailsImpl)authentication.getPrincipal()).getId();
-				
-				switch(action.get()) {
-				
-				case "newAddress":
-					if(result.hasErrors()) {
-						System.out.println(result);
-						return "redirect:/webshop/checkout";
 
-					}
-					ServiceResponse<Customer> customerResponse =  customerService.getCustomerById(id);
-					if(customerResponse.isSucessful()) {
-						Customer c = customerResponse.getResponseObjects().get(0);
-						c.addAddress(newAddress.get());
-						ServiceResponse<Customer> res = customerService.updateCustomer(c);
-						System.out.println("RES:"+ res.getResponseObjects());
-						return "redirect:/webshop/checkout";
-					}
-					else {
-						m.addAttribute("errorMessage",ServiceErrorMessages.CUSTOMER.couldNotFind());
-						return "redirect:/webshop/login";
-					}
-					
-					
+	@PostMapping("checkout")
+	public String postCheckout(@ModelAttribute SessionModel sessionModel, Model m, Authentication authentication,
+			@RequestParam("action") Optional<String> action, @RequestParam("actionValue") Optional<Integer> actionValue,
+			@Valid Optional<CustomerAddress> newAddress, BindingResult result) {
+		if (authentication != null) {
+
+			if (action.isPresent()) {
+				long id = ((UserDetailsImpl) authentication.getPrincipal()).getId();
+
+				switch (action.get()) {
+
+				case "newAddress":
+					ServiceResponse<Customer> customerResponse;
+					return handleNewAddress(m, newAddress, result, id);
+
 				case "newOrder":
-					System.out.println(actionValue);
-					 customerResponse = customerService.getCustomerById(id);
-					if(customerResponse.isSucessful() && actionValue.isPresent()) {
-						Customer foundCustomer = customerResponse.getResponseObjects().get(0);
-						ServiceResponse<Order> response = orderService.createOrderFromShoppingCart(sessionModel.getCart(), id,
-								foundCustomer.getAddresses().get(actionValue.get()));
-						System.out.println(response);
-						
-						if(response.isSucessful()) {
-							m.addAttribute("completedOrder", response.getResponseObjects().get(0));
-							sessionModel.getCart().dispose();
-							return "orderCompletedView";
-						}
-						else {
-							m.addAttribute("errorMessage", response.getErrorMessages());
-						}
+					customerResponse = customerService.getCustomerById(id);
+					if (customerResponse.isSucessful() && actionValue.isPresent()) {
+						return handleNewOrder(sessionModel, m, actionValue, id, customerResponse);
 					}
-					
-					
 					break;
-				
-				
-				
-				
 				}
-				
-				
-				
-				
+
 			}
-			
-		
-			
-			
-			
+
 		}
 		return "redirect:/webshop/checkout";
-		
-		//Redirect to OrderCompleted or myaccount
 	}
-	@GetMapping("testOrderView")
-	public String getOrderCompleteView(Model m) {
-		
 
-		m.addAttribute("completedOrder",orderService.getOrderById(1L).getResponseObjects().get(0));
-		return "orderCompletedView";
+	private String handleNewOrder(SessionModel sessionModel, Model m, Optional<Integer> actionValue, long id,
+			ServiceResponse<Customer> customerResponse) {
+		Customer foundCustomer = customerResponse.getResponseObjects().get(0);
+		ServiceResponse<Order> response = orderService.createOrderFromShoppingCart(sessionModel.getCart(), id,
+				foundCustomer.getAddresses().get(actionValue.get()));
+
+		if (response.isSucessful()) {
+			m.addAttribute("completedOrder", response.getResponseObjects().get(0));
+			sessionModel.getCart().dispose();
+			return "orderCompletedView";
+		} else {
+			m.addAttribute("errorMessage", response.getErrorMessages());
+			return "redirect:/webshop/checkout";
+		}
+	}
+
+	private String handleNewAddress(Model m, Optional<CustomerAddress> newAddress, BindingResult result, long id) {
+		if (result.hasErrors()) {
+			return "redirect:/webshop/checkout";
+
+		}
+		ServiceResponse<Customer> customerResponse = customerService.getCustomerById(id);
+		if (customerResponse.isSucessful()) {
+			Customer c = customerResponse.getResponseObjects().get(0);
+			c.addAddress(newAddress.get());
+			ServiceResponse<Customer> res = customerService.updateCustomer(c);
+			return "redirect:/webshop/checkout";
+		} else {
+			m.addAttribute("errorMessage", ServiceErrorMessages.CUSTOMER.couldNotFind());
+			return "redirect:/webshop/login";
+		}
+	}
+	private String prepareCheckoutPage(Model m, Authentication authentication) {
+		long id = ((UserDetailsImpl) authentication.getPrincipal()).getId();
+		ServiceResponse<Customer> customerResponse = customerService.getCustomerById(id);
+		if (customerResponse.isSucessful()) {
+			System.out.println("THE CUSTOMER TO CHECKOUT:" + customerResponse.getResponseObjects().get(0));
+			m.addAttribute("customer", customerResponse.getResponseObjects().get(0));
+		} else {
+			m.addAttribute("errorMessage", customerResponse.getErrorMessages());
+			m.addAttribute("customer", new Customer());
+		}
+		m.addAttribute("newAddress", new CustomerAddress());
+
+		return "checkoutView";
 	}
 
 }
