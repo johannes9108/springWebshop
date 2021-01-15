@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Shopping Cart</title>
+    <link rel="stylesheet" th:href="@{/resources/css/base.css}">
+    <link rel="stylesheet" th:href="@{/resources/css/shoppingCart.css}">
+
+</head>
+
+<body th:with="cart=${session.sessionModel.cart}">
+    <div th:replace="fragments/header.html :: header(title='Shopping Cart',links=${linkMap})"></div>
+
+    <main th:object="${cart}">
+        <article class="shoppingCartWrapper">
+
+            <section class="cartContainer">
+                <div th:each="product : ${cart.productMap}" class="cartItem">
+                    <div class="itemInfo">
+                        <span th:text="${product.key.name}"></span>
+                        <span th:text="|Price per item: ${product.key.basePrice}|"></span>
+                        <span th:text="|Quantity: ${product.value}|"></span>
+                        <span th:text="|Cost: ${cart.getItemSum(product.key)}|"></span>
+                    </div>
+                    <div class="itemEdit">
+                        <form method="POST" th:action="@{/webshop/shoppingcart}">
+                            <input type="hidden" name="action" value="add" />
+                            <input type="hidden" name="id" th:value="${product.key.id}" />
+                            <input type="submit" value="Increase" />
+                        </form>
+                        <form method="POST" th:action="@{/webshop/shoppingcart}">
+
+                            <input type="hidden" name="id" th:value="${product.key.id}" />
+                            <input type="hidden" name="action" value="remove" />
+                            <input type="submit" value="Decrease" />
+                        </form>
+
+                    </div>
+
+                </div>
+            </section>
+            <section class="metaContainer">
+                <span th:text="|Total sum: *{getTotalSum()}|"></span>
+                <span th:text="|Total articles: *{getTotalItems()}|"></span>
+                <a href="/webshop/checkout">Go to Checkout</a>
+            </section>
+
+        </article>
+    </main>
+
+
+
+
+
+    <footer>
+        <a th:href="@{/webshop/products(page=${session.sessionModel.productPage})}">Back to Shopping</a>
+
+    </footer>
+
+
+</body>
+
+</html>

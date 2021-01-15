@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Single Order</title>
+    <link rel="stylesheet" th:href="@{/resources/css/base.css}">
+    <script th:src="@{/resources/js/jquery-3.5.1.min.js}"></script>
+
+
+
+    <style>
+        main {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+        }
+
+        .orderInfo {
+            padding: 1rem;
+            background-color: antiquewhite;
+
+        }
+
+        .orderInfo>span,
+        .orderLines>span {
+            font-weight: bold;
+            font-style: italic;
+            font-size: 1.2rem;
+            border-bottom: darkcyan 1px solid;
+        }
+
+        .orderLines {
+            background-color: azure;
+        }
+
+        .orderProperty {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .primitiveData,
+        .dates {
+            padding: 0.5rem;
+            display: grid;
+            grid-template-columns: auto auto;
+        }
+
+        .status {
+            color: green;
+        }
+
+        .dateNotSet {
+            color: red;
+        }
+
+        .orderLines {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .lineRow {
+            display: grid;
+            grid-template-columns: 1fr 2fr 2fr 1fr 1fr 2fr 2fr 2fr 1fr;
+            border-bottom: 1px darkcyan solid;
+            padding: 0.5rem;
+        }
+
+        .lineRow:nth-of-type(odd) {
+            background-color: beige;
+        }
+    </style>
+</head>
+
+
+<body th:object="${currentOrder}">
+    <div th:replace="fragments/header.html :: header(title=|Order __*{id}__|,links=${linkMap})"></div>
+    <main>
+        <section class="orderInfo">
+            <span>Basic Data</span>
+            <div class="primitiveData">
+                <div class="orderProperty">
+                    <label>Number of Items</label>
+                    <span>1</span>
+                </div>
+                <div class="orderProperty">
+                    <label>Total Sum</label>
+                    <span>1</span>
+                </div>
+                <div class="orderProperty">
+                    <label>Total Discount</label>
+                    <span>1</span>
+                </div>
+                <div class="orderProperty">
+                    <label>Total Payable</label>
+                    <span>1</span>
+                </div>
+                <div class="orderProperty">
+                    <label>Currency</label>
+                    <span>1</span>
+                </div>
+
+            </div>
+            <span>Dates</span>
+            <!-- <p th:text="${}"></p> -->
+            <div class="dates">
+                <div class="orderProperty">
+                    <label th:class="*{created != null?'status':'dateNotSet'}">Created</label>
+                    <span th:text="*{created}">N</span>
+                </div>
+                <div class="orderProperty">
+                    <label th:class="*{dispatched != null?'status':'dateNotSet'}">Dispatched</label>
+                    <span th:text="*{dispatched}">Not Dispatched</span>
+                    <form th:unless="*{dispatched}" th:action="@{${#request.getRequestURL()}}" method="POST">
+                        <input type="submit" value="Dispatch">
+                    </form>
+                </div>
+                <div class="orderProperty">
+                    <label th:class="*{inDelivery != null?'status':'dateNotSet'}">In Delivery</label>
+                    <span th:if="*{inDelivery}" th:text="*{inDelivery}">Not yet in delivery</span>
+
+                </div>
+                <div class="orderProperty">
+                    <label th:class="*{deliveryComplete != null?'status':'dateNotSet'}">Delivery Complete</label>
+                    <span th:text="*{deliveryComplete}">Currently in delivery</span>
+                </div>
+
+            </div>
+        </section>
+        <section class="orderLines">
+            <span>OrderLines</span>
+            <div class="lineContainer">
+                <div class="lineRow">
+                    <label>Id</label>
+                    <label>Product Id</label>
+                    <label>Quantity</label>
+                    <label>Sum</label>
+                    <label>Vat Sum</label>
+                    <label>Vat Percentage</label>
+                    <label>Discount</label>
+                    <label>Sum Payable</label>
+                    <label>Currency</label>
+                </div>
+
+                <div th:each="line : *{orderLines}" class="lineRow">
+                    <span th:text="${line.id}">1</span>
+                    <span th:text="${line.productId}">1</span>
+                    <span th:text="${line.itemQuantity}">1</span>
+                    <span th:text="${line.sum}">1</span>
+                    <span th:text="${line.vatSum}">1</span>
+                    <span th:text="${line.vatPercentage}">1</span>
+                    <span th:text="${line.discount}">1</span>
+                    <span th:text="${line.sumPayable}">1</span>
+                    <span th:text="${line.currency}">1</span>
+                </div>
+
+
+
+            </div>
+
+        </section>
+
+    </main>
+    <footer>
+        <a th:href="@{/webshop/admin/orders(page=${session.sessionModel.orderPage},return=true)}">Back</a>
+
+    </footer>
+</body>
+
+</html>

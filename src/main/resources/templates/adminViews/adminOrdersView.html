@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Only for Admins</title>
+    <link rel="stylesheet" th:href="@{/resources/css/base.css}">
+
+    <style>
+        main {
+            display: grid;
+            grid-template-columns: 4fr 2fr;
+
+        }
+
+
+
+        .segmentation {
+            /* background-color: greenyellow; */
+            display: grid;
+            grid-template-rows: 4fr 1fr;
+
+        }
+
+        .segmentContainer {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+
+        }
+
+        .segmentationRow {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            /* background-color: royalblue; */
+            /* border: 1px solid seagreen; */
+            margin: 1rem;
+            padding: 0 2rem;
+        }
+
+        .segmentationRow>* {
+            width: 100%;
+        }
+
+        .category {
+            margin: 1rem;
+            /* background-color: skyblue; */
+        }
+
+        .subCategory {
+            margin: 1rem;
+
+            /* background-color: rebeccapurple; */
+        }
+
+        .type {
+            margin: 1rem;
+            /* background-color: black; */
+        }
+
+
+        .order {
+            /* background-color: red; */
+            display: grid;
+            grid-template-rows: 4fr 1fr;
+            overflow: hidden;
+
+        }
+
+        .orderTable {
+            margin: 0.5rem 0;
+
+            display: flex;
+            flex-direction: column;
+            overflow: auto;
+        }
+
+        .orderMeta {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* justify-content: space-around; */
+        }
+
+        .rowContainer {
+            display: grid;
+            grid-template-columns: 90% minmax(auto, 10%);
+            background-color: azure;
+            /* padding: 0 0.5rem; */
+        }
+
+        .dataRow {
+            display: grid;
+            grid-template-columns: 0.5fr 1fr 1fr 2fr 2fr 2fr;
+
+            /* overflow: hidden; */
+        }
+
+        .rowContainer span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+
+        .rowContainer>input {
+            margin: 0 auto 0 0;
+
+        }
+
+
+
+        .rowContainer:nth-of-type(odd) {
+            background-color: antiquewhite;
+        }
+
+        /* .headerRow {
+            font-size: 1.2rem;
+            border-bottom: 0.1rem solid darkcyan;
+            font-style: italic;
+        } */
+    </style>
+    <script type="text/javascript" th:src="@{/resources/js/jquery-3.5.1.min.js}"></script>
+    <script th:inline="javascript">
+
+        function findAllCheckedOrders() {
+            let array = [];
+            $(".rowContainer input[id]").each(function () {
+                if ($(this).prop("checked"))
+                    array.push($(this).prop("id"))
+                // array.push($(this).val());
+            });
+            return array;
+        }
+        function findAllUnCheckedOrders() {
+            let array = [];
+            $(".rowContainer input[id]").each(function () {
+                if ($(this).prop("checked") == false)
+                    array.push($(this).prop("id"))
+                // array.push($(this).val());
+            });
+            return array;
+        }
+        $(document).ready(function () {
+            let session = /*[[${session}]]*/;
+            let orderStatus = /*[[${selectedStatus}]]*/;
+            $('#orderFilter').val(orderStatus);
+
+
+            $('.orderTable a').each(function (e, element) {
+                let currentAnchor = $(this);
+                currentAnchor.on('click', function (event) {
+                    console.log(currentAnchor);
+                    // setTimeout(function () {
+                    //     console.log("Waiting...")
+
+                    //     if (event.target.tagName == 'INPUT') {
+
+                    //     } else {
+                    //         window.location = currentAnchor.href;
+                    //     }
+                    // }, 3000);
+
+                });
+            });
+
+            $('#orderFilter').on('change', function () {
+                $('<input />').attr("type", "hidden")
+                    .attr("name", "action")
+                    .attr("value", "filter").appendTo(document.forms['filter']);
+                $('<input />').attr("type", "hidden")
+                    .attr("name", "actionValue")
+                    .attr("value", this.value).appendTo(document.forms['filter']);
+
+                document.forms['filter'].submit();
+            });
+            $('#expediteOrders').click(function () {
+                $('<input />').attr("type", "hidden")
+                    .attr("name", "action")
+                    .attr("value", "approve").appendTo(document.forms['expediteOrders']);
+                listOfCheckOrders = findAllCheckedOrders();
+
+
+                console.log(listOfCheckOrders);
+
+                $('<input />').attr("type", "hidden")
+                    .attr("name", "expeditedList")
+                    .attr("value", listOfCheckOrders).appendTo(document.forms['expediteOrders']);
+
+                // document.forms['expediteOrders'].submit();
+            });
+            $('#unoReverse').click(function () {
+
+                $('<input />').attr("type", "hidden")
+                    .attr("name", "action")
+                    .attr("value", "disapprove").appendTo(document.forms['expediteOrders']);
+                listOfUnCheckOrders = findAllUnCheckedOrders();
+
+
+                console.log(listOfUnCheckOrders);
+
+                $('<input />').attr("type", "hidden")
+                    .attr("name", "expeditedList")
+                    .attr("value", listOfUnCheckOrders).appendTo(document.forms['expediteOrders']);
+
+                // document.forms['expediteOrders'].submit();
+            });
+
+        });
+    </script>
+</head>
+
+<body th:with="currentPage=(${sessionModel.orderPage})">
+    <!-- <h1 th:text="|${currentPage} ${totalPages}|"></h1> -->
+    <div th:replace="fragments/header.html :: header(title=Admin,links=${links})"></div>
+    <main>
+        <section class="order">
+            <div class="orderTable">
+                <div class="rowContainer headerRow">
+
+                    <div class="dataRow ">
+                        <span>ID</span>
+                        <span>Items</span>
+                        <span>Sum</span>
+                        <span>Vat Sum</span>
+                        <span>Discount</span>
+                        <span>Payable</span>
+                    </div>
+                    <span th:if="${#strings.equalsIgnoreCase(__selectedStatus__, 'ALL') }">Status</span>
+                    <span
+                        th:if="${#strings.equalsIgnoreCase(__selectedStatus__, 'NOT_HANDLED') || #strings.equalsIgnoreCase(__selectedStatus__, 'DISPATCHED') }">Expedited</span>
+                </div>
+                <div class="rowContainer" th:each="order : ${allOrders}">
+
+                    <a th:href="@{/webshop/admin/orders/__${order.id}__}" class="dataRow">
+                        <span th:text="${order.id}">Empty</span>
+                        <span th:text="${order.totalNumberOfItem}">Empty</span>
+                        <span th:text="${order.totalSum}">Empty</span>
+                        <span th:text="${order.totalVatSum}">Empty</span>
+                        <span th:text="${order.totalDiscount}">Empty</span>
+                        <span th:text="${order.totalPayable}">Empty</span>
+                    </a>
+                    <span th:if="${#strings.equalsIgnoreCase(__selectedStatus__, 'ALL') }"
+                        th:text="${order.getOrderStatus()}"></span>
+                    <input
+                        th:if="${#strings.equalsIgnoreCase(__selectedStatus__, 'NOT_HANDLED') || #strings.equalsIgnoreCase(__selectedStatus__, 'DISPATCHED')  }"
+                        th:checked="${#strings.equalsIgnoreCase(__selectedStatus__, 'DISPATCHED')}" type="checkbox"
+                        th:id="${order.id}" />
+                </div>
+
+
+
+
+            </div>
+
+        </section>
+        <section class="segmentation" th:object="${sessionModel.categoryModel}">
+            <!-- <p th:each="orderStatus : ${orderStatuses}" th:text="${orderStatus}"></p> -->
+            <div class="segmentationContainer" th:object="${sessionModel.categoryModel}">
+                <!-- <p th:text="*{categories}"></p>
+                            <p th:text="*{subCategories}"></p>
+                            <p th:text="*{types}"></p> -->
+                <!-- <p th:text="*{selectedCat}"></p> -->
+                <form name="filter" class="segmentationRow" method="POST" th:action="@{/webshop/admin/orders/}">
+                    <label for="orderStatus">Order Status</label>
+                    <select id="orderFilter" name="orderStatus" th:field="${selectedStatus}">
+                        <option value="All">All</option>
+                        <option th:each="orderStatus : ${orderStatuses}" th:text="${orderStatus}"
+                            th:value="${orderStatus}"></option>
+                    </select>
+
+                </form>
+                <form name="expediteOrders" class="segmentationRow"
+                    th:if="${#strings.equalsIgnoreCase(__selectedStatus__, 'NOT_HANDLED') || #strings.equalsIgnoreCase(__selectedStatus__, 'DISPATCHED')  }"
+                    th:action="@{/webshop/admin/orders}" method="POST">
+                    <input th:if="${#strings.equalsIgnoreCase(__selectedStatus__, 'NOT_HANDLED')}" id="expediteOrders"
+                        type="submit" value="Expedite Selected Orders" />
+                    <input disabled th:if="${#strings.equalsIgnoreCase(__selectedStatus__, 'DISPATCHED')}" id="unoReverse"
+                        type="submit" value="Reverse Orders" />
+                </form>
+                <!-- <div class="segmentationRow">123</div>
+                <div class="segmentationRow">432</div>
+                <div class="segmentationRow">12312</div> -->
+
+
+
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+    <footer>
+        <div class="pages">
+            <a th:if="${currentPage > 1}"
+                th:href="@{/webshop/admin/orders(page=__${currentPage-1>0?currentPage-1:''}__)}">Back</a>
+            <a th:if="${currentPage<totalPages}"
+                th:href="@{/webshop/admin/orders(page=__${currentPage<2?2:currentPage+1}__)}">Next</a>
+        </div>
+    </footer>
+</body>
+
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Single Product</title>
+    <link rel="stylesheet" th:href="@{/resources/css/base.css}">
+    <style>
+        .actionButtons {
+            display: flex;
+        }
+
+        .metaData {
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+
+            display: grid;
+            grid-template-columns: 30% 70%;
+            grid-template-rows: 100%;
+        }
+
+        .itemFields {
+            padding: 1rem;
+        }
+
+        .imgContainer {
+            display: flex;
+            justify-content: center;
+            padding: 1rem;
+
+        }
+
+        .imgContainer>img {
+            max-width: 100%;
+            object-fit: contain;
+            object-position: top;
+            /* width: 300px; */
+            /* object-fit: cover; */
+        }
+
+        .dataContainer {
+            display: flex;
+            flex-direction: column;
+
+        }
+    </style>
+</head>
+
+<body th:with="cart=${session.sessionModel.cart}">
+    <!-- <p th:text="$"></p> -->
+    <div th:replace="fragments/header.html :: header(title=${currentProduct.name},links=${linkMap})"></div>
+
+    <main th:object="${currentProduct}">
+        <div class="dataContainer">
+            <section class="itemFields">
+                <fieldset>
+                    <legend>Product Information</legend>
+                    <label><strong>Name:</strong> <span th:text="*{name}">Empty</span></label>
+                    <label><strong>Description:</strong> <textarea th:text="*{description}">Empty</textarea></label>
+                    <label><strong>Price:</strong> <span th:text="*{basePrice}">Empty</span></label>
+                    <label><strong>Available:</strong> <span th:text="*{published}">Empty</span></label>
+                    <label><strong>Vat:</strong> <span th:text="*{vatPercentage}">Empty</span></label>
+
+                    <fieldset>
+                        <legend>Cart</legend>
+
+                        <section class="shoppingCartActions">
+
+                            <div class="actionButtons">
+
+                                <form th:action="@{/webshop/products/product/__${currentProduct.id}__}" method="POST">
+                                    <input type="hidden" th:field="*{name}" />
+                                    <input type="hidden" th:field="*{id}" />
+                                    <input type="hidden" th:field="*{basePrice}" />
+                                    <input type="hidden" th:field="*{description}" />
+                                    <input type="hidden" th:field="*{fullImageUrl}" />
+                                    <input type="hidden" th:field="*{thumbnailUrl}" />
+                                    <input type="hidden" name="action" value="add">
+                                    <input type="submit" value="Add to cart" />
+                                </form>
+                                <form th:if="${cart.getCartQuantityByProductId(__*{id}__)>0}"
+                                    th:action="@{/webshop/products/product/__*{id}__}" method="POST">
+                                    <input type="hidden" th:field="*{name}" />
+                                    <input type="hidden" th:field="*{id}" />
+                                    <input type="hidden" th:field="*{basePrice}" />
+                                    <input type="hidden" th:field="*{description}" />
+                                    <input type="hidden" th:field="*{fullImageUrl}" />
+                                    <input type="hidden" th:field="*{thumbnailUrl}" />
+                                    <input type="hidden" name="action" value="remove">
+                                    <input type="submit" value="Remove from cart" />
+                                </form>
+                            </div>
+
+                            <div class="metaData">
+                                <span
+                                    th:text="|Currently in cart: ${cart.getCartQuantityByProductId(__*{id}__)}|"></span>
+                                <span th:text="|Cart totalsum: ${cart.getTotalSum()}|"></span>
+
+                            </div>
+                        </section>
+                    </fieldset>
+                </fieldset>
+            </section>
+
+        </div>
+
+        <section class="imgContainer">
+            <img th:src="@{|/resources*{fullImageUrl}|}" alt="">
+        </section>
+
+
+
+    </main>
+
+
+    <!-- <p th:if="${test}" th:text="${test}">sadasd</p>
+            <p th:unless="${test}">Empty</p> -->
+    <footer>
+        <a th:href="@{/webshop/products(page=${session.sessionModel.productPage})}">Back</a>
+
+
+    </footer>
+</body>
+
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Congratulations to your order!</title>
+    <link rel="stylesheet" th:href="@{/resources/css/base.css}">
+    <style>
+        main {
+
+            display: grid;
+            grid-template-columns: auto;
+            grid-template-rows: 10fr 1fr;
+        }
+
+        .orderInfo {
+            display: grid;
+            grid-template-columns: 50% 50%;
+            overflow: hidden;
+        }
+
+        .metadata {
+            display: flex;
+            flex-flow: column;
+        }
+
+        .orderRow>label {
+            font-style: italic;
+            font-weight: 700;
+        }
+
+        .vatPercentages {
+            display: flex;
+            flex-flow: column;
+        }
+
+        .fixedScroll {
+            top: 0;
+            position: sticky;
+        }
+
+        .orderLines {
+            background-color: antiquewhite;
+            overflow: auto;
+        }
+
+        .orderLine:nth-of-type(1) {
+            font-style: italic;
+        }
+
+        .orderLine {
+            display: grid;
+            background-color: aliceblue;
+            border-bottom: 0.05rem solid darkcyan;
+            grid-template-columns: 2fr 2fr 1fr 1fr 2fr 1fr 2fr;
+        }
+
+        .orderLine:nth-of-type(odd) {
+            background-color: beige;
+
+        }
+
+        .orderLine>span {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            display: block;
+            overflow: hidden;
+        }
+
+        .actionLinks {
+            display: flex;
+            justify-content: space-around;
+        }
+    </style>
+</head>
+
+<body th:with="completedOrder=${completedOrder}">
+    <div th:replace="fragments/header.html :: header(title=('Order __${completedOrder.id}__'),links=${linkMap})"></div>
+    <!-- <p th:text="${completedOrder}"></p> -->
+    <main th:object="${completedOrder}">
+        <section class="orderInfo">
+            <div class="metadata">
+                <div class="orderRow">
+                    <label for="">Total Number of Items</label>
+                    <span th:text="*{TotalNumberOfItem}"></span>
+
+                </div>
+                <div class="orderRow">
+
+                    <label for="">Total Sum</label>
+                    <span th:text="*{totalSum}"></span>
+                </div>
+
+                <div class="orderRow">
+
+                    <label for="">Total Vat Sum</label>
+                    <span th:text="*{totalVatSum}"></span>
+                </div>
+
+                <div class="orderRow">
+
+                    <label for="">Vat Percentages</label>
+                    <div class="vatPercentages">
+                        <span th:each="vatPercentage: *{vatPercentages}" th:text="${vatPercentage}"></span>
+                    </div>
+                </div>
+
+                <div class="orderRow">
+
+                    <label for="">Total Discount</label>
+                    <span th:text="*{totalDiscount}"></span>
+                </div>
+
+                <div class="orderRow">
+
+                    <label for="">Total Payable</label>
+                    <span th:text="*{totalPayable}"></span>
+                </div>
+
+            </div>
+            <div class="orderLines">
+                <div class="orderLine fixedScroll">
+                    <label for="">Product Id</label>
+                    <label for="">Item Quantity</label>
+                    <label for="">Sum</label>
+                    <label for="">Vat Sum</label>
+                    <label for="">Vat Percentage</label>
+                    <label for="">Discount</label>
+                    <label for="">Sum Payable</label>
+                </div>
+                <div th:each="order : *{orderLines}" class="orderLine">
+                    <span th:text="${order.productId}"></span>
+                    <span th:text="${order.itemQuantity}"></span>
+                    <span th:text="${order.sum}"></span>
+                    <span th:text="${order.vatSum}"></span>
+                    <span th:text="${order.vatPercentage}"></span>
+                    <span th:text="${order.discount}"></span>
+                    <span th:text="${order.sumPayable}"></span>
+
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="actionLinks">
+            <a th:href="@{/webshop/products}">Back to Browsing</a>
+            <!-- <a th:href="@{/webshop/products}">Go to My Account</a> -->
+        </div>
+    </footer>
+</body>
+
+</html>

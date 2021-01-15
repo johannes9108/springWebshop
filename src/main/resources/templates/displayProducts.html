@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="ISO-8859-1">
+    <title>Products Page</title>
+    <link rel="stylesheet" th:href="@{/resources/css/base.css}">
+    <script type="text/javascript" th:src="@{/resources/js/jquery-3.5.1.min.js}"></script>
+
+    <script type="text/javascript" th:inline="javascript">
+        function selectedCategory() {
+            var container = document.getElementById("categoryParent")
+            console.log(container)
+            var select = document.querySelector('#sel');
+            console.log(select.value)
+            var subCategory = document.createElement("select")
+
+
+        }
+        function reset(element) {
+            element.val('0');
+        }
+
+        $(document).ready(function () {
+            console.log("Test")
+            let categoriesObject = /*[[${sessionModel.categoryModel}]]*/;
+            let session = /*[[${session}]]*/;
+            console.log(session)
+
+
+            if (categoriesObject.selectedCat > 0) {
+                $('#sub').attr("disabled", false);
+            }
+            if (categoriesObject.selectedSub > 0) {
+                $('#type').attr("disabled", false);
+            }
+            $('#cat').on('change', function () {
+                reset($('#sub'));
+                reset($('#type'));
+                let selectedVal = this.value;
+                console.log(selectedVal)
+                $('<input />').attr('type', 'hidden')
+                    .attr('name', "reset")
+                    .attr('value', 'true').appendTo(document.forms['filter']);
+                document.forms['filter'].submit();
+            });
+            $('#sub').on('change', function () {
+                reset($('#type'));
+                let selectedVal = this.value;
+                console.log(selectedVal)
+                $('<input />').attr('type', 'hidden')
+                    .attr('name', "reset")
+                    .attr('value', 'true').appendTo(document.forms['filter']);
+                document.forms['filter'].submit();
+            });
+            $('#type').on('change', function () {
+                let selectedVal = this.value;
+                console.log(selectedVal)
+                $('<input />').attr('type', 'hidden')
+                    .attr('name', "reset")
+                    .attr('value', 'true').appendTo(document.forms['filter']);
+                document.forms['filter'].submit();
+            });
+
+        });
+    </script>
+    <style>
+        .search {
+            display: flex;
+        }
+
+        .search :nth-child(1) {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .search :nth-child(1) :nth-child(1) {
+            margin: 0 1rem;
+        }
+    </style>
+</head>
+
+
+<body th:with="currentPage=(${sessionModel.productPage})">
+    <!-- <p th:text="|CP:${currentPage},TP:${totalPages}|"></p>
+    <button type="button" th:onclick="showAlert()">Show Alert</button> -->
+
+    <div th:replace="fragments/header.html :: header(title=Browsing...,links=${links})"></div>
+
+    <main>
+        <!-- <p th:text="${sessionModel.categoryModel}"></p> -->
+        <div class="productsWrapper">
+
+            <div class="filterOptions" id="categoryParent">
+                <form name="filter" th:action="@{/webshop/products}" method="POST"
+                    th:object="${sessionModel.categoryModel}">
+                    <select id="cat" th:field="*{selectedCat}">
+                        <option th:text="All" th:value="0">Categories</option>
+
+                        <option th:each="category : *{categories}" th:text="${category.name}" th:value="${category.id}">
+                        </option>
+                        Categories</option>
+                    </select>
+
+                    <select id="sub" disabled th:field="*{selectedSub}">
+                        <option th:text="All" th:value="0">Subcategories</option>
+                        <option th:each="subCategory : *{subCategories}" th:text="${subCategory.name}"
+                            th:value="${subCategory.id}">Subcategories</option>
+                    </select>
+                    <select id="type" disabled th:field="*{selectedType}">
+                        <option th:text="All" th:value="0">Types</option>
+                        <option th:each="type : *{types}" th:text="${type.name}" th:value="${type.id}"></option>
+                        Types</option>
+                    </select>
+                </form>
+                <div class="search">
+                    <form method="POST" th:action="@{/webshop/products}">
+                        <input type="text" name="searchInput" th:value="${searchInput}" placeholder="Search for name">
+                        <input type="submit" id="search" value="Search">
+                    </form>
+                    <form method="POST" th:action="@{/webshop/products}">
+                        <input type="hidden" name="reset" value="true" />
+                        <input type="submit" id="reset" value="Reset">
+                    </form>
+                </div>
+
+            </div>
+            <div class="productContainer">
+                <p th:if="${allProducts.size() == 0}">
+                    Sorry products found in this category
+                </p>
+                <div th:each="product : ${allProducts}" class="productItem">
+                    <a th:href="@{__${#request.getRequestURL()}__/product/__${product.id}__}">
+                        <img class="thumbnail" th:src="@{|/resources${product.thumbnailUrl}|}" />
+                    </a>
+                    <div class="productText">
+                        <span th:text="${product.name}">test</span>
+                        <!-- <span th:text="${product.productType}"></span> -->
+                        <!-- <span th:text="${product.productType.toString()}"></span> -->
+                        <form method="POST" th:action="@{/webshop/products}">
+                            <input type="hidden" name="addToCart" th:value="${product.id}" />
+                            <input type="submit" value="Add to cart" />
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+    </main>
+    <!-- Save this for admin UI -->
+    <!-- <section th:object="${newProduct}">
+
+            <form class="formLayout" method="POST" th:action="@{/webshop/products}">
+                <label>Name</label>
+                <input th:field="*{name}" type="text" />
+
+                <label>Price</label>
+                <input th:field="*{basePrice}" type="text" />
+
+                <label>Description</label>
+                <textarea th:field="*{description}"></textarea>
+                <input type="submit" value="Create!" />
+            </form>
+        </section> -->
+
+
+    <footer>
+        <!-- <p th:text="${session.sessionModel.productPage}"></p> -->
+        <!-- <h1 th:text="${currentPage}">Welcome to all products page</h1> -->
+        <a th:if="${currentPage > 1}"
+            th:href="@{/webshop/products(page=__${currentPage-1>0?currentPage-1:''}__)}">Back</a>
+        <a th:if="${currentPage<totalPages}"
+            th:href="@{/webshop/products(page=__${currentPage<2?2:currentPage+1}__)}">Next</a>
+
+    </footer>
+
+</body>
+
+</html>

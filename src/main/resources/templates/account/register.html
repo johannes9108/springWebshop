@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Register</title>
+    <link rel="stylesheet" th:href="@{/resources/css/base.css}">
+    <script type="text/javascript" th:src="@{/resources/js/jquery-3.5.1.min.js}"></script>
+
+    <style>
+        main {
+            padding: 1rem;
+        }
+    </style>
+    <script th:inline="javascript">
+        $(document).ready(() => {
+
+            var password = document.getElementById("password")
+                , confirm_password = document.getElementById("repeatPassword");
+
+            function validatePassword() {
+                console.log("Validerar")
+                if (password.value != confirm_password.value) {
+                    confirm_password.setCustomValidity("Passwords Don't Match");
+                } else {
+                    confirm_password.setCustomValidity('');
+                }
+            }
+
+            password.onchange = validatePassword;
+            confirm_password.onkeyup = validatePassword;
+
+            let emailComp = document.getElementById("email");
+            function validateEmail() {
+
+                let regEx = /^\D(\.?\w+)*@\w+\.(\w+\.)*\w+$/;
+                let result = regEx.test(emailComp.value);
+                console.log("Validerar Email:" + result + ":" + emailComp.value.length);
+                if (!result) {
+                    emailComp.setCustomValidity("Wrong Email format")
+                }
+                else {
+                    emailComp.setCustomValidity('');
+                }
+
+            }
+
+            emailComp.onblur = validateEmail;
+
+        })
+
+    </script>
+</head>
+
+<body>
+    <div th:replace="fragments/header.html :: header(title='Register',links=${links})"></div>
+    <main>
+
+        <form th:action="@{/webshop/register}" method="POST">
+
+            <div class="row">
+                <label for="">First Name</label>
+
+                <input name="firstName" type="text" placeholder="firstName" required="true" autofocus="true" />
+
+            </div>
+            <div class="row">
+                <label for="">Last Name</label>
+
+                <input name="lastName" type="text" placeholder="lastName" required="true" />
+            </div>
+
+            <div class="row">
+                <label for="">Password</label>
+                <input id="password" name="password" type="password" placeholder="Password" required="true" />
+            </div>
+            <div class="row">
+                <label for="">Repeat Password</label>
+                <input id="repeatPassword" name="repeatPassword" type="password" placeholder="Password"
+                    required="true" />
+            </div>
+            <div class="row">
+                <label for="">Email</label>
+
+                <input id="email" name="email" type="text" placeholder="Email" required="true" />
+            </div>
+            <div class="row">
+                <label for="">Phonenumber</label>
+
+                <input name="Phonenumber" type="text" placeholder="Phonenumber" />
+            </div>
+            <div class="row">
+                <label for="">Mobile</label>
+
+                <input name="Mobile" type="text" placeholder="Mobile" />
+            </div>
+            <div class="row">
+
+                <input name="Submit" type="Submit" value="Register" />
+            </div>
+
+
+        </form>
+
+
+
+
+
+
+    </main>
+    <footer></footer>
+</body>
+
+</html>

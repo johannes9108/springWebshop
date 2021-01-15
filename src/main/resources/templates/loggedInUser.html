@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="https://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta charset="UTF-8">
+    <title>LoggedInUser</title>
+</head>
+<body>
+    <div sec:authorize="isAuthenticated()">
+        <h3>Authenticated as</h3>
+        <p>Account ID: <span sec:authentication="principal.id"></span></p>
+        <p>First name: <span sec:authentication="principal.firstName"></span></p>
+        <p>Last name: <span sec:authentication="principal.LastName"></span></p>
+        <p>Role: <span sec:authentication="principal.authorities"></span></p>
+        <p>Email: <span sec:authentication="principal.email"></span></p>
+    </div>
+    <div sec:authorize="!isAuthenticated()">
+        <h3>You are not logged in!</h3>
+    </div>
+</body>
+</html>

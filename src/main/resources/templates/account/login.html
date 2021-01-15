@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Login</title>
+    <link rel="stylesheet" th:href="@{/resources/css/base.css}">
+    <style>
+        main {
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: 30%;
+        }
+
+        .buttons {
+            display: flex;
+        }
+    </style>
+</head>
+
+<body>
+    <div th:replace="fragments/header.html :: header(title='Login',links=${links})"></div>
+    <main>
+        <form method="POST" th:action="@{/webshop/login}">
+            <p th:if="${param.error}">Invalid credentials</p>
+            <fieldset>
+                <legend>Login</legend>
+                <label><strong>Email: </strong>
+                    <input name="username" type="text" placeholder="Email" required="true" />
+
+                </label>
+                <label for=""><strong>Password:</strong> <input name="password" type="password" placeholder="Password"
+                        required="true" />
+                </label>
+                <div class="buttons">
+                    <input type="submit" value="Log in" />
+                    <a class="anchorButton" th:href="@{/webshop/register}">Register</a>
+
+                </div>
+            </fieldset>
+
+
+
+        </form>
+
+
+
+    </main>
+    <footer></footer>
+</body>
+
+</html>

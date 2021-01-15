@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<style type="text/css">
+		.formLayout {
+			display: grid;
+			/* grid-auto-rows: auto;
+			grid-auto-columns: 30%; */
+		}
+
+		.containerLayout {
+			display: flex;
+			height: 100vh;
+			width: 40vw;
+			background-color: beige;
+
+		}
+	</style>
+	<link rel="stylesheet" th:href="@{/resources/css/base.css}">
+
+	<meta charset="ISO-8859-1">
+	<title>Create a new Product here!</title>
+</head>
+
+<body>
+	<h2>Create your new product</h2>
+	<article class="containerLayout" th:object="${newProduct}">
+		<section>
+
+			<form class="formLayout" method="POST" th:action="@{/webshop/}">
+				<label>Name</label>
+				<input th:field="*{domainProduct.name}" type="text" />
+
+				<label>Price</label>
+				<input th:field="*{domainProduct.basePrice}" type="number" />
+
+				<label>Description</label>
+				<textarea th:field="*{domainProduct.description}"></textarea>
+				<input type="submit" value="Create!" />
+			</form>
+		</section>
+		<section>
+
+			<form class="formLayout" method="POST" th:action="@{/webshop/type/newType}">
+				<select>
+					<optgroup label="Types">
+						<th:block th:each="type : ${types}">
+							<option th:text="${type.name}">Furniture</option>
+						</th:block>
+					</optgroup>
+				</select>
+				<input th:field="*{newType}" type="text" placeholder="Your own type" />
+				<input type="submit" value="Create new type!" />
+
+			</form>
+
+			<form class="formLayout" method="POST" th:action="@{/webshop/category/newCategory}">
+				<select>
+					<optgroup label="Categories">
+						<th:block th:each="category : ${categories}">
+							<option th:text="${category.name}">Couches</option>
+						</th:block>
+					</optgroup>
+				</select>
+				<p th:text="${newCategory}">Insert Category</p>
+				<input th:field="*{newCategory}" type="text" placeholder="Your own category" />
+
+				<input type="submit" value="Create new category!" />
+
+			</form>
+
+		</section>
+		<section>
+			<button onclick="init()">Click me</button>
+
+		</section>
+	</article>
+
+
+	<script type="text/javascript" th:src="@{/js/adminProduct.js}"></script>
+</body>
+
+</html>

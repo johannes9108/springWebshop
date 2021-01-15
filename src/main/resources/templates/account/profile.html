@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Logged IN</title>
+    <link rel="stylesheet" th:href="@{/resources/css/base.css}">
+    <style>
+        main {
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+        }
+
+        .orderRow {
+            border-radius: 3px;
+            padding: 0 0.5rem;
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            background-color: azure;
+        }
+
+        .orderRow>span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .orderRow:nth-child(odd) {
+            background-color: bisque;
+        }
+    </style>
+</head>
+
+<body>
+    <div th:replace="fragments/header.html :: header(title='My Account',links=${links})"></div>
+    <main>
+        <fieldset th:object="${customer}">
+            <legend>Profile Information</legend>
+            <label for=""><strong>First Name</strong><span th:text="*{firstName}">-</span></label>
+            <label for=""><strong>Last Name</strong><span th:text="*{lastName}">-</span></label>
+            <label for=""><strong>Email</strong><span th:text="*{email}">-</span></label>
+            <label for=""><strong>Username</strong><span th:text="*{username}">-</span></label>
+            <label for=""><strong>Phone Number</strong><span th:text="*{phoneNumber}">-</span></label>
+            <label for=""><strong>Mobile Number</strong><span th:text="*{mobileNumber}">-</span></label>
+        </fieldset>
+        <fieldset>
+            <legend>Order History</legend>
+            <div class="orderRow">
+                <span>ID</span>
+                <span>Items</span>
+                <span>Sum</span>
+                <span>Vat Sum</span>
+                <span>Discount</span>
+                <span>Payable</span>
+                <span>Status</span>
+            </div>
+            <section class="orderTable">
+                <div th:href="@{/webshop/admin/orders/__${order.id}__}" class="orderRow" th:each="order : ${orders}">
+                    <span th:text="${order.id}">Empty</span>
+                    <span th:text="${order.totalNumberOfItem}">Empty</span>
+                    <span th:text="${order.totalSum}">Empty</span>
+                    <span th:text="${order.totalVatSum}">Empty</span>
+                    <span th:text="${order.totalDiscount}">Empty</span>
+                    <span th:text="${order.totalPayable}">Empty</span>
+                    <span th:text="${order.getOrderStatus()}">Empty</span>
+
+
+
+                </div>
+
+
+
+            </section>
+
+        </fieldset>
+
+    </main>
+    <footer></footer>
+</body>
+
+</html>

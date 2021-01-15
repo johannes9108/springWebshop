@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="ISO-8859-1">
+    <title>New product</title>
+    <link rel="stylesheet" th:href="@{/resources/css/base.css}">
+    <script th:src="@{/resources/js/jquery-3.5.1.min.js}"></script>
+
+    <style>
+        main {
+            display: grid;
+            grid-template-areas:
+                "itemFields segmentation"
+                "itemFields segmentation"
+                "actions segmentation";
+            grid-template-columns: 50% 50%;
+            overflow: hidden;
+        }
+
+        .itemFields {
+            grid-area: itemFields;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            overflow: auto;
+        }
+
+        .itemField {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            align-items: inherit;
+            margin: 1rem;
+        }
+
+        .segmentation {
+            grid-area: segmentation;
+            height: 100%;
+        }
+
+        .segmentationContainer {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .segmentationContainer>form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        .segmentationRow {
+            display: flex;
+            flex-direction: column;
+            width: 50%;
+            margin: 1rem;
+        }
+
+
+        .segmentationInput>* {
+            width: 50%;
+        }
+
+        .actions {
+            grid-area: actions;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        select {
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+</head>
+<script type="text/javascript" th:src="@{/js/jquery-3.5.1.min.js}"></script>
+
+<script th:inline="javascript">
+    function reset(element) {
+        element.val('0');
+    }
+    $(document).ready(function () {
+        let categoriesObject = /*[[${sessionModel.categoryModel}]]*/;
+        let session = /*[[${session}]]*/;
+        let segmentation = /*[[${sessionModel.categoryModel}]]*/;
+
+        console.log(segmentation);
+
+        if (categoriesObject.selectedCat > 0) {
+            $('#sub').attr("disabled", false);
+        } else {
+            $('#sub').attr("disabled", true);
+            reset($('#type'))
+            reset($('#sub'));
+        }
+
+        if (categoriesObject.selectedSub > 0) {
+            $('#type').attr("disabled", false);
+        }
+        else {
+            reset($('#type'))
+            $('#type').attr("disabled", true);
+        }
+
+
+        // if (categoriesObject.selectedCat > 0) {
+        //     // $('#cat option[value=' + segmentation.selectedCat + ']').attr('selected', true);
+        //     $('#sub').attr('disabled', false);
+        // }
+        // if (categoriesObject.selectedSub > 0) {
+        //     // $('#sub option[value=' + segmentation.selectedSub + ']').attr('selected', true);
+        //     $('#type').attr('disabled', false);
+
+        // }
+
+
+
+        // $('#type option[value=' + segmentation.selectedType + ']').attr('selected', true);
+
+        $('#cat').on('change', function () {
+            let selectedVal = this.value;
+            console.log(selectedVal);
+
+
+            $('<input />').attr('type', 'hidden')
+                .attr('name', "action")
+                .attr('value', 'cat').appendTo(document.forms['filter']);
+            $('<input />').attr('type', 'hidden')
+                .attr('name', "actionValue")
+                .attr('value', this.value).appendTo(document.forms['filter']);
+
+            document.forms['filter'].submit();
+        });
+        $('#sub').on('change', function () {
+            let selectedVal = this.value;
+            console.log(selectedVal)
+
+
+
+            $('<input />').attr('type', 'hidden')
+                .attr('name', "action")
+                .attr('value', 'sub').appendTo(document.forms['filter']);
+            $('<input />').attr('type', 'hidden')
+                .attr('name', "actionValue")
+                .attr('value', this.value).appendTo(document.forms['filter']);
+
+            document.forms['filter'].submit();
+        });
+        $('#type').on('change', function () {
+            let selectedVal = this.value;
+            console.log(selectedVal)
+
+
+            $('<input />').attr('type', 'hidden')
+                .attr('name', "action")
+                .attr('value', 'type').appendTo(document.forms['filter']);
+            $('<input />').attr('type', 'hidden')
+                .attr('name', "actionValue")
+                .attr('value', this.value).appendTo(document.forms['filter']);
+            document.forms['filter'].submit();
+        });
+
+
+    });
+</script>
+
+<body>
+    <div th:replace="fragments/header.html :: header(title='New Product',links=${links})"></div>
+    <!-- <p th:text="${sessionModel.categoryModel}"></p> -->
+
+    <main th:object="${sessionModel.categoryModel}">
+        <form th:action="@{/webshop/admin/products/new}" method="POST">
+            <section class="itemFields">
+
+                <div class="itemField">
+                    <span>Name</span>
+                    <input th:field="${newProduct.name}" />
+                </div>
+                <div class="itemField">
+                    <span>Price</span>
+                    <input th:field="${newProduct.basePrice}" />
+                </div>
+                <div class="itemField">
+                    <span>Description</span>
+                    <textarea th:field="${newProduct.description}">Empty</textarea>
+                </div>
+                <div class="itemField">
+                    <span>Vat Percentage</span>
+                    <input th:field="${newProduct.vatPercentage}" />
+                </div>
+               
+            </section>
+
+            <section class="actions">
+                <input id="createProduct" type="submit" value="Create new Product" />
+            </section>
+
+        </form>
+        <section class="segmentation">
+
+            <div class="segmentationContainer">
+                <form name="filter" th:action="@{/webshop/admin/products/new}" method="POST">
+                    <div class="segmentationRow">
+                        <span>Category</span>
+                        <select id="cat" th:field="*{selectedCat}">
+                            <option value="0">New</option>
+                            <option th:each="category : *{categories}" th:text="${category.name}"
+                                th:value="${category.id}">
+                            </option>
+                        </select>
+                    </div>
+                    <div class="segmentationRow">
+                        <span>SubCategory</span>
+                        <select id="sub" th:field="*{selectedSub}" disabled>
+                            <option value="0">New</option>
+                            <option th:each="subCategory : *{subCategories}" th:text="${subCategory.name}"
+                                th:value="${subCategory.id}">
+                                Subcategories</option>
+                        </select>
+                    </div>
+                    <div class="segmentationRow">
+                        <span>Type</span>
+                        <select id="type" th:field="*{selectedType}" disabled>
+                            <option value="0">New</option>
+                            <option th:each="type : *{types}" th:text="${type.name}" th:value="${type.id}"></option>
+                            Types</option>
+                        </select>
+                    </div>
+                </form>
+                <form class="segmentationInput" method="POST" th:action="@{/webshop/admin/products/new}">
+                    <span th:if="*{selectedCat==0}">Custom Category</span>
+                    <span th:if="*{selectedSub==0 && selectedCat!=0}">Custom Subcategory</span>
+                    <span th:if="*{selectedType==0 && selectedCat!=0 && selectedSub!=0}">Custom Type</span>
+                    <input th:unless="*{selectedType!=0 && selectedCat!=0 && selectedSub!=0}" type="text"
+                        name="newSegmentation" th:value="${newSegmentation}" />
+                    <input th:if="*{selectedCat==0}" type="submit" value="Add New Category" />
+                    <input th:if="*{selectedSub==0 && selectedCat!=0}" type="submit" value="Add New Sub Category" />
+                    <input th:if="*{selectedType==0 && selectedCat!=0 && selectedSub!=0}" type="submit"
+                        value="Add New Type" />
+                    <!-- <input type="submit" value="Delete Selected Category"> -->
+                </form>
+            </div>
+        </section>
+     
+    </main>
+    <footer><a th:href="@{/webshop/admin/products(page=${session.sessionModel.productPage},return=true)}">Back</a>
+    </footer>
+</body>
+
+</html>

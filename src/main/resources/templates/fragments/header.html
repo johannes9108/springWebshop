@@ -1,0 +1,42 @@
+<html xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+</html>
+<header th:fragment="header(title,links)">
+    <span class="errorMessage" th:if="${errorMessage}" th:text="${errorMessage}"></span>
+    <span class="success" th:if="${success}" th:text="${success}"></span>
+    <section class="headerContainer">
+        <div class="headerItem">
+            <h1 th:text="${title}"></h1>
+        </div>
+        <nav class="navigationLinks headerItem">
+            <a th:each="link,meta : ${links}" th:text="${link.key}" th:href="@{${link.value}}"></a>
+        </nav>
+
+        <nav sec:authorize="!isAuthenticated()" class="accountLinks headerItem">
+            <a th:href="@{/webshop/login}">Login</a>
+            <a th:href="@{/webshop/register}">Register</a>
+        </nav>
+        <nav sec:authorize="isAuthenticated()" class="accountLinks headerItem">
+            <div>
+                <span>Logged in as </span>
+                <strong>
+                    <span sec:authentication="principal.firstName"></span>
+                </strong>
+            </div>
+            <div>
+                <span sec:authorize="hasAuthority('CUSTOMER')">
+                    <a th:href="@{/webshop/profile}">My Account</a>
+                </span>
+
+            </div>
+            <div>
+                <span sec:authorize="hasAuthority('ADMIN')">
+                    <a th:href="@{/webshop/admin/products}">Admin Panel</a>
+                </span>
+
+            </div>
+            <a th:href="@{/webshop/logout}">Logout</a>
+        </nav>
+    </section>
+
+</header>

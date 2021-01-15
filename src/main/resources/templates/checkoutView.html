@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org"
+    xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<!--<html xmlns:th="https://www.thymeleaf.org">-->
+
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Checkout View</title>
+    <link rel="stylesheet" th:href="@{/resources/css/base.css}">
+    <link rel="stylesheet" th:href="@{/resources/css/shoppingCart.css}">
+
+    <style>
+        .wrapper {
+            display: grid;
+            height: 100%;
+            box-sizing: border-box;
+            grid-template-columns: 50% 50%;
+            grid-template-rows: 100%;
+            overflow: auto;
+        }
+
+
+
+
+
+        .customerInfo {
+            box-sizing: border-box;
+            display: grid;
+
+            grid-template-rows: 35% 55% 10%;
+        }
+
+        .userDetailsContainer {
+            display: flex;
+            flex-direction: column;
+
+        }
+
+        .userDetailsContainer>h2 {
+            align-self: center;
+            padding: 0;
+            margin: 0;
+        }
+
+        .userDetails {
+
+
+            box-sizing: border-box;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: auto auto;
+            grid-auto-rows: 5vh;
+            gap: 1rem;
+            border-bottom: 1px solid darkcyan;
+        }
+
+        .flexableContent {
+            display: flex;
+            justify-content: space-evenly;
+            flex-direction: column;
+
+        }
+
+        .addressWrapper {
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            overflow: auto;
+            padding: 1rem;
+            /* background-color: red; */
+        }
+
+        .newAddressForm {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1rem 0;
+
+        }
+
+        .newAddressForm>button {
+            width: 60%;
+
+        }
+
+        .addressContainer {
+            overflow: auto;
+            margin: 1rem 0;
+        }
+
+        #displayAddressForm {
+            align-self: center;
+        }
+
+
+        .address {
+            display: flex;
+            flex-direction: column;
+            border-bottom: 1px solid darkcyan;
+        }
+
+
+        .userDataRow {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .actions {
+            border-top: 1px solid darkcyan;
+            flex: 1;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .hide {
+            display: none;
+        }
+
+        .show {
+            display: block;
+        }
+
+        .selectedAddress {
+            font-style: italic;
+            font-weight: bold;
+            color: green;
+        }
+    </style>
+    <script type="text/javascript" th:src="@{/resources/js/jquery-3.5.1.min.js}"></script>
+    <script th:inline="javascript" type="text/javascript">
+
+        let currentCustomer = /*[[${customer}]]*/;
+        let currentAddress = 0;
+        console.log(currentCustomer);
+        // console.log(currentCustomer.addresses.length);
+
+
+        $(document).ready(() => {
+            if (currentCustomer.addresses.length > 0) {
+                console.log("Should hide the form")
+                $('#newAddressForm').toggleClass('hide');
+                console.log($("#newAddressForm"));
+            }
+
+            $('#displayAddressForm').click(() => {
+                $('#newAddressForm').toggleClass('hide');
+            });
+            $('#newOrderButton').click(() => {
+                $('<input />').attr('type', 'hidden')
+                    .attr('name', "action")
+                    .attr('value', 'newOrder').appendTo(document.forms['newOrderForm']);
+                $('<input />').attr('type', 'hidden')
+                    .attr('name', "actionValue")
+                    .attr('value', currentAddress).appendTo(document.forms['newOrderForm']);
+                document.forms['newOrderForm'].submit();
+            });
+            $('#newAddressButton').click(() => {
+
+                $('<input />').attr('type', 'hidden')
+                    .attr('name', "action")
+                    .attr('value', 'newAddress').appendTo(document.forms['newAddressForm']);
+
+
+                document.forms['newAddressForm'].submit();
+
+
+
+
+
+            });
+
+
+
+        });
+        function selectAddress(index) {
+            let children = $('.addressContainer').children().each((number, element) => {
+                element.classList.remove('selectedAddress');
+            });
+            $('#addr' + index).toggleClass('selectedAddress');
+            currentAddress = index;
+
+        }
+
+
+
+
+    </script>
+</head>
+
+<body th:with="cart=${session.sessionModel.cart}">
+    <div th:replace="fragments/header.html :: header(title='Checkout',links=${links})"></div>
+    <main>
+        <article class="wrapper" th:object="${cart}">
+            <section class="shoppingCartWrapper">
+                <section class="cartContainer">
+                    <div th:each="product : ${cart.productMap}" class="cartItem">
+                        <div class="itemInfo">
+                            <span th:text="${product.key.name}"></span>
+                            <span th:text="|Price per item: ${product.key.basePrice}|"></span>
+                            <span th:text="|Quantity: ${product.value}|"></span>
+                            <span th:text="|Cost: ${cart.getItemSum(product.key)}|"></span>
+                        </div>
+                        <div class="itemEdit">
+                            <form method="POST"
+                                th:action="@{/webshop/shoppingcart(id=__${product.key.id}__,action=add)}">
+                                <input type="submit" value="+" />
+                            </form>
+                            <form method="POST"
+                                th:action="@{/webshop/shoppingcart(id=__${product.key.id}__,action=remove)}">
+                                <input type="submit" value="-" />
+                            </form>
+
+                        </div>
+
+                    </div>
+                </section>
+                <section class="metaContainer">
+                    <div class="metaData">
+                        <span th:text="|Total sum: *{getTotalSum()}|"></span>
+                        <span th:text="|Total articles: *{getTotalItems()}|"></span>
+                    </div>
+                </section>
+            </section>
+
+
+            <div th:object="${customer}" class="customerInfo">
+
+
+                <div class="userDetailsContainer">
+
+                    <h2>User Details</h2>
+                    <div class="userDetails">
+                        <div class="userDataRow">
+                            <label for="firstName">First Name</label>
+                            <input type="text" th:field="*{firstName}" />
+                        </div>
+                        <div class="userDataRow">
+                            <label for="lastName">Last Name</label>
+                            <input type="text" th:field="*{lastName}" />
+
+                        </div>
+                        <div class="userDataRow">
+                            <label for="email">Email</label>
+                            <input type="text" th:field="*{email}" />
+
+                        </div>
+                        <div class="userDataRow">
+                            <label for="phoneNumber">Phonenumber</label>
+                            <input type="number" th:field="*{phoneNumber}" />
+
+                        </div>
+                        <div class="userDataRow">
+                            <label for="mobileNumber">Mobile</label>
+                            <input type="text" th:field="*{mobileNumber}" />
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="addressWrapper">
+
+                    <form class="newAddressForm" id="newAddressForm" name="newAddressForm" th:object="${newAddress}"
+                        method="POST" th:action="@{/webshop/checkout}">
+
+                        <div class="userDataRow">
+                            <label for="street">Street</label>
+                            <input type="text" th:field="*{street}" />
+                        </div>
+                        <div class="userDataRow">
+                            <label for="zipCode">Zipcode</label>
+                            <input type="number" th:field="*{zipCode}" />
+
+                        </div>
+                        <div class="userDataRow">
+                            <label for="city">City</label>
+                            <input type="text" th:field="*{city}" />
+
+                        </div>
+                        <div class="userDataRow">
+                            <label for="country">Country</label>
+                            <input type="text" th:field="*{country}" />
+
+                        </div>
+                        <!-- <div class="userDataRow">
+                                <label for="addressType">AddressType</label>
+                                <input type="text" th:field="*{addressType}" />
+                                
+                            </div> -->
+
+                        <button id="newAddressButton" type="submit">Create new Address</button>
+
+                    </form>
+                    <div class="addressContainer">
+                        <div th:if="*{addresses}" th:each="address,meta: *{addresses}" class="address"
+                            th:classappend="${meta.index == 0 ? 'selectedAddress':''}" th:object="${address}"
+                            th:id="|addr${meta.index}|" th:onclick="|selectAddress('${meta.index}')|">
+                            <span th:text="*{street}"></span>
+                            <span th:text="|*{zipCode} *{city}|"></span>
+                            <span th:text="*{country}"></span>
+                        </div>
+                    </div>
+
+                    <button id="displayAddressForm" type="button">New Address
+                        Form</button>
+                </div>
+
+
+                <form name="newOrderForm" class="actions" method="POST" th:action="@{/webshop/checkout}">
+                    <!-- <a th:href="@{/webshop/checkout(action=updateUserDetail)}">Update user details</a> -->
+                    <button id="newOrderButton" type="button">Place order</button>
+                </form>
+            </div>
+        </article>
+    </main>
+    <footer>
+        Footer Here
+    </footer>
+
+
+</body>
+
+</html>
